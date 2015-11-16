@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/buttonLayout"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="16dp"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:weightSum="2">
+
+        <Button
+            android:id="@+id/upcoming_button"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/left_round_button_filled_background"
+            android:text="@string/upcoming"
+            android:textAllCaps="false"
+            android:textColor="#fff"
+            android:textSize="17sp" />
+
+        <Button
+            android:id="@+id/past_button"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="-1.5dp"
+            android:layout_weight="1"
+            android:background="@drawable/round_corner_button_background"
+            android:text="@string/past"
+            android:textAllCaps="false"
+            android:textColor="#F89715"
+            android:textSize="17sp" />
+    </LinearLayout>
+
+<FrameLayout
+    android:id="@+id/booking_frame_container"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:layout_below="@+id/buttonLayout"
+    />
+
+        <!--<android.support.v4.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
+            <!--android:id="@+id/swipe_refresh_layout"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_below="@+id/buttonLayout"-->
+            <!--android:layout_height="match_parent">-->
+
+            <!--<RelativeLayout-->
+                <!--android:id="@+id/orders_layout"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="match_parent"-->
+                <!--android:layout_margin="10dp">-->
+
+                <!--<ListView-->
+                    <!--android:id="@+id/orders_listview"-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="match_parent"-->
+                    <!--android:clickable="true"-->
+                    <!--android:descendantFocusability="blocksDescendants"-->
+                    <!--android:visibility="visible" />-->
+
+                <!--<TextView-->
+                    <!--android:id="@+id/no_bookings_placeholder"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_centerInParent="true"-->
+                    <!--android:textSize="19sp" />-->
+
+            <!--</RelativeLayout>-->
+        <!--</android.support.v4.widget.SwipeRefreshLayout>-->
+
+
+</RelativeLayout>

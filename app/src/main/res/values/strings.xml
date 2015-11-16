@@ -1,0 +1,66 @@
+<resources>
+    <string name="app_name">Carrus Trucker App</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_login">LoginActivity</string>
+    <string name="driverId">Driver ID</string>
+    <string name="submit">Submit</string>
+    <string name="enterOTP">Enter OTP</string>
+    <string name="login">Login</string>
+    <string name="no_internet_connection">No internet connection.</string>
+    <string name="retry">\u00A0<b>Please retry</b></string>
+    <string name="internetConnectionError">No internet connection, please try again.</string>
+    <string name="title_activity_home_screen">HomeScreen</string>
+    <string name="sending">Sending...</string>
+    <string name="verifying">Verifying...</string>
+    <string name="current_shipment">Current Shipment</string>
+    <string name="my_profile">My Profile</string>
+    <string name="driving_license">Driving License</string>
+    <string name="licence_state">License State</string>
+    <string name="expires_on">Expires on</string>
+    <string name="mobile_number">Mobile Number</string>
+    <string name="my_schedule">My Schedule</string>
+    <string name="upcoming">Upcoming</string>
+    <string name="past">Past</string>
+    <string name="no_upcoming_orders">No upcoming orders.</string>
+    <string name="no_past_orders">No past orders.</string>
+    <string name="terms_condition">Terms &amp; Conditions\n Privacy Policy</string>
+    <string name="shipment_details">Shipment Details</string>
+    <string name="loading">Loading...</string>
+    <string name="pickup">Pick Up</string>
+    <string name="drop_off">Drop Off</string>
+    <string name="cargo_details">Cargo Details</string>
+    <string name="documents">Documents</string>
+    <string name="advisory_checkList">Advisory CheckList</string>
+    <string name="notes">Notes</string>
+    <string name="my_notes">My Notes</string>
+    <string name="pod">POD</string>
+    <string name="invoice">Invoice</string>
+    <string name="consignment">Consignment Notes</string>
+    <string name="please_wait">Please wait...</string>
+    <string name="indian_rupee_symbol">₹</string>
+    <string name="collect_cash">Collect Cash</string>
+
+
+    <!-- Nav Drawer Menu Items -->
+    <string-array name="nav_drawer_items">
+        <item >Home</item>
+        <item >Bookings</item>
+        <item >Call Fleet Owner</item>
+        <item >Logout</item>
+    </string-array>
+
+    <!-- Nav Drawer List Item Icons -->
+    <!-- Keep them in order as the titles are in -->
+    <array name="nav_drawer_icons">
+        <item>@drawable/home_icon_selector</item>
+        <item>@drawable/booking_icon_selector</item>
+        <item>@drawable/call_icon_selector</item>
+        <item>@drawable/logout_icon_selector</item>
+    </array>
+
+<!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_booking_details">BookingDetails</string>
+</resources>

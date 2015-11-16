@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_expanded="true" android:drawable="@mipmap/icon_cross" />
+    <item android:drawable="@mipmap/icon_add"
+        />
+    <!--<item android:drawable="@mipmap/icon_cross" android:state_empty="true"/>-->
+    <!--<item android:drawable="@mipmap/icon_add" android:state_expanded="true"/>-->
+    <!--<item android:drawable="@mipmap/icon_cross" />-->
+</selector>

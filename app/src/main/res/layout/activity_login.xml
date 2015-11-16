@@ -1,0 +1,123 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@mipmap/bg"
+    tools:context="com.carrustruckerapp.activities.LoginActivity">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true">
+
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            >
+
+            <ImageView
+                android:id="@+id/appLogo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:background="@mipmap/logo" />
+
+            <ViewFlipper xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/flipper"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/appLogo">
+
+                <LinearLayout
+                    android:id="@+id/driverIdLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <EditText
+                        android:id="@+id/driverId"
+                        style="@android:style/Widget.EditText"
+                        android:layout_width="match_parent"
+                        android:layout_height="56dp"
+                        android:layout_marginTop="40dp"
+                        android:animateLayoutChanges="true"
+                        android:background="@color/white"
+                        android:digits="0123456789"
+                        android:drawableLeft="@mipmap/icon_driver"
+                        android:drawablePadding="10dp"
+                        android:hint="@string/driverId"
+                        android:inputType="number"
+                        android:maxLength="6"
+                        android:padding="10dp"
+                        android:imeOptions="actionDone"
+                        android:textAppearance="@style/CustomTextAppearance"
+                        android:textColor="#969696"
+                        android:textColorHint="#969696" />
+
+                    <Button
+                        android:id="@+id/submitButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="56dp"
+                        android:animateLayoutChanges="true"
+                        android:background="@color/blue"
+                        android:text="@string/submit"
+                        android:textAllCaps="true"
+                        android:textAppearance="@style/CustomTextAppearance.NeueMedium"
+                        android:textColor="@color/white" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/otpLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <EditText
+                        android:id="@+id/otp"
+                        style="@android:style/Widget.EditText"
+                        android:layout_width="match_parent"
+                        android:layout_height="56dp"
+                        android:layout_marginTop="40dp"
+                        android:animateLayoutChanges="true"
+                        android:background="@color/white"
+                        android:digits="0123456789"
+                        android:drawableLeft="@mipmap/icon_otp"
+                        android:drawablePadding="10dp"
+                        android:hint="@string/enterOTP"
+                        android:inputType="numberPassword"
+                        android:padding="10dp"
+                        android:imeOptions="actionDone"
+                        android:textAppearance="@style/CustomTextAppearance"
+                        android:textColor="#969696"
+                        android:textColorHint="#969696" />
+
+                    <Button
+                        android:id="@+id/loginButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="56dp"
+                        android:animateLayoutChanges="true"
+                        android:background="@color/blue"
+                        android:clickable="true"
+                        android:text="@string/login"
+                        android:textAllCaps="true"
+                        android:textAppearance="@style/CustomTextAppearance.NeueMedium"
+                        android:textColor="@color/white" />
+                </LinearLayout>
+            </ViewFlipper>
+        </RelativeLayout>
+    </ScrollView>
+
+    <LinearLayout
+        android:id="@+id/errorLayout"
+        android:layout_width="fill_parent"
+        android:layout_height="50dp"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="50dp"
+        android:visibility="gone">
+
+        <include layout="@layout/error_bar_top" />
+    </LinearLayout>
+
+</RelativeLayout>

@@ -1,0 +1,101 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="android:navigationBarColor">@color/navigation_bar_color</item>
+        <item name="android:colorPrimaryDark">@color/primary_color_dark</item>
+        <item name="android:windowEnableSplitTouch">false</item>
+        <item name="android:splitMotionEvents">false</item>
+
+    </style>
+
+    <!--Custom text appearance-->
+    <style name="CustomTextAppearance" parent="android:TextAppearance">
+        <!--<item name="android:textStyle">normal</item>-->
+        <item name="fontPath">fonts/Helvetica/Helvetica.ttf</item>
+    </style>
+
+    <!--Custom bold text appearance-->
+    <style name="CustomTextAppearance.Bold" parent="CustomTextAppearance">
+        <!-- Custom Attr-->
+        <item name="fontPath">fonts/Helvetica/Helvetica-Bold.ttf</item>
+        <!--<item name="android:textStyle">bold</item>-->
+    </style>
+
+    <!--Custom BoldOblique text appearance-->
+    <style name="CustomTextAppearance.BoldOblique" parent="CustomTextAppearance">
+        <!-- Custom Attr-->
+        <item name="fontPath">fonts/Helvetica/Helvetica-BoldOblique.ttf</item>
+        <!--<item name="android:textStyle">bold</item>-->
+    </style>
+
+    <!--Custom light text appearance-->
+    <style name="CustomTextAppearance.Light" parent="CustomTextAppearance">
+        <!-- Custom Attr-->
+        <item name="fontPath">fonts/Helvetica/Helvetica-Light.ttf</item>
+        <!--<item name="android:textStyle">bold</item>-->
+    </style>
+
+    <!--Custom LightOblique text appearance-->
+    <style name="CustomTextAppearance.LightOblique" parent="CustomTextAppearance">
+        <!-- Custom Attr-->
+        <item name="fontPath">fonts/Helvetica/Helvetica-LightOblique.ttf</item>
+        <!--<item name="android:textStyle">bold</item>-->
+    </style>
+
+    <!--Custom Oblique text appearance-->
+    <style name="CustomTextAppearance.Oblique" parent="CustomTextAppearance">
+        <!-- Custom Attr-->
+        <item name="fontPath">fonts/Helvetica/Helvetica-Oblique.ttf</item>
+        <!--<item name="android:textStyle">bold</item>-->
+    </style>
+
+    <!--Custom HelveticaNeue text appearance-->
+    <style name="CustomTextAppearance.HelveticaNeue" parent="CustomTextAppearance">
+        <!-- Custom Attr-->
+        <item name="fontPath">fonts/HelveticaNeue/HelveticaNeue.ttf</item>
+        <!--<item name="android:textStyle">bold</item>-->
+    </style>
+
+    <!--Custom NeueBold text appearance-->
+    <style name="CustomTextAppearance.NeueBold" parent="CustomTextAppearance">
+        <!-- Custom Attr-->
+        <item name="fontPath">fonts/HelveticaNeue/HelveticaNeue-Bold.otf</item>
+        <!--<item name="android:textStyle">bold</item>-->
+    </style>
+
+    <!--Custom NeueLight text appearance-->
+    <style name="CustomTextAppearance.NeueLight" parent="CustomTextAppearance">
+        <!-- Custom Attr-->
+        <item name="fontPath">fonts/HelveticaNeue/HelveticaNeue-Light.otf</item>
+        <!--<item name="android:textStyle">bold</item>-->
+    </style>
+
+    <!--Custom NeueMedium text appearance-->
+    <style name="CustomTextAppearance.NeueMedium" parent="CustomTextAppearance">
+        <!-- Custom Attr-->
+        <item name="fontPath">fonts/HelveticaNeue/HelveticaNeue-Medium.otf</item>
+        <!--<item name="android:textStyle">bold</item>-->
+    </style>
+
+    <style name="customRatingBar" parent="@android:style/Widget.RatingBar">
+        <item name="android:progressDrawable">@drawable/ratingbarstars</item>
+        <item name="android:minHeight">30dip</item>
+        <item name="android:maxHeight">30dip</item>
+    </style>
+
+
+    <!--Pop up Theme-->
+
+    <style name="Theme.AppCompat.Translucent">
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowActionBar">false</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:colorBackgroundCacheHint">@null</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowAnimationStyle">@android:style/Animation</item>
+    </style>
+
+
+</resources>

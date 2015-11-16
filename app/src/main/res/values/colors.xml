@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="grey">#ffd7d7d7</color>
+    <color name="white">#fff</color>
+    <color name="black">#000</color>
+    <color name="blue">#2362C0</color>
+    <color name="dark_gery">#ff949494</color>
+    <color name="navigation_bar_color">#2362C0</color>
+    <color name="primary_color_dark">#2362C0</color>
+    <color name="orange">#F89715</color>
+    <color name="green">#72CD56</color>
+    <color name="booking_details_tv_color">#969696</color>
+    <color name="white_translucent">#ffffff</color>
+    <color name="red">#f00</color>
+    <color name="dark_blue">#2058AB</color>
+</resources>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item   android:state_focused="true"
+        android:state_pressed="false"
+        android:drawable="@mipmap/icon_booking_p"
+        />
+    <!-- Button Focused Pressed-->
+    <item   android:state_focused="true"
+        android:state_pressed="true"
+        android:drawable="@mipmap/icon_booking_p"
+        />
+    <!-- Button Pressed-->
+    <item   android:state_focused="false"
+        android:state_pressed="true"
+        android:drawable="@mipmap/icon_booking_p"
+        />
+    <!-- Button Default Image-->
+    <item   android:drawable="@mipmap/icon_booking_n"/>
+</selector>

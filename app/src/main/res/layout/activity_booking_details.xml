@@ -1,0 +1,419 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.carrustruckerapp.activities.BookingDetails">
+
+    <RelativeLayout
+        android:id="@+id/headerView"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:background="@color/blue"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/back_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:clickable="true"
+            android:padding="16dp"
+            android:src="@drawable/back_button_selector" />
+
+        <TextView
+            android:id="@+id/headerTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="@string/shipment_details"
+            android:textAppearance="@style/CustomTextAppearance.NeueMedium"
+            android:textColor="@color/white"
+            android:textSize="@dimen/header_text_size" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/order_status_layout"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_below="@+id/headerView"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:id="@+id/crn_number"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="16sp"
+            android:textAppearance="@style/CustomTextAppearance"
+            android:textColor="@color/white"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/order_status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="16sp"
+            android:textAppearance="@style/CustomTextAppearance"
+            android:textColor="@color/white"
+            android:textSize="16sp" />
+    </RelativeLayout>
+
+    <ScrollView
+        android:id="@+id/scrollView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/order_status_layout">
+
+        <RelativeLayout
+            android:id="@+id/pickupnpickoffLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:id="@+id/truck_details_layout"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:gravity="center_vertical"
+                android:orientation="vertical"
+                android:paddingLeft="16dp">
+
+                <TextView
+                    android:id="@+id/truckName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif"
+                    android:textColor="@color/blue"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:id="@+id/truckNumber"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif"
+                    android:textColor="@color/dark_gery"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/detail_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/truck_details_layout"
+                android:background="@color/white"
+                android:orientation="vertical"
+                android:paddingLeft="18dp"
+                android:paddingRight="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:singleLine="true"
+                    android:text="@string/pickup"
+                    android:textAllCaps="true"
+                    android:textAppearance="@style/CustomTextAppearance"
+                    android:textColor="@color/blue"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:id="@+id/pickup_trucker_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:drawableLeft="@mipmap/icon_shipment_detail1"
+                    android:drawablePadding="10dp"
+                    android:singleLine="true"
+                    android:textAppearance="@style/CustomTextAppearance"
+                    android:textColor="@color/booking_details_tv_color"
+                    android:textSize="16sp" />
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:id="@+id/pickup_name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
+                        android:drawableLeft="@mipmap/icon_shipment_detail2"
+                        android:drawablePadding="10dp"
+                        android:singleLine="true"
+                        android:textAppearance="@style/CustomTextAppearance"
+                        android:textColor="@color/booking_details_tv_color"
+                        android:textSize="16sp" />
+
+                    <ImageView
+                        android:id="@+id/pickup_call"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:clickable="true"
+                        android:src="@mipmap/icon_call2" />
+                </RelativeLayout>
+
+                <TextView
+                    android:id="@+id/pickup_location"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:drawableLeft="@mipmap/icon_shipment_detail3"
+                    android:drawablePadding="10dp"
+                    android:singleLine="false"
+                    android:textAppearance="@style/CustomTextAppearance"
+                    android:textColor="@color/booking_details_tv_color"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/pickup_day"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:drawableLeft="@mipmap/icon_shipment_detail4"
+                    android:drawablePadding="10dp"
+                    android:singleLine="true"
+                    android:textAppearance="@style/CustomTextAppearance"
+                    android:textColor="@color/booking_details_tv_color"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/pickup_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:drawableLeft="@mipmap/icon_shipment_detail5"
+                    android:drawablePadding="10dp"
+                    android:singleLine="true"
+                    android:textAppearance="@style/CustomTextAppearance"
+                    android:textColor="@color/booking_details_tv_color"
+                    android:textSize="16sp" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="10dp"
+                    android:background="@color/booking_details_tv_color" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:singleLine="true"
+                    android:text="@string/drop_off"
+                    android:textAllCaps="true"
+                    android:textAppearance="@style/CustomTextAppearance"
+                    android:textColor="@color/blue"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:id="@+id/dropup_trucker_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:drawableLeft="@mipmap/icon_shipment_detail1"
+                    android:drawablePadding="10dp"
+                    android:singleLine="true"
+                    android:textAppearance="@style/CustomTextAppearance"
+                    android:textColor="@color/booking_details_tv_color"
+                    android:textSize="16sp" />
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:id="@+id/dropup_name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
+                        android:drawableLeft="@mipmap/icon_shipment_detail2"
+                        android:drawablePadding="10dp"
+                        android:singleLine="true"
+                        android:textAppearance="@style/CustomTextAppearance"
+                        android:textColor="@color/booking_details_tv_color"
+                        android:textSize="16sp" />
+
+                    <ImageView
+                        android:id="@+id/dropoff_call"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:clickable="true"
+                        android:src="@mipmap/icon_call2" />
+                </RelativeLayout>
+
+                <TextView
+                    android:id="@+id/dropup_location"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:drawableLeft="@mipmap/icon_shipment_detail3"
+                    android:drawablePadding="10dp"
+                    android:singleLine="false"
+                    android:textAppearance="@style/CustomTextAppearance"
+                    android:textColor="@color/booking_details_tv_color"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/dropup_day"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:drawableLeft="@mipmap/icon_shipment_detail4"
+                    android:drawablePadding="10dp"
+                    android:singleLine="true"
+                    android:textAppearance="@style/CustomTextAppearance"
+                    android:textColor="@color/booking_details_tv_color"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/dropup_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:drawableLeft="@mipmap/icon_shipment_detail5"
+                    android:drawablePadding="10dp"
+                    android:singleLine="true"
+                    android:textAppearance="@style/CustomTextAppearance"
+                    android:textColor="@color/booking_details_tv_color"
+                    android:textSize="16sp" />
+            </LinearLayout>
+
+            <ExpandableListView
+                android:id="@+id/exListView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/detail_layout"
+                android:groupIndicator="@null" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_below="@+id/exListView"
+                android:background="@color/grey" />
+
+
+            <RelativeLayout
+                android:id="@+id/payment_mode_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/exListView"
+                android:padding="10dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Payment Method"
+                    android:textAllCaps="true"
+                    android:textAppearance="@style/CustomTextAppearance"
+                    android:textColor="@color/blue" />
+
+                <TextView
+                    android:id="@+id/payment_method"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:textAllCaps="true"
+                    android:textAppearance="@style/CustomTextAppearance"
+                    android:textColor="@color/orange" />
+            </RelativeLayout>
+
+            <Button
+                android:id="@+id/collect_cash_button"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_below="@+id/payment_mode_layout"
+                android:layout_margin="10dp"
+                android:background="@drawable/button_background_selector"
+                android:text="@string/collect_cash"
+                android:textColor="@color/white"
+                android:visibility="gone" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_below="@+id/collect_cash_button"
+                android:background="@color/grey" />
+
+            <RelativeLayout
+                android:id="@+id/total_amount_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/collect_cash_button"
+                android:padding="10dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Total Cost"
+                    android:textAllCaps="true"
+                    android:textAppearance="@style/CustomTextAppearance"
+                    android:textColor="@color/blue" />
+
+                <TextView
+                    android:id="@+id/total_amount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:textAllCaps="true"
+                    android:textAppearance="@style/CustomTextAppearance"
+                    android:textColor="@color/orange" />
+            </RelativeLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_below="@+id/total_amount_layout"
+                android:background="@color/grey" />
+
+            <Button
+                android:id="@+id/status_button"
+                android:layout_width="fill_parent"
+                android:layout_height="40dp"
+                android:layout_below="@+id/total_amount_layout"
+                android:background="@drawable/button_background_selector"
+                android:textAppearance="@style/CustomTextAppearance"
+                android:textColor="@color/white"
+                android:textSize="14sp"
+                android:visibility="gone" />
+
+        </RelativeLayout>
+    </ScrollView>
+
+    <LinearLayout
+        android:id="@+id/retry_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:clickable="true"
+        android:orientation="horizontal"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/no_internet_connection" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/retry" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/errorLayout"
+        android:layout_width="fill_parent"
+        android:layout_height="50dp"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="50dp"
+        android:visibility="gone">
+
+        <include layout="@layout/error_bar_top" />
+    </LinearLayout>
+
+
+</RelativeLayout>

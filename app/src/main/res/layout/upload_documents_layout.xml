@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:padding="10dp"
+  android:clickable="true"
+
+    >
+
+    <LinearLayout
+
+        android:id="@+id/upload_document"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:background="@drawable/dotted_border">
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@mipmap/icon_upload"
+            android:padding="10dp"/>
+        <TextView
+            android:id="@+id/upload_button_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/blue"
+            android:textSize="18sp"
+            android:padding="10dp"
+            android:textAppearance="@style/CustomTextAppearance"/>
+    </LinearLayout>
+
+    <!--<LinearLayout-->
+        <!--android:id="@+id/invoiceLayout"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:clickable="true"-->
+        <!--android:orientation="horizontal"-->
+        <!--android:gravity="center_vertical"-->
+        <!--android:layout_marginTop="10dp"-->
+        <!--android:background="@drawable/dotted_border">-->
+        <!--<ImageView-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:src="@mipmap/icon_upload"-->
+            <!--android:padding="10dp"/>-->
+        <!--<TextView-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:text="@string/invoice"-->
+            <!--android:textColor="@color/blue"-->
+            <!--android:textSize="18sp"-->
+            <!--android:padding="10dp"-->
+            <!--android:textAppearance="@style/CustomTextAppearance"/>-->
+    <!--</LinearLayout>-->
+
+    <!--<LinearLayout-->
+        <!--android:id="@+id/consignmentLayout"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:clickable="true"-->
+        <!--android:orientation="horizontal"-->
+        <!--android:gravity="center_vertical"-->
+        <!--android:layout_marginTop="10dp"-->
+        <!--android:background="@drawable/dotted_border">-->
+        <!--<ImageView-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:src="@mipmap/icon_upload"-->
+            <!--android:padding="10dp"/>-->
+        <!--<TextView-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:text="@string/consignment"-->
+            <!--android:textColor="@color/blue"-->
+            <!--android:textSize="18sp"-->
+            <!--android:padding="10dp"-->
+            <!--android:textAppearance="@style/CustomTextAppearance"/>-->
+    <!--</LinearLayout>-->
+
+</LinearLayout>

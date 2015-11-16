@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="fill_parent"
+    android:paddingLeft="10dp"
+    android:paddingRight="10dp"
+    android:layout_marginTop="16dp"
+    android:orientation="horizontal"
+    android:gravity="center"
+    android:weightSum="4.5">
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.95"
+        android:gravity="center">
+
+        <LinearLayout
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:background="@drawable/circle"
+            android:gravity="center"
+            android:layout_gravity="center_vertical"
+            android:orientation="vertical"
+            >
+
+            <TextView
+                android:id="@+id/date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="31"
+                android:textColor="@color/white"
+                android:textSize="18sp" />
+
+            <TextView
+                android:layout_marginTop="-6dp"
+                android:id="@+id/month"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/date"
+                android:text="Oct"
+                android:textAllCaps="true"
+                android:textColor="@color/white"
+                android:textSize="12sp" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="5dp"
+        android:layout_weight="1.9"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Test Test"
+            android:textAppearance="@style/CustomTextAppearance"
+            android:textColor="@color/blue"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/truckName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tata Ace, CH 01 A 1111"
+            android:textAppearance="@style/CustomTextAppearance"
+            android:textColor="@color/dark_gery"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/shipingJourney"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Chandigarh to Delhi"
+            android:textAppearance="@style/CustomTextAppearance"
+            android:textColor="@color/orange"
+            android:textSize="14sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="5dp"
+        android:layout_weight="1.65"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/timeSlot"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:text="Monday, 4PM - 8PM"
+            android:textAppearance="@style/CustomTextAppearance"
+            android:textColor="@color/dark_gery"
+            android:textSize="13sp" />
+
+        <TextView
+            android:id="@+id/status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:text="Reached Pickup Location"
+            android:textAppearance="@style/CustomTextAppearance"
+            android:textColor="@color/dark_gery"
+            android:textSize="13sp" />
+
+    </LinearLayout>
+
+
+</LinearLayout>

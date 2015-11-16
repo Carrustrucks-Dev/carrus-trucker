@@ -1,0 +1,116 @@
+package com.carrustruckerapp.activities;
+
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.os.Bundle;
+import android.provider.Settings;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.content.LocalBroadcastManager;
+
+import com.carrustruckerapp.interfaces.GPSDailogCallBack;
+import com.carrustruckerapp.utils.CommonUtils;
+import com.carrustruckerapp.utils.Log;
+
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
+
+
+public class BaseActivity extends FragmentActivity implements GPSDailogCallBack{
+    private Activity activity;
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+
+        super.onCreate(savedInstanceState);
+        activity=this;
+        mMessageReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if(dialog!=null)
+                    dialog.dismiss();
+                boolean enabled = CommonUtils.isGPSEnabled(activity);
+                Log.e("GPS Online Status", "" + enabled);
+
+            }
+        };
+    }
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        // to apply uniform customised typeface
+        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver,
+                new IntentFilter("gpstracker"));
+if(!(activity instanceof SplashScreen)) {
+    Intent i = new Intent("gpstracker");
+
+    LocalBroadcastManager.getInstance(activity).sendBroadcast(i);
+}
+    }
+
+    private BroadcastReceiver mMessageReceiver ;
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver);
+        if(dialog!=null)
+            dialog.dismiss();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
+
+    Dialog dialog;
+    @Override
+    public void showGSP() {
+        Log.e("showGSP","showGSP");
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(activity);
+
+        // Setting Dialog Title
+        alertDialog.setTitle("GPS is settings");
+
+        // Setting Dialog Message
+        alertDialog.setMessage("GPS is not enabled. Do you want to go to settings menu?");
+
+        // On pressing Settings button
+        alertDialog.setPositiveButton("Settings", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+                Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+               startActivity(intent);
+
+            }
+        });
+
+        alertDialog.setCancelable(false);
+
+//         on pressing cancel button
+    /*    alertDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });*/
+
+        // Showing Alert Message
+          dialog=alertDialog.create();
+        dialog.show();
+    }
+}
