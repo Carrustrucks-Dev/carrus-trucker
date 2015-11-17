@@ -96,13 +96,14 @@ public class UpcomingOrdersFragment extends Fragment implements AppConstants, Sw
                 homeCallback.getCommonUtils().showLoadingDialog(getActivity(), getResources().getString(R.string.loading));
             }
 
-            bookingsArrayList.clear();
+
             Log.i("bookingsArrayList", bookingsArrayList.size() + "");
             homeCallback.getWebServices().getUpComingOrders(homeCallback.getSharedPreference().getString(ACCESS_TOKEN, ""),
                     new Callback<String>() {
                         @Override
                         public void success(String serverResponse, Response response) {
                             try {
+                                bookingsArrayList.clear();
                                 JSONObject jsonObjectServerResponse = new JSONObject(serverResponse);
                                 if (!jsonObjectServerResponse.isNull("data")) {
                                     JSONArray jsonDataArray = new JSONArray(jsonObjectServerResponse.getString("data"));

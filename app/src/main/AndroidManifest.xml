@@ -84,6 +84,13 @@
             android:name=".activities.BookingDetails"
             android:label="@string/title_activity_booking_details" >
         </activity>
+
+        <activity
+            android:name=".activities.ShowImageActivity"
+            android:label=""
+
+            >
+        </activity>
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="9a344ba4644c7661f8ee12e1e5573f21396bbaf0" />

@@ -152,12 +152,13 @@ public class PastOrdersFragment extends Fragment implements AppConstants, SwipeR
                 homeCallback.getCommonUtils().showLoadingDialog(getActivity(), getResources().getString(R.string.loading));
             }
 
-            pastBookingArrayList.clear();
+
             homeCallback.getWebServices().getPastOrders(homeCallback.getSharedPreference().getString(ACCESS_TOKEN, ""),
                     new Callback<String>() {
                         @Override
                         public void success(String serverResponse, Response response) {
                             try {
+                                pastBookingArrayList.clear();
                                 JSONObject jsonObjectServerResponse = new JSONObject(serverResponse);
                                 if (!jsonObjectServerResponse.isNull("data")) {
                                     JSONArray jsonDataArray = new JSONArray(jsonObjectServerResponse.getString("data"));

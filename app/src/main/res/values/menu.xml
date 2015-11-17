@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="image_menu">
+        <item>@string/upload_image</item>
+        <item>@string/upload_pdf</item>
+        <item>@string/cancel</item>
+    </string-array>
+
+</resources>

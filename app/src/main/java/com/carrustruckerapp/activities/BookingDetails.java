@@ -19,6 +19,7 @@ import android.widget.TextView;
 import com.carrustruckerapp.R;
 import com.carrustruckerapp.adapters.ExpandableListAdapter;
 import com.carrustruckerapp.entities.ExpandableChildItem;
+import com.carrustruckerapp.interfaces.ActivityResultCallback;
 import com.carrustruckerapp.interfaces.AppConstants;
 import com.carrustruckerapp.interfaces.WebServices;
 import com.carrustruckerapp.utils.CommonUtils;
@@ -42,7 +43,7 @@ import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 
-public class BookingDetails extends BaseActivity implements View.OnClickListener, AppConstants{
+public class BookingDetails extends BaseActivity implements View.OnClickListener, AppConstants, ActivityResultCallback, ExpandableListView.OnChildClickListener {
 
 
     private String bookingId;
@@ -56,12 +57,11 @@ public class BookingDetails extends BaseActivity implements View.OnClickListener
     public CommonUtils commonUtils;
     public String accessToken;
     public SharedPreferences sharedPreferences;
-    public String dropOffPhoneNumber,pickUpPhoneNumber;
-    ImageView pickUpCallButton,dropOffCallButton;
+    public String dropOffPhoneNumber, pickUpPhoneNumber;
+    ImageView pickUpCallButton, dropOffCallButton;
     private RelativeLayout orderStatusLayout;
-    private TextView crnNumber,orderStatus,truckName,truckNumber,pickUpTruckerName,pickupName,
-            pickUpLocation,pickUpDay,pickUpTime,dropOffTruckerName,dropOffName,dropOffLocation,dropOffDay,dropOffTime
-            ,paymentMethod,totalCost;
+    private TextView crnNumber, orderStatus, truckName, truckNumber, pickUpTruckerName, pickupName,
+            pickUpLocation, pickUpDay, pickUpTime, dropOffTruckerName, dropOffName, dropOffLocation, dropOffDay, dropOffTime, paymentMethod, totalCost;
     private Button orderStatusButton;
 
 
@@ -70,7 +70,6 @@ public class BookingDetails extends BaseActivity implements View.OnClickListener
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_booking_details);
         init();
-
 
 
         // Listview Group click listener
@@ -145,198 +144,206 @@ public class BookingDetails extends BaseActivity implements View.OnClickListener
         globalClass = (GlobalClass) getApplicationContext();
         webServices = globalClass.getWebServices();
         commonUtils = new CommonUtils();
-        crnNumber=(TextView) findViewById(R.id.crn_number);
-        orderStatus=(TextView) findViewById(R.id.order_status);
-        truckName=(TextView) findViewById(R.id.truckName);
-        truckNumber=(TextView) findViewById(R.id.truckNumber);
-        pickUpTruckerName=(TextView) findViewById(R.id.pickup_trucker_name);
-        pickupName=(TextView) findViewById(R.id.pickup_name);
-        pickUpLocation=(TextView) findViewById(R.id.pickup_location);
-        pickUpDay=(TextView) findViewById(R.id.pickup_day);
-        pickUpTime=(TextView) findViewById(R.id.pickup_time);
-        dropOffTruckerName=(TextView) findViewById(R.id.dropup_trucker_name);
-        dropOffName=(TextView) findViewById(R.id.dropup_name);
-        dropOffLocation=(TextView) findViewById(R.id.dropup_location);
-        dropOffDay=(TextView) findViewById(R.id.dropup_day);
-        dropOffTime=(TextView) findViewById(R.id.dropup_time);
-        pickUpCallButton=(ImageView) findViewById(R.id.pickup_call);
+        crnNumber = (TextView) findViewById(R.id.crn_number);
+        orderStatus = (TextView) findViewById(R.id.order_status);
+        truckName = (TextView) findViewById(R.id.truckName);
+        truckNumber = (TextView) findViewById(R.id.truckNumber);
+        pickUpTruckerName = (TextView) findViewById(R.id.pickup_trucker_name);
+        pickupName = (TextView) findViewById(R.id.pickup_name);
+        pickUpLocation = (TextView) findViewById(R.id.pickup_location);
+        pickUpDay = (TextView) findViewById(R.id.pickup_day);
+        pickUpTime = (TextView) findViewById(R.id.pickup_time);
+        dropOffTruckerName = (TextView) findViewById(R.id.dropup_trucker_name);
+        dropOffName = (TextView) findViewById(R.id.dropup_name);
+        dropOffLocation = (TextView) findViewById(R.id.dropup_location);
+        dropOffDay = (TextView) findViewById(R.id.dropup_day);
+        dropOffTime = (TextView) findViewById(R.id.dropup_time);
+        pickUpCallButton = (ImageView) findViewById(R.id.pickup_call);
         pickUpCallButton.setOnClickListener(this);
-        dropOffCallButton=(ImageView) findViewById(R.id.dropoff_call);
+        dropOffCallButton = (ImageView) findViewById(R.id.dropoff_call);
         dropOffCallButton.setOnClickListener(this);
-        orderStatusLayout=(RelativeLayout)findViewById(R.id.order_status_layout);
-        paymentMethod=(TextView)findViewById(R.id.payment_method);
-        totalCost=(TextView)findViewById(R.id.total_amount);
-        orderStatusButton=(Button)findViewById(R.id.status_button);
+        orderStatusLayout = (RelativeLayout) findViewById(R.id.order_status_layout);
+        paymentMethod = (TextView) findViewById(R.id.payment_method);
+        totalCost = (TextView) findViewById(R.id.total_amount);
+        orderStatusButton = (Button) findViewById(R.id.status_button);
         orderStatusButton.setOnClickListener(this);
         findViewById(R.id.collect_cash_button).setOnClickListener(this);
         findViewById(R.id.retry_button).setOnClickListener(this);
         expListView = (ExpandableListView) findViewById(R.id.exListView);
         getOrderDetails();
+        expListView.setOnChildClickListener(this);
     }
 
 
-    void getOrderDetails(){
+    void getOrderDetails() {
         commonUtils.showLoadingDialog(BookingDetails.this, getResources().getString(R.string.loading));
-            webServices.getBookingDetails(accessToken,bookingId,
-                    new Callback<String>() {
-                        @Override
-                        public void success(String serverResponse, Response response) {
-                            findViewById(R.id.scrollView).setVisibility(View.VISIBLE);
-                            try {
-                                JSONObject jsonObject=new JSONObject(serverResponse);
-                                Calendar cal = Calendar.getInstance();
-                                TimeZone tz = cal.getTimeZone();
-                                DateFormat f = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-                                f.setTimeZone(TimeZone.getTimeZone("ISO"));
-                                Date d = f.parse(String.valueOf(jsonObject.getJSONObject("data").getJSONObject("pickUp").getString("date")));
-                                Date d1 = f.parse(String.valueOf(jsonObject.getJSONObject("data").getJSONObject("dropOff").getString("date")));
-                                DateFormat date = new SimpleDateFormat("EEEE, d");
-                                DateFormat dayNumber = new SimpleDateFormat("d");
-                                int day = Integer.parseInt(dayNumber.format(d));
-                                int day1 = Integer.parseInt(dayNumber.format(d1));
-                                DateFormat month = new SimpleDateFormat("MMMM");
-                                crnNumber.setText("CRN - " + jsonObject.getJSONObject("data").getString("crn").toUpperCase());
-                                if(jsonObject.getJSONObject("data").getString("bookingStatus").equals("REACHED_DESTINATION")||
-                                        jsonObject.getJSONObject("data").getString("bookingStatus").equals("REACHED_PICKUP_LOCATION")) {
-                                    orderStatusLayout.setBackgroundColor(getResources().getColor(R.color.orange));
-                                }
-                                if(jsonObject.getJSONObject("data").getString("bookingStatus").equals("ON_GOING")||
-                                        jsonObject.getJSONObject("data").getString("bookingStatus").equals("UP_GOING")) {
-                                    orderStatusLayout.setBackgroundColor(getResources().getColor(R.color.dark_blue));
-                                }
-                                if(jsonObject.getJSONObject("data").getString("bookingStatus").equals("CONFIRMED")) {
-                                    orderStatusLayout.setBackgroundColor(getResources().getColor(R.color.green));
-                                }
-                                if(jsonObject.getJSONObject("data").getString("bookingStatus").equals("HALT")||
-                                        jsonObject.getJSONObject("data").getString("bookingStatus").equals("COMPLETED")) {
-                                    orderStatusLayout.setBackgroundColor(getResources().getColor(R.color.dark_gery));
-                                }
-                                if(jsonObject.getJSONObject("data").getString("bookingStatus").equals("CANCELED")) {
-                                    orderStatusLayout.setBackgroundColor(getResources().getColor(R.color.red));
-                                }
-                                if(jsonObject.getJSONObject("data").getString("bookingStatus").equals("ON_GOING")||
-                                        jsonObject.getJSONObject("data").getString("bookingStatus").equals("HALT")||
-                                        jsonObject.getJSONObject("data").getString("bookingStatus").equals("REACHED_DESTINATION")){
-                                    orderStatusButton.setVisibility(View.VISIBLE);
-                                    orderStatusButton.setText("END TRIP");
+        webServices.getBookingDetails(accessToken, bookingId,
+                new Callback<String>() {
+                    @Override
+                    public void success(String serverResponse, Response response) {
+                        findViewById(R.id.scrollView).setVisibility(View.VISIBLE);
+                        try {
+                            JSONObject jsonObject = new JSONObject(serverResponse);
+                            Calendar cal = Calendar.getInstance();
+                            TimeZone tz = cal.getTimeZone();
+                            DateFormat f = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+                            f.setTimeZone(TimeZone.getTimeZone("ISO"));
+                            Date d = f.parse(String.valueOf(jsonObject.getJSONObject("data").getJSONObject("pickUp").getString("date")));
+                            Date d1 = f.parse(String.valueOf(jsonObject.getJSONObject("data").getJSONObject("dropOff").getString("date")));
+                            DateFormat date = new SimpleDateFormat("EEEE, d");
+                            DateFormat dayNumber = new SimpleDateFormat("d");
+                            int day = Integer.parseInt(dayNumber.format(d));
+                            int day1 = Integer.parseInt(dayNumber.format(d1));
+                            DateFormat month = new SimpleDateFormat("MMMM");
+                            crnNumber.setText("CRN - " + jsonObject.getJSONObject("data").getString("crn").toUpperCase());
+                            if (jsonObject.getJSONObject("data").getString("bookingStatus").equals("REACHED_DESTINATION") ||
+                                    jsonObject.getJSONObject("data").getString("bookingStatus").equals("REACHED_PICKUP_LOCATION")) {
+                                orderStatusLayout.setBackgroundColor(getResources().getColor(R.color.orange));
+                            }
+                            if (jsonObject.getJSONObject("data").getString("bookingStatus").equals("ON_GOING") ||
+                                    jsonObject.getJSONObject("data").getString("bookingStatus").equals("UP_GOING")) {
+                                orderStatusLayout.setBackgroundColor(getResources().getColor(R.color.dark_blue));
+                            }
+                            if (jsonObject.getJSONObject("data").getString("bookingStatus").equals("CONFIRMED")) {
+                                orderStatusLayout.setBackgroundColor(getResources().getColor(R.color.green));
+                            }
+                            if (jsonObject.getJSONObject("data").getString("bookingStatus").equals("HALT") ||
+                                    jsonObject.getJSONObject("data").getString("bookingStatus").equals("COMPLETED")) {
+                                orderStatusLayout.setBackgroundColor(getResources().getColor(R.color.dark_gery));
+                            }
+                            if (jsonObject.getJSONObject("data").getString("bookingStatus").equals("CANCELED")) {
+                                orderStatusLayout.setBackgroundColor(getResources().getColor(R.color.red));
+                            }
+                            if (jsonObject.getJSONObject("data").getString("bookingStatus").equals("ON_GOING") ||
+                                    jsonObject.getJSONObject("data").getString("bookingStatus").equals("HALT") ||
+                                    jsonObject.getJSONObject("data").getString("bookingStatus").equals("REACHED_DESTINATION")) {
+                                orderStatusButton.setVisibility(View.VISIBLE);
+                                orderStatusButton.setText("END TRIP");
 
-                                }
-                                if(jsonObject.getJSONObject("data").getString("bookingStatus").equals("ON_THE_WAY")||
-                                        jsonObject.getJSONObject("data").getString("bookingStatus").equals("REACHED_PICKUP_LOCATION")
-                                        ){
-                                    orderStatusButton.setVisibility(View.VISIBLE);
-                                    orderStatusButton.setText("START TRIP");
+                            }
+                            if (jsonObject.getJSONObject("data").getString("bookingStatus").equals("ON_THE_WAY") ||
+                                    jsonObject.getJSONObject("data").getString("bookingStatus").equals("REACHED_PICKUP_LOCATION")
+                                    ) {
+                                orderStatusButton.setVisibility(View.VISIBLE);
+                                orderStatusButton.setText("START TRIP");
 
-                                }
-                                if(jsonObject.getJSONObject("data").getString("bookingStatus").equals("CONFIRMED")){
-                                    orderStatusButton.setVisibility(View.VISIBLE);
-                                    orderStatusButton.setText("ON THE WAY");
+                            }
+                            if (jsonObject.getJSONObject("data").getString("bookingStatus").equals("CONFIRMED")) {
+                                orderStatusButton.setVisibility(View.VISIBLE);
+                                orderStatusButton.setText("ON THE WAY");
 
-                                }
+                            }
 
-                                orderStatus.setText(jsonObject.getJSONObject("data").getString("bookingStatus").toUpperCase().replace("_", " "));
-                                truckName.setText(jsonObject.getJSONObject("data").getJSONObject("truck").getJSONObject("truckType").getString("typeTruckName").toUpperCase());
-                                truckNumber.setText(jsonObject.getJSONObject("data").getJSONObject("assignTruck").getString("truckNumber").toUpperCase());
-                                pickUpTruckerName.setText(jsonObject.getJSONObject("data").getJSONObject("pickUp").getString("companyName"));
-                                pickupName.setText(jsonObject.getJSONObject("data").getJSONObject("pickUp").getString("name"));
-                                pickUpLocation.setText(jsonObject.getJSONObject("data").getJSONObject("pickUp").getString("address")+", "+
-                                        jsonObject.getJSONObject("data").getJSONObject("pickUp").getString("city")+", "+
-                                        jsonObject.getJSONObject("data").getJSONObject("pickUp").getString("state")+" - "+
-                                        jsonObject.getJSONObject("data").getJSONObject("pickUp").getString("zipCode"));
-                                pickUpPhoneNumber=jsonObject.getJSONObject("data").getJSONObject("pickUp").getString("contactNumber");
-                                pickUpDay.setText(date.format(d)+commonUtils.getDateSuffix(day)+" "+month.format(d));
-                                pickUpTime.setText(jsonObject.getJSONObject("data").getJSONObject("pickUp").getString("time").toUpperCase());
-                                dropOffTruckerName.setText(jsonObject.getJSONObject("data").getJSONObject("dropOff").getString("companyName"));
-                                dropOffName.setText(jsonObject.getJSONObject("data").getJSONObject("dropOff").getString("name"));
-                                dropOffLocation.setText(jsonObject.getJSONObject("data").getJSONObject("dropOff").getString("address")+", "+
-                                        jsonObject.getJSONObject("data").getJSONObject("dropOff").getString("city")+", "+
-                                        jsonObject.getJSONObject("data").getJSONObject("dropOff").getString("state")+" - "+
-                                        jsonObject.getJSONObject("data").getJSONObject("dropOff").getString("zipCode"));
-                                dropOffPhoneNumber=jsonObject.getJSONObject("data").getJSONObject("dropOff").getString("contactNumber");
-                                dropOffDay.setText(date.format(d1)+commonUtils.getDateSuffix(day1)+" "+month.format(d1));
-                                dropOffTime.setText(jsonObject.getJSONObject("data").getJSONObject("dropOff").getString("time").toUpperCase());
-                                paymentMethod.setText(jsonObject.getJSONObject("data").getString("paymentMode").toUpperCase());
-                                totalCost.setText(getResources().getString(R.string.indian_rupee_symbol)+" "+jsonObject.getJSONObject("data").getJSONObject("bid").getString("acceptPrice"));
-                                if(jsonObject.getJSONObject("data").getString("paymentStatus").equalsIgnoreCase("Pending")
-                                        &&jsonObject.getJSONObject("data").getString("paymentMode").equalsIgnoreCase("Cash"))
-                                    findViewById(R.id.collect_cash_button).setVisibility(View.VISIBLE);
+                            orderStatus.setText(jsonObject.getJSONObject("data").getString("bookingStatus").toUpperCase().replace("_", " "));
+                            truckName.setText(jsonObject.getJSONObject("data").getJSONObject("truck").getJSONObject("truckType").getString("typeTruckName").toUpperCase());
+                            truckNumber.setText(jsonObject.getJSONObject("data").getJSONObject("assignTruck").getString("truckNumber").toUpperCase());
+                            pickUpTruckerName.setText(jsonObject.getJSONObject("data").getJSONObject("pickUp").getString("companyName"));
+                            pickupName.setText(jsonObject.getJSONObject("data").getJSONObject("pickUp").getString("name"));
+                            pickUpLocation.setText(jsonObject.getJSONObject("data").getJSONObject("pickUp").getString("address") + ", " +
+                                    jsonObject.getJSONObject("data").getJSONObject("pickUp").getString("city") + ", " +
+                                    jsonObject.getJSONObject("data").getJSONObject("pickUp").getString("state") + " - " +
+                                    jsonObject.getJSONObject("data").getJSONObject("pickUp").getString("zipCode"));
+                            pickUpPhoneNumber = jsonObject.getJSONObject("data").getJSONObject("pickUp").getString("contactNumber");
+                            pickUpDay.setText(date.format(d) + commonUtils.getDateSuffix(day) + " " + month.format(d));
+                            pickUpTime.setText(jsonObject.getJSONObject("data").getJSONObject("pickUp").getString("time").toUpperCase());
+                            dropOffTruckerName.setText(jsonObject.getJSONObject("data").getJSONObject("dropOff").getString("companyName"));
+                            dropOffName.setText(jsonObject.getJSONObject("data").getJSONObject("dropOff").getString("name"));
+                            dropOffLocation.setText(jsonObject.getJSONObject("data").getJSONObject("dropOff").getString("address") + ", " +
+                                    jsonObject.getJSONObject("data").getJSONObject("dropOff").getString("city") + ", " +
+                                    jsonObject.getJSONObject("data").getJSONObject("dropOff").getString("state") + " - " +
+                                    jsonObject.getJSONObject("data").getJSONObject("dropOff").getString("zipCode"));
+                            dropOffPhoneNumber = jsonObject.getJSONObject("data").getJSONObject("dropOff").getString("contactNumber");
+                            dropOffDay.setText(date.format(d1) + commonUtils.getDateSuffix(day1) + " " + month.format(d1));
+                            dropOffTime.setText(jsonObject.getJSONObject("data").getJSONObject("dropOff").getString("time").toUpperCase());
+                            paymentMethod.setText(jsonObject.getJSONObject("data").getString("paymentMode").toUpperCase());
+                            totalCost.setText(getResources().getString(R.string.indian_rupee_symbol) + " " + jsonObject.getJSONObject("data").getJSONObject("bid").getString("acceptPrice"));
+                            if (jsonObject.getJSONObject("data").getString("paymentStatus").equalsIgnoreCase("Pending")
+                                    && jsonObject.getJSONObject("data").getString("paymentMode").equalsIgnoreCase("Cash"))
+                                findViewById(R.id.collect_cash_button).setVisibility(View.VISIBLE);
 
 //                                prepareListData();
-                                listDataHeader = new ArrayList<String>();
-                                listDataChild = new HashMap<String, List<ExpandableChildItem>>();
+                            listDataHeader = new ArrayList<String>();
+                            listDataChild = new HashMap<String, List<ExpandableChildItem>>();
 
-                                // Adding child data
-                                listDataHeader.add(getResources().getString(R.string.cargo_details));
-                                listDataHeader.add(getResources().getString(R.string.documents));
-                                listDataHeader.add(getResources().getString(R.string.advisory_checkList));
-                                listDataHeader.add(getResources().getString(R.string.notes));
-                                listDataHeader.add(getResources().getString(R.string.my_notes));
-
-
-                                // Adding child data
-                                ArrayList<ExpandableChildItem> cargoDetails = new ArrayList<ExpandableChildItem>();
-                                cargoDetails.add(new ExpandableChildItem("Type of Cargo", CommonUtils.toCamelCase(jsonObject.getJSONObject("data").getJSONObject("cargo").getJSONObject("cargoType").getString("typeCargoName"))));
-                                cargoDetails.add(new ExpandableChildItem("Weight",jsonObject.getJSONObject("data").getJSONObject("cargo").getString("weight")+" Ton"));
-
-                                ArrayList<ExpandableChildItem> documents = new ArrayList<ExpandableChildItem>();
-                                documents.add(new ExpandableChildItem(getString(R.string.pod),""));
-                                documents.add(new ExpandableChildItem(getString(R.string.invoice),""));
-                                documents.add(new ExpandableChildItem(getString(R.string.consignment),""));
+                            // Adding child data
+                            listDataHeader.add(getResources().getString(R.string.cargo_details));
+                            listDataHeader.add(getResources().getString(R.string.documents));
+                            listDataHeader.add(getResources().getString(R.string.advisory_checkList));
+                            listDataHeader.add(getResources().getString(R.string.notes));
+                            listDataHeader.add(getResources().getString(R.string.my_notes));
 
 
-                                ArrayList<ExpandableChildItem> checklist = new ArrayList<ExpandableChildItem>();
-                                checklist.add(new ExpandableChildItem("Checklist 1", "Driving License"));
-                                checklist.add(new ExpandableChildItem("Checklist 2", "PAN"));
-                                checklist.add(new ExpandableChildItem("Checklist 3", "SIN"));
+                            // Adding child data
+                            ArrayList<ExpandableChildItem> cargoDetails = new ArrayList<ExpandableChildItem>();
+                            cargoDetails.add(new ExpandableChildItem("Type of Cargo", CommonUtils.toCamelCase(jsonObject.getJSONObject("data").getJSONObject("cargo").getJSONObject("cargoType").getString("typeCargoName"))));
+                            cargoDetails.add(new ExpandableChildItem("Weight", jsonObject.getJSONObject("data").getJSONObject("cargo").getString("weight") + " Ton"));
 
-                                ArrayList<ExpandableChildItem> notes = new ArrayList<ExpandableChildItem>();
-                                notes.add(new ExpandableChildItem(jsonObject.getJSONObject("data").getString("jobNote"),""));
-
-                                ArrayList<ExpandableChildItem> myNotes = new ArrayList<ExpandableChildItem>();
-                                if(jsonObject.getJSONObject("data").has("truckerNote")){
-                                    myNotes.add(new ExpandableChildItem(jsonObject.getJSONObject("data").getString("truckerNote"), ""));
-                                }else {
-                                    myNotes.add(new ExpandableChildItem("", ""));
-                                }
-
-                                listDataChild.put(listDataHeader.get(0), cargoDetails); // Header, Child data
-                                listDataChild.put(listDataHeader.get(1), documents);
-                                listDataChild.put(listDataHeader.get(2), checklist);
-                                listDataChild.put(listDataHeader.get(3), notes);
-                                listDataChild.put(listDataHeader.get(4), myNotes);
-                                listAdapter = new ExpandableListAdapter(BookingDetails.this,bookingId, listDataHeader, listDataChild);
-                                expListView.setAdapter(listAdapter);
-                                setListViewHeight(expListView);
-                                final ScrollView scrollview = (ScrollView)findViewById(R.id.scrollView);
-
-                                scrollview.post(new Runnable() {
-                                    public void run() {
-                                        scrollview.scrollTo(0, 0);
-                                    }
-                                });
-
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                                commonUtils.dismissLoadingDialog();
+                            ArrayList<ExpandableChildItem> documents = new ArrayList<ExpandableChildItem>();
+                            if (jsonObject.getJSONObject("data").has("doc")) {
+                                documents.add(new ExpandableChildItem(getString(R.string.pod), jsonObject.getJSONObject("data").getJSONObject("doc").has("pod") ? jsonObject.getJSONObject("data").getJSONObject("doc").getString("pod") : ""));
+                                documents.add(new ExpandableChildItem(getString(R.string.invoice), jsonObject.getJSONObject("data").getJSONObject("doc").has("invoice") ? jsonObject.getJSONObject("data").getJSONObject("doc").getString("invoice") : ""));
+                                documents.add(new ExpandableChildItem(getString(R.string.consignment), jsonObject.getJSONObject("data").getJSONObject("doc").has("consigmentNote") ? jsonObject.getJSONObject("data").getJSONObject("doc").getString("consigmentNote") : ""));
+                            } else {
+                                documents.add(new ExpandableChildItem(getString(R.string.pod), ""));
+                                documents.add(new ExpandableChildItem(getString(R.string.invoice), ""));
+                                documents.add(new ExpandableChildItem(getString(R.string.consignment), ""));
                             }
 
 
+                            ArrayList<ExpandableChildItem> checklist = new ArrayList<ExpandableChildItem>();
+                            checklist.add(new ExpandableChildItem("Checklist 1", "Driving License"));
+                            checklist.add(new ExpandableChildItem("Checklist 2", "PAN"));
+                            checklist.add(new ExpandableChildItem("Checklist 3", "SIN"));
+
+                            ArrayList<ExpandableChildItem> notes = new ArrayList<ExpandableChildItem>();
+                            notes.add(new ExpandableChildItem(jsonObject.getJSONObject("data").getString("jobNote"), ""));
+
+                            ArrayList<ExpandableChildItem> myNotes = new ArrayList<ExpandableChildItem>();
+                            if (jsonObject.getJSONObject("data").has("truckerNote")) {
+                                myNotes.add(new ExpandableChildItem(jsonObject.getJSONObject("data").getString("truckerNote"), ""));
+                            } else {
+                                myNotes.add(new ExpandableChildItem("", ""));
+                            }
+
+                            listDataChild.put(listDataHeader.get(0), cargoDetails); // Header, Child data
+                            listDataChild.put(listDataHeader.get(1), documents);
+                            listDataChild.put(listDataHeader.get(2), checklist);
+                            listDataChild.put(listDataHeader.get(3), notes);
+                            listDataChild.put(listDataHeader.get(4), myNotes);
+                            listAdapter = new ExpandableListAdapter(BookingDetails.this, bookingId, listDataHeader, listDataChild);
+                            expListView.setAdapter(listAdapter);
+                            setListViewHeight(expListView);
+                            final ScrollView scrollview = (ScrollView) findViewById(R.id.scrollView);
+                            expListView.setOnChildClickListener(BookingDetails.this);
+                            scrollview.post(new Runnable() {
+                                public void run() {
+                                    scrollview.scrollTo(0, 0);
+                                }
+                            });
+
+
+                        } catch (Exception e) {
+                            e.printStackTrace();
                             commonUtils.dismissLoadingDialog();
                         }
 
-                        @Override
-                        public void failure(RetrofitError retrofitError) {
-                            if (((RetrofitError) retrofitError).getKind() == RetrofitError.Kind.NETWORK) {
-                                MaterialDesignAnimations.fadeIn(getApplicationContext(), findViewById(R.id.errorLayout), getResources().getString(R.string.internetConnectionError), 0);
-                                findViewById(R.id.scrollView).setVisibility(View.GONE);
-                                findViewById(R.id.retry_button).setVisibility(View.VISIBLE);
-                                commonUtils.dismissLoadingDialog();
-                            } else {
-                                commonUtils.dismissLoadingDialog();
-                                commonUtils.showRetrofitError(BookingDetails.this, retrofitError);
-                            }
+
+                        commonUtils.dismissLoadingDialog();
+                    }
+
+                    @Override
+                    public void failure(RetrofitError retrofitError) {
+                        if (((RetrofitError) retrofitError).getKind() == RetrofitError.Kind.NETWORK) {
+                            MaterialDesignAnimations.fadeIn(getApplicationContext(), findViewById(R.id.errorLayout), getResources().getString(R.string.internetConnectionError), 0);
+                            findViewById(R.id.scrollView).setVisibility(View.GONE);
+                            findViewById(R.id.retry_button).setVisibility(View.VISIBLE);
+                            commonUtils.dismissLoadingDialog();
+                        } else {
+                            commonUtils.dismissLoadingDialog();
+                            commonUtils.showRetrofitError(BookingDetails.this, retrofitError);
                         }
-                    });
+                    }
+                });
     }
 
     private void prepareListData() {
@@ -355,8 +362,8 @@ public class BookingDetails extends BaseActivity implements View.OnClickListener
                         Log.i("Success", "" + serverResponse);
                         findViewById(R.id.collect_cash_button).setVisibility(View.GONE);
                         try {
-                            JSONObject jsonObject=new JSONObject(serverResponse);
-                            CommonUtils.showSingleButtonPopup(BookingDetails.this,jsonObject.getString("message"));
+                            JSONObject jsonObject = new JSONObject(serverResponse);
+                            CommonUtils.showSingleButtonPopup(BookingDetails.this, jsonObject.getString("message"));
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -387,25 +394,25 @@ public class BookingDetails extends BaseActivity implements View.OnClickListener
             case R.id.pickup_call:
                 try {
                     Intent call = new Intent(Intent.ACTION_DIAL);
-                    call.setData(Uri.parse("tel:" + "+91"+pickUpPhoneNumber));
+                    call.setData(Uri.parse("tel:" + "+91" + pickUpPhoneNumber));
                     startActivity(call);
                 } catch (Exception e) {
-                    commonUtils.showSingleButtonPopup(BookingDetails.this,"Unable to perform action.");
+                    commonUtils.showSingleButtonPopup(BookingDetails.this, "Unable to perform action.");
                 }
                 break;
 
             case R.id.dropoff_call:
                 try {
                     Intent call = new Intent(Intent.ACTION_DIAL);
-                    call.setData(Uri.parse("tel:" + "+91"+dropOffPhoneNumber));
+                    call.setData(Uri.parse("tel:" + "+91" + dropOffPhoneNumber));
                     startActivity(call);
                 } catch (Exception e) {
-                    commonUtils.showSingleButtonPopup(BookingDetails.this,"Unable to perform action.");
+                    commonUtils.showSingleButtonPopup(BookingDetails.this, "Unable to perform action.");
                 }
                 break;
 
             case R.id.status_button:
-                if(orderStatusButton.getText().equals("END TRIP")){
+                if (orderStatusButton.getText().equals("END TRIP")) {
                     commonUtils.showLoadingDialog(BookingDetails.this, getResources().getString(R.string.loading));
                     webServices.completeOrder(accessToken, bookingId, "COMPLETED", new Callback<String>() {
                         @Override
@@ -422,7 +429,7 @@ public class BookingDetails extends BaseActivity implements View.OnClickListener
                             commonUtils.dismissLoadingDialog();
                         }
                     });
-                }else if(orderStatusButton.getText().equals("ON THE WAY")){
+                } else if (orderStatusButton.getText().equals("ON THE WAY")) {
                     commonUtils.showLoadingDialog(BookingDetails.this, getResources().getString(R.string.loading));
                     webServices.changeOrderStatus(accessToken, bookingId, "ON_THE_WAY", new Callback<String>() {
                         @Override
@@ -439,12 +446,12 @@ public class BookingDetails extends BaseActivity implements View.OnClickListener
                             commonUtils.dismissLoadingDialog();
                         }
                     });
-                }else if(orderStatusButton.getText().equals("START TRIP")){
+                } else if (orderStatusButton.getText().equals("START TRIP")) {
                     commonUtils.showLoadingDialog(BookingDetails.this, getResources().getString(R.string.loading));
                     webServices.changeOrderStatus(accessToken, bookingId, "ON_GOING", new Callback<String>() {
                         @Override
                         public void success(String s, Response response) {
-                            Log.i("Success",""+s);
+                            Log.i("Success", "" + s);
                             orderStatusButton.setVisibility(View.GONE);
                             commonUtils.dismissLoadingDialog();
                             getOrderDetails();
@@ -452,7 +459,7 @@ public class BookingDetails extends BaseActivity implements View.OnClickListener
 
                         @Override
                         public void failure(RetrofitError error) {
-                            Log.i("Failure",""+error);
+                            Log.i("Failure", "" + error);
                             commonUtils.dismissLoadingDialog();
                         }
                     });
@@ -523,4 +530,23 @@ public class BookingDetails extends BaseActivity implements View.OnClickListener
     }
 
 
+    @Override
+    public void startActivityResult(Intent intent, int requestCode, int resultCode) {
+        startActivityForResult(intent, requestCode);
+
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (listAdapter != null)
+            listAdapter.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
+    public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
+        if (listAdapter != null)
+            listAdapter.onChildClick(parent, v, groupPosition, childPosition, id);
+        return false;
+    }
 }

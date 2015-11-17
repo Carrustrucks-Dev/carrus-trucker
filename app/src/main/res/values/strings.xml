@@ -41,7 +41,13 @@
     <string name="please_wait">Please wait...</string>
     <string name="indian_rupee_symbol">₹</string>
     <string name="collect_cash">Collect Cash</string>
-
+    <string name="upload_image">Upload image</string>
+    <string name="upload_pdf">Upload pdf</string>
+    <string name="cancel">Cancel</string>
+    <string name="upload_documents">Upload documents</string>
+    <string name="unable_to_perform_action">Unable to perform action.</string>
+    <string name="select_picture">Select picture</string>
+<string name="upload_new_document">Upload New Document</string>
 
     <!-- Nav Drawer Menu Items -->
     <string-array name="nav_drawer_items">
