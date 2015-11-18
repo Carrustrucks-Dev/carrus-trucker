@@ -32,7 +32,7 @@ public class GlobalClass extends Application implements AppConstants {
 
     public WebServices getGoogleWebServices() {
         webServices = new RestAdapter.Builder()
-                .setEndpoint(GOOGLE_URL).build().create(WebServices.class);
+                .setEndpoint(GOOGLE_URL).setConverter(new StringConverter()).setLogLevel(RestAdapter.LogLevel.NONE).build().create(WebServices.class);
         return webServices;
     }
 

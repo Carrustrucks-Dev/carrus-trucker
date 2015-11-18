@@ -34,6 +34,7 @@ import com.carrustruckerapp.fragments.DriverProfile;
 import com.carrustruckerapp.interfaces.AppConstants;
 import com.carrustruckerapp.interfaces.HomeCallback;
 import com.carrustruckerapp.interfaces.WebServices;
+import com.carrustruckerapp.services.MyService;
 import com.carrustruckerapp.utils.CommonUtils;
 import com.carrustruckerapp.utils.Connectivity;
 import com.carrustruckerapp.utils.GlobalClass;
@@ -71,6 +72,7 @@ public class HomeScreen extends BaseActivity implements AppConstants,HomeCallbac
     public String accessToken;
     public LinearLayout errorLayout;
     private int lastSelectedScreen=0;
+    private Bundle bundle;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -152,6 +154,7 @@ public class HomeScreen extends BaseActivity implements AppConstants,HomeCallbac
         webServices = globalClass.getWebServices();
         commonUtils = new CommonUtils();
         errorLayout = (LinearLayout) findViewById(R.id.errorLayout);
+        bundle=getIntent().getExtras();
     }
 
     @Override
@@ -194,9 +197,6 @@ public class HomeScreen extends BaseActivity implements AppConstants,HomeCallbac
             case 0:
                 headerTitle.setText(getResources().getString(R.string.current_shipment));
                 fragment = new CurrentShipmentFragment();
-                Bundle bundle = new Bundle();
-                bundle.putString("edttext", "From Activity");
-// set Fragmentclass Arguments
                 fragment.setArguments(bundle);
                 break;
             case 1:
@@ -415,6 +415,7 @@ public class HomeScreen extends BaseActivity implements AppConstants,HomeCallbac
         yesButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                dialog.dismiss();
                 logout();
 //                finish();
 //                overridePendingTransition(R.anim.anim_slide_in_right, R.anim.anim_slide_out_right);
@@ -435,5 +436,11 @@ public class HomeScreen extends BaseActivity implements AppConstants,HomeCallbac
     @Override
     protected void onResume() {
         super.onResume();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        stopService(new Intent(HomeScreen.this, MyService.class));
     }
 }

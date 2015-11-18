@@ -68,6 +68,16 @@
             android:label="@string/title_activity_home_screen"
             android:screenOrientation="portrait" >
         </activity>
+        <receiver
+            android:name=".gcm.GcmBroadcastReceiver"
+            android:permission="com.google.android.c2dm.permission.SEND" >
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+                <category android:name="com.carrustruckerapp" />
+            </intent-filter>
+        </receiver>
+
+        <service android:name=".gcm.GcmMessageHandler" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
@@ -88,9 +98,11 @@
         <activity
             android:name=".activities.ShowImageActivity"
             android:label=""
-
             >
         </activity>
+
+        <service android:name=".services.MyService"></service>
+
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="9a344ba4644c7661f8ee12e1e5573f21396bbaf0" />

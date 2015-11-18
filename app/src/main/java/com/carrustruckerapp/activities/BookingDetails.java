@@ -280,13 +280,13 @@ public class BookingDetails extends BaseActivity implements View.OnClickListener
 
                             ArrayList<ExpandableChildItem> documents = new ArrayList<ExpandableChildItem>();
                             if (jsonObject.getJSONObject("data").has("doc")) {
-                                documents.add(new ExpandableChildItem(getString(R.string.pod), jsonObject.getJSONObject("data").getJSONObject("doc").has("pod") ? jsonObject.getJSONObject("data").getJSONObject("doc").getString("pod") : ""));
-                                documents.add(new ExpandableChildItem(getString(R.string.invoice), jsonObject.getJSONObject("data").getJSONObject("doc").has("invoice") ? jsonObject.getJSONObject("data").getJSONObject("doc").getString("invoice") : ""));
-                                documents.add(new ExpandableChildItem(getString(R.string.consignment), jsonObject.getJSONObject("data").getJSONObject("doc").has("consigmentNote") ? jsonObject.getJSONObject("data").getJSONObject("doc").getString("consigmentNote") : ""));
+                                documents.add(new ExpandableChildItem(getString(R.string.pod), jsonObject.getJSONObject("data").getJSONObject("doc").has("pod") ? jsonObject.getJSONObject("data").getJSONObject("doc").getString("pod") : null));
+                                documents.add(new ExpandableChildItem(getString(R.string.invoice), jsonObject.getJSONObject("data").getJSONObject("doc").has("invoice") ? jsonObject.getJSONObject("data").getJSONObject("doc").getString("invoice") : null));
+                                documents.add(new ExpandableChildItem(getString(R.string.consignment), jsonObject.getJSONObject("data").getJSONObject("doc").has("consigmentNote") ? jsonObject.getJSONObject("data").getJSONObject("doc").getString("consigmentNote") : null));
                             } else {
-                                documents.add(new ExpandableChildItem(getString(R.string.pod), ""));
-                                documents.add(new ExpandableChildItem(getString(R.string.invoice), ""));
-                                documents.add(new ExpandableChildItem(getString(R.string.consignment), ""));
+                                documents.add(new ExpandableChildItem(getString(R.string.pod), null));
+                                documents.add(new ExpandableChildItem(getString(R.string.invoice), null));
+                                documents.add(new ExpandableChildItem(getString(R.string.consignment), null));
                             }
 
 

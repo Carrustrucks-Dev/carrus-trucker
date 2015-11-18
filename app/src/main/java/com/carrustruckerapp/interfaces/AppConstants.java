@@ -23,4 +23,5 @@ public interface AppConstants {
     String FLEET_OWNER_NO="fleet_owner_no";
     int LOAD_IMAGE_RESULTS = 1;
     int LOAD_PDF_FILE = 2;
+    String DRIVER_NO="driver_no";
 }

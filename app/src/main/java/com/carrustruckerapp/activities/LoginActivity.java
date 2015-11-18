@@ -265,9 +265,10 @@ public class LoginActivity extends BaseActivity implements AppConstants {
                         try {
                             SharedPreferences.Editor editor = sharedPreferences.edit();
                             JSONObject jsonObject = new JSONObject(serverResponse);
-                            JSONObject data = new JSONObject(jsonObject.getString("data"));
+                            JSONObject data = jsonObject.getJSONObject("data");
                             editor.putString(ACCESS_TOKEN, data.getString("accessToken"));
                             editor.putString(DRIVER_ID, data.getJSONObject("profileData").getString("driverId"));
+                            editor.putString(DRIVER_NO,data.getJSONObject("profileData").getString("_id"));
                             editor.putString(DRIVAR_NAME, data.getJSONObject("profileData").getString("driverName"));
                             editor.putString(DRIVING_LICENSE, data.getJSONObject("profileData").getJSONObject("drivingLicense").getString("drivingLicenseNo"));
                             editor.putString(VALIDITY,data.getJSONObject("profileData").getJSONObject("drivingLicense").getString("validity"));
@@ -276,21 +277,24 @@ public class LoginActivity extends BaseActivity implements AppConstants {
                             editor.putString(RATING, data.getJSONObject("profileData").getString("rating"));
 //                            editor.putString(EMAIL, data.getString("email"));
                             if (!data.getJSONObject("profileData").isNull("profilePicture")) {
-                                JSONObject profilePicture = new JSONObject(data.getString("profilePicture"));
-                                editor.putString(DRIVER_IMAGE, profilePicture.getString("thumb"));
-                            } else {   
+                                    JSONObject profilePicture = data.getJSONObject("profileData").getJSONObject("profilePicture");
+                                    editor.putString(DRIVER_IMAGE, profilePicture.getString("thumb"));
+                            } else {
                                 editor.putString(DRIVER_IMAGE, null);
                             }
                             editor.commit();
                             Intent intent = new Intent(LoginActivity.this, HomeScreen.class);
                             Bundle mBundle = new Bundle();
                             if(data.has("booking")) {
+                                mBundle.putBoolean("isBooking",true);
                                 mBundle.putString("bookingId", data.getJSONObject("booking").getString("_id"));
                                 mBundle.putString("tracking", data.getJSONObject("booking").getString("tracking"));
                                 mBundle.putString("dropOffLong", data.getJSONObject("booking").getJSONObject("dropOff").getJSONObject("coordinates").getString("dropOffLong"));
                                 mBundle.putString("dropOffLat", data.getJSONObject("booking").getJSONObject("dropOff").getJSONObject("coordinates").getString("dropOffLat"));
                                 mBundle.putString("pickUpLong", data.getJSONObject("booking").getJSONObject("pickUp").getJSONObject("coordinates").getString("pickUpLong"));
                                 mBundle.putString("pickUpLat", data.getJSONObject("booking").getJSONObject("pickUp").getJSONObject("coordinates").getString("pickUpLat"));
+                            }else {
+                                mBundle.putBoolean("isBooking",false);
                             }
                             intent.putExtras(mBundle);
                             startActivity(intent);

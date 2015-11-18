@@ -103,7 +103,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter implements 
 
                 break;
             case 1:
-                if(expandableChildItem.getDetail().equalsIgnoreCase("")) {
+                if(expandableChildItem.getDetail().equalsIgnoreCase("null")) {
                     convertView = infalInflater.inflate(R.layout.upload_documents_layout, null);
                     TextView uploadButtonText = (TextView) convertView.findViewById(R.id.upload_button_text);
                     uploadButtonText.setText(expandableChildItem.getName());
@@ -275,7 +275,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter implements 
         if(groupPosition==1){
 
             ExpandableChildItem childItem = (ExpandableChildItem) getChild(groupPosition, childPosition);
-            if(childItem.getDetail().equalsIgnoreCase("")) {
+            if(childItem.getDetail().equalsIgnoreCase("null")) {
                 documentName = childItem.getName();
                 selectImage();
                 Log.e("Document Name", documentName);

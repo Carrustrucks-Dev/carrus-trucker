@@ -94,10 +94,17 @@ public interface WebServices {
     @Multipart
     @PUT("/api/v1/trucker/uploadDoc")
     public void uploadDocument(@Header("authorization") String accessToken,
-                          @Part("bookingId") TypedString bookingId,
-                          @PartMap Map<String, TypedFile> Files,
-                          Callback<String> callback);
+                               @Part("bookingId") TypedString bookingId,
+                               @PartMap Map<String, TypedFile> Files,
+                               Callback<String> callback);
 
+    @FormUrlEncoded
+    @POST("/api/v1/tracking")
+    public void sendTracking(@Field("bookingId") String bookingId,
+                             @Field("truckerId") String truckerId,
+                             @Field("long") String lon,
+                             @Field("lat") String lat,
+                             Callback<String> callback);
 
 
 }
