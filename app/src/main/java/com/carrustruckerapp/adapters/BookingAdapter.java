@@ -9,6 +9,7 @@ import android.widget.TextView;
 
 import com.carrustruckerapp.R;
 import com.carrustruckerapp.entities.Booking;
+import com.carrustruckerapp.utils.CommonUtils;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -65,12 +66,13 @@ public class BookingAdapter extends BaseAdapter {
             Date d = f.parse(String.valueOf(data.get(position).getBookingTime()));
             DateFormat date = new SimpleDateFormat("dd");
             DateFormat month = new SimpleDateFormat("MMM");
+            DateFormat dayName = new SimpleDateFormat("EEE");
             mViewHolder.date.setText(date.format(d));
             mViewHolder.month.setText(month.format(d));
-            mViewHolder.name.setText(data.get(position).getName());
+            mViewHolder.name.setText(CommonUtils.toCamelCase(data.get(position).getName()));
             mViewHolder.truckName.setText(data.get(position).getTruckName());
             mViewHolder.shipingJourney.setText(data.get(position).getShipingJourney());
-            mViewHolder.timeSlot.setText(data.get(position).getTimeSlot());
+            mViewHolder.timeSlot.setText(dayName.format(d)+", "+data.get(position).getTimeSlot());
             if(data.get(position).getStatus().equals("REACHED_DESTINATION")||data.get(position).getStatus().equals("REACHED_PICKUP_LOCATION"))
                 mViewHolder.status.setTextColor(context.getResources().getColor(R.color.orange));
             if(data.get(position).getStatus().equals("ON_GOING")||data.get(position).getStatus().equals("UP_GOING"))

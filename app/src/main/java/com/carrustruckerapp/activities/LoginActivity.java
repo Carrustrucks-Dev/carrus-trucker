@@ -13,6 +13,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.ViewFlipper;
 
 import com.carrustruckerapp.R;
@@ -21,12 +22,15 @@ import com.carrustruckerapp.interfaces.WebServices;
 import com.carrustruckerapp.utils.CommonUtils;
 import com.carrustruckerapp.utils.Connectivity;
 import com.carrustruckerapp.utils.GlobalClass;
+import com.carrustruckerapp.utils.MaterialDesignAnimations;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
+import retrofit.mime.TypedByteArray;
 
 public class LoginActivity extends BaseActivity implements AppConstants {
 
@@ -42,6 +46,8 @@ public class LoginActivity extends BaseActivity implements AppConstants {
     Animation slideLeftOut, slideLeftIn, slideRightIn, slideRightOut;
     boolean flag = false;
     public Connectivity connectivity;
+    private TextView resendOtp;
+    boolean isResendOtp=false;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -78,11 +84,18 @@ public class LoginActivity extends BaseActivity implements AppConstants {
                             }
                         }
                         break;
+
+                    case R.id.resendOtp:
+                        isResendOtp=true;
+                        etOtp.setText("");
+                        sendDriverId();
+                        break;
                 }
             }
         };
         submitButton.setOnClickListener(handler);
         loginButton.setOnClickListener(handler);
+        resendOtp.setOnClickListener(handler);
 
 
         etDriverId.addTextChangedListener(new TextWatcher() {
@@ -129,6 +142,7 @@ public class LoginActivity extends BaseActivity implements AppConstants {
     }
 
     private void init() {
+        resendOtp=(TextView) findViewById(R.id.resendOtp);
         connectivity = new Connectivity(this);
         commonUtils = new CommonUtils();
         sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, Context.MODE_PRIVATE);
@@ -158,6 +172,8 @@ public class LoginActivity extends BaseActivity implements AppConstants {
             flipper.setOutAnimation(slideRightOut);
             flipper.showPrevious();
             flag = false;
+            etOtp.setText("");
+            isResendOtp=false;
         } else {
             super.onBackPressed();
             finish();
@@ -217,20 +233,38 @@ public class LoginActivity extends BaseActivity implements AppConstants {
                 new Callback<String>() {
                     @Override
                     public void success(String serverResponse, Response response) {
-                        try {
-                            flipper.setInAnimation(slideLeftIn);
-                            flipper.setOutAnimation(slideLeftOut);
-                            flipper.showNext();
-                            flag = true;
-                        } catch (Exception e) {
-                            e.printStackTrace();
+                        if(!isResendOtp) {
+                            try {
+                                flipper.setInAnimation(slideLeftIn);
+                                flipper.setOutAnimation(slideLeftOut);
+                                flipper.showNext();
+                                flag = true;
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
                         }
                         commonUtils.dismissLoadingDialog();
                     }
 
                     @Override
                     public void failure(RetrofitError retrofitError) {
-                        commonUtils.showRetrofitError(LoginActivity.this,retrofitError);
+                        int statusCode = retrofitError.getResponse().getStatus();
+                        if (statusCode == 401){
+                            String json = new String(((TypedByteArray) retrofitError.getResponse()
+                                    .getBody()).getBytes());
+                            try {
+                                JSONObject jsonObject = new JSONObject(json);
+                                etDriverId.setText("");
+                                MaterialDesignAnimations.fadeIn(LoginActivity.this, findViewById(R.id.errorLayout), jsonObject.get("message").toString(), 0);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                            commonUtils.dismissLoadingDialog();
+                        }
+                        else {
+                            commonUtils.showRetrofitError(LoginActivity.this, retrofitError);
+                            commonUtils.dismissLoadingDialog();
+                        }
 //                        try {
 //                            Log.e("request succesfull", "RetrofitError = " + retrofitError.toString());
 //                            if (((RetrofitError) retrofitError).getKind() == RetrofitError.Kind.NETWORK) {
@@ -251,7 +285,7 @@ public class LoginActivity extends BaseActivity implements AppConstants {
 //                        } catch (Exception e) {
 //                            e.printStackTrace();
 //                        }
-                        commonUtils.dismissLoadingDialog();
+
                     }
                 });
     }
@@ -293,6 +327,15 @@ public class LoginActivity extends BaseActivity implements AppConstants {
                                 mBundle.putString("dropOffLat", data.getJSONObject("booking").getJSONObject("dropOff").getJSONObject("coordinates").getString("dropOffLat"));
                                 mBundle.putString("pickUpLong", data.getJSONObject("booking").getJSONObject("pickUp").getJSONObject("coordinates").getString("pickUpLong"));
                                 mBundle.putString("pickUpLat", data.getJSONObject("booking").getJSONObject("pickUp").getJSONObject("coordinates").getString("pickUpLat"));
+                                mBundle.putString("shipperName",data.getJSONObject("booking").getJSONObject("shipper").getString("firstName")+" "+
+                                        data.getJSONObject("booking").getJSONObject("shipper").getString("lastName"));
+                                mBundle.putString("bookingCreatedAt",data.getJSONObject("booking").getString("bookingCreatedAt"));
+                                mBundle.putString("bookingStatus",data.getJSONObject("booking").getJSONObject("pickUp").getString("date"));
+                                mBundle.putString("shipperPhoneNumber",data.getJSONObject("booking").getJSONObject("shipper").getString("phoneNumber"));
+                                mBundle.putString("shippingJourney",CommonUtils.toCamelCase(data.getJSONObject("booking").getJSONObject("pickUp").getString("city"))+" to "+
+                                        CommonUtils.toCamelCase(data.getJSONObject("booking").getJSONObject("dropOff").getString("city")));
+                                mBundle.putString("timeSlot",data.getJSONObject("booking").getJSONObject("pickUp").getString("time"));
+                                mBundle.putString("truckNameNumber",data.getJSONObject("booking").getJSONObject("truck").getJSONObject("truckType").getString("typeTruckName"));
                             }else {
                                 mBundle.putBoolean("isBooking",false);
                             }
@@ -308,6 +351,10 @@ public class LoginActivity extends BaseActivity implements AppConstants {
 
                     @Override
                     public void failure(RetrofitError retrofitError) {
+                        int statusCode = retrofitError.getResponse().getStatus();
+                        if (statusCode == 400){
+                            etOtp.setText("");
+                        }
                         commonUtils.showRetrofitError(LoginActivity.this,retrofitError);
 //                        try {
 //                            Log.e("request succesfull", "RetrofitError = " + retrofitError.toString());

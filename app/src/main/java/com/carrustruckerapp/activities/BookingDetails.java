@@ -208,7 +208,8 @@ public class BookingDetails extends BaseActivity implements View.OnClickListener
                                 orderStatusLayout.setBackgroundColor(getResources().getColor(R.color.green));
                             }
                             if (jsonObject.getJSONObject("data").getString("bookingStatus").equals("HALT") ||
-                                    jsonObject.getJSONObject("data").getString("bookingStatus").equals("COMPLETED")) {
+                                    jsonObject.getJSONObject("data").getString("bookingStatus").equals("COMPLETED")||
+                                    jsonObject.getJSONObject("data").getString("bookingStatus").equals("ON_THE_WAY")) {
                                 orderStatusLayout.setBackgroundColor(getResources().getColor(R.color.dark_gery));
                             }
                             if (jsonObject.getJSONObject("data").getString("bookingStatus").equals("CANCELED")) {

@@ -17,6 +17,7 @@ import com.carrustruckerapp.adapters.BookingAdapter;
 import com.carrustruckerapp.entities.Booking;
 import com.carrustruckerapp.interfaces.AppConstants;
 import com.carrustruckerapp.interfaces.HomeCallback;
+import com.carrustruckerapp.utils.CommonUtils;
 import com.carrustruckerapp.utils.Log;
 
 import org.json.JSONArray;
@@ -88,6 +89,12 @@ public class PastOrdersFragment extends Fragment implements AppConstants, SwipeR
         isRefreshView=true;
         swipeRefreshLayout.setRefreshing(true);
         getData();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        onRefresh();
     }
 
     private void getData() {
@@ -166,11 +173,11 @@ public class PastOrdersFragment extends Fragment implements AppConstants, SwipeR
                                         Booking booking = new Booking();
                                         JSONObject jsonObject = jsonDataArray.getJSONObject(i);
                                         booking.setBooking_id(jsonObject.getString("_id"));
-                                        booking.setBookingTime(jsonObject.getString("bookingCreatedAt"));
+                                        booking.setBookingTime(jsonObject.getJSONObject("pickUp").getString("date"));
                                         booking.setName(jsonObject.getJSONObject("shipper").getString("firstName") + " " + jsonObject.getJSONObject("shipper").getString("lastName"));
-                                        booking.setShipingJourney(jsonObject.getJSONObject("pickUp").getString("city") + " to " + jsonObject.getJSONObject("pickUp").getString("city"));
+                                        booking.setShipingJourney(CommonUtils.toCamelCase(jsonObject.getJSONObject("pickUp").getString("city")) + " to " + CommonUtils.toCamelCase(jsonObject.getJSONObject("pickUp").getString("city")));
                                         booking.setStatus(jsonObject.getString("bookingStatus"));
-                                        booking.setTimeSlot(jsonObject.getJSONObject("dropOff").getString("time"));
+                                        booking.setTimeSlot(jsonObject.getJSONObject("pickUp").getString("time"));
                                         booking.setTruckName(jsonObject.getJSONObject("truck").getJSONObject("truckType").getString("typeTruckName"));
                                         pastBookingArrayList.add(booking);
                                     }

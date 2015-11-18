@@ -17,6 +17,7 @@ import com.carrustruckerapp.adapters.BookingAdapter;
 import com.carrustruckerapp.entities.Booking;
 import com.carrustruckerapp.interfaces.AppConstants;
 import com.carrustruckerapp.interfaces.HomeCallback;
+import com.carrustruckerapp.utils.CommonUtils;
 import com.carrustruckerapp.utils.Log;
 
 import org.json.JSONArray;
@@ -91,6 +92,12 @@ public class UpcomingOrdersFragment extends Fragment implements AppConstants, Sw
         getData();
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        onRefresh();
+    }
+
     private void getData() {
             if (!isRefreshView) {
                 homeCallback.getCommonUtils().showLoadingDialog(getActivity(), getResources().getString(R.string.loading));
@@ -111,11 +118,11 @@ public class UpcomingOrdersFragment extends Fragment implements AppConstants, Sw
                                         Booking booking = new Booking();
                                         JSONObject jsonObject = jsonDataArray.getJSONObject(i);
                                         booking.setBooking_id(jsonObject.getString("_id"));
-                                        booking.setBookingTime(jsonObject.getString("bookingCreatedAt"));
+                                        booking.setBookingTime(jsonObject.getJSONObject("pickUp").getString("date"));
                                         booking.setName(jsonObject.getJSONObject("shipper").getString("firstName") + " " + jsonObject.getJSONObject("shipper").getString("lastName"));
-                                        booking.setShipingJourney(jsonObject.getJSONObject("pickUp").getString("city") + " to " + jsonObject.getJSONObject("dropOff").getString("city"));
+                                        booking.setShipingJourney(CommonUtils.toCamelCase(jsonObject.getJSONObject("pickUp").getString("city")) + " to " + CommonUtils.toCamelCase(jsonObject.getJSONObject("pickUp").getString("city")));
                                         booking.setStatus(jsonObject.getString("bookingStatus"));
-                                        booking.setTimeSlot(jsonObject.getJSONObject("dropOff").getString("time"));
+                                        booking.setTimeSlot(jsonObject.getJSONObject("pickUp").getString("time"));
                                         booking.setTruckName(jsonObject.getJSONObject("truck").getJSONObject("truckType").getString("typeTruckName"));
                                         bookingsArrayList.add(booking);
                                     }

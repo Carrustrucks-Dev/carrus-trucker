@@ -105,6 +105,18 @@
                         android:textAllCaps="true"
                         android:textAppearance="@style/CustomTextAppearance.NeueMedium"
                         android:textColor="@color/white" />
+
+                    <TextView
+                        android:id="@+id/resendOtp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/resend_otp"
+                        android:textColor="@drawable/change_text_color"
+                        android:textSize="14sp"
+                        android:textAppearance="@style/CustomTextAppearance.Bold"
+                        android:gravity="center_horizontal"
+                        android:background="#70000000"
+                        android:padding="5dp"/>
                 </LinearLayout>
             </ViewFlipper>
         </RelativeLayout>

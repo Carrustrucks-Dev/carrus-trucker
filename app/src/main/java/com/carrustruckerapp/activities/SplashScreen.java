@@ -132,6 +132,15 @@ public class SplashScreen extends BaseActivity implements AppConstants {
                                 mBundle.putString("dropOffLat", data.getJSONObject("bookingData").getJSONObject("dropOff").getJSONObject("coordinates").getString("dropOffLat"));
                                 mBundle.putString("pickUpLong", data.getJSONObject("bookingData").getJSONObject("pickUp").getJSONObject("coordinates").getString("pickUpLong"));
                                 mBundle.putString("pickUpLat", data.getJSONObject("bookingData").getJSONObject("pickUp").getJSONObject("coordinates").getString("pickUpLat"));
+                                mBundle.putString("shipperName",data.getJSONObject("bookingData").getJSONObject("shipper").getString("firstName")+" "+
+                                        data.getJSONObject("bookingData").getJSONObject("shipper").getString("lastName"));
+                                mBundle.putString("bookingCreatedAt",data.getJSONObject("bookingData").getJSONObject("pickUp").getString("date"));
+                                mBundle.putString("bookingStatus",data.getJSONObject("bookingData").getString("bookingStatus"));
+                                mBundle.putString("shipperPhoneNumber",data.getJSONObject("bookingData").getJSONObject("shipper").getString("phoneNumber"));
+                                mBundle.putString("shippingJourney",CommonUtils.toCamelCase(data.getJSONObject("bookingData").getJSONObject("pickUp").getString("city"))+" to "+
+                                        CommonUtils.toCamelCase(data.getJSONObject("bookingData").getJSONObject("dropOff").getString("city")));
+                                mBundle.putString("timeSlot",data.getJSONObject("bookingData").getJSONObject("pickUp").getString("time"));
+                                mBundle.putString("truckNameNumber",data.getJSONObject("bookingData").getJSONObject("truck").getJSONObject("truckType").getString("typeTruckName"));
                             } else {
                                 mBundle.putBoolean("isBooking",false);
                             }

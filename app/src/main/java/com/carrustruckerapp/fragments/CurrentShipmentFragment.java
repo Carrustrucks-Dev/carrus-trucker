@@ -2,15 +2,19 @@ package com.carrustruckerapp.fragments;
 
 import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.carrustruckerapp.R;
 import com.carrustruckerapp.interfaces.WebServices;
 import com.carrustruckerapp.services.MyService;
+import com.carrustruckerapp.utils.CommonUtils;
 import com.carrustruckerapp.utils.GMapV2GetRouteDirection;
 import com.carrustruckerapp.utils.GPSTracker;
 import com.carrustruckerapp.utils.GlobalClass;
@@ -29,7 +33,13 @@ import org.xml.sax.SAXException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.TimeZone;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -42,7 +52,7 @@ import retrofit.client.Response;
 /**
  * Created by Saurbhv on 10/28/15.
  */
-public class CurrentShipmentFragment extends android.support.v4.app.Fragment {
+public class CurrentShipmentFragment extends android.support.v4.app.Fragment implements View.OnClickListener {
 
     private GoogleMap googleMap;
     private GPSTracker gpsTracker;
@@ -50,7 +60,10 @@ public class CurrentShipmentFragment extends android.support.v4.app.Fragment {
     public GlobalClass globalClass;
     private GMapV2GetRouteDirection v2GetRouteDirection;
     private Bundle bundle;
-    private RelativeLayout noBookingLayout;
+    private RelativeLayout noBookingLayout, bookingDetailsLayout;
+    private TextView tvName, tvDate, tvMonth, tvShipingJourney,tvBookingStatus,tvTimeSlot,tvTruckName;
+    private ImageView callShipper;
+    private String shipperNumber;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -72,7 +85,17 @@ public class CurrentShipmentFragment extends android.support.v4.app.Fragment {
 //        googleMap.getUiSettings().setZoomControlsEnabled(false);
         googleMap.getUiSettings().setTiltGesturesEnabled(false);
         googleMap.getUiSettings().setMyLocationButtonEnabled(false);
-        noBookingLayout=(RelativeLayout) v.findViewById(R.id.noBookingLayout);
+        noBookingLayout = (RelativeLayout) v.findViewById(R.id.noBookingLayout);
+        bookingDetailsLayout = (RelativeLayout) v.findViewById(R.id.bookingDetailsLayout);
+        tvName = (TextView) v.findViewById(R.id.name);
+        tvDate = (TextView) v.findViewById(R.id.date);
+        tvMonth = (TextView) v.findViewById(R.id.month);
+        tvShipingJourney = (TextView) v.findViewById(R.id.shipingJourney);
+        tvBookingStatus=(TextView) v.findViewById(R.id.status);
+        callShipper=(ImageView) v.findViewById(R.id.callShipperButton);
+        tvTimeSlot=(TextView)v.findViewById(R.id.timeSlot);
+        tvTruckName=(TextView)v.findViewById(R.id.truckName);
+        callShipper.setOnClickListener(this);
         if (gpsTracker.canGetLocation()) {
             googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(gpsTracker.getLatitude(), gpsTracker.getLongitude()), 14));
 //            getDriectionToDestination(new LatLng(gpsTracker.getLatitude(), gpsTracker.getLongitude()), gpsTracker.getLatitude() + ", " + gpsTracker.getLongitude(), "11.723512, 78.466287", GMapV2GetRouteDirection.MODE_DRIVING);
@@ -89,16 +112,39 @@ public class CurrentShipmentFragment extends android.support.v4.app.Fragment {
         super.onActivityCreated(savedInstanceState);
         v2GetRouteDirection = new GMapV2GetRouteDirection();
         bundle = getArguments();
+        shipperNumber=bundle.getString("shipperPhoneNumber");
         Log.e("isbooking", "" + bundle.getBoolean("isBooking"));
         if (bundle.getBoolean("isBooking")) {
+            bookingDetailsLayout.setVisibility(View.VISIBLE);
+            Calendar cal = Calendar.getInstance();
+            TimeZone tz = cal.getTimeZone();
+            DateFormat f = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+            f.setTimeZone(TimeZone.getTimeZone("ISO"));
+            try {
+                Date d = f.parse(bundle.getString("bookingCreatedAt"));
+                DateFormat date = new SimpleDateFormat("dd");
+                DateFormat month = new SimpleDateFormat("MMM");
+                DateFormat dayName = new SimpleDateFormat("EEE");
+                tvDate.setText(date.format(d));
+                tvMonth.setText(month.format(d));
+                tvTimeSlot.setText(dayName.format(d)+", "+bundle.getString("timeSlot"));
+                tvTruckName.setText(bundle.getString("truckNameNumber"));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+            tvShipingJourney.setText(bundle.getString("shippingJourney"));
+            tvName.setText(CommonUtils.toCamelCase(bundle.getString("shipperName")));
+            tvBookingStatus.setText(bundle.getString("bookingStatus").replace("_", " "));
 
             getDriectionToDestination(new LatLng(gpsTracker.getLatitude(), gpsTracker.getLongitude()), bundle.getString("pickUpLat") + ", " + bundle.getString("pickUpLong"), bundle.getString("dropOffLat") + ", " + bundle.getString("dropOffLong"), GMapV2GetRouteDirection.MODE_DRIVING);
             if (bundle.getString("tracking").equalsIgnoreCase("YES")) {
                 Intent intent = new Intent(getActivity(), MyService.class);
                 intent.putExtra("bookingId", bundle.getString("bookingId"));
+
                 getActivity().startService(intent);
             }
-        }else{
+        } else {
             noBookingLayout.setVisibility(View.VISIBLE);
         }
 
@@ -123,7 +169,7 @@ public class CurrentShipmentFragment extends android.support.v4.app.Fragment {
                     builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
                     Document doc = builder.parse(in);
                     ArrayList<LatLng> directionPoint = v2GetRouteDirection.getDirection(doc);
-                    PolylineOptions rectLine = new PolylineOptions().width(6).color(Color.parseColor("#1F58B9"));
+                    PolylineOptions rectLine = new PolylineOptions().width(6).color(Color.GREEN);
 
                     for (int i = 0; i < directionPoint.size(); i++) {
                         rectLine.add(directionPoint.get(i));
@@ -149,6 +195,21 @@ public class CurrentShipmentFragment extends android.support.v4.app.Fragment {
                 Log.e("error", "" + error);
             }
         });
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.callShipperButton:
+                try {
+                    Intent call = new Intent(Intent.ACTION_DIAL);
+                    call.setData(Uri.parse("tel:" + "+91" + shipperNumber));
+                    startActivity(call);
+                } catch (Exception e) {
+                    CommonUtils.showSingleButtonPopup(getActivity(),"Unable to perform action.");
+                }
+                break;
+        }
     }
 
     //    @Override
