@@ -329,8 +329,8 @@ public class LoginActivity extends BaseActivity implements AppConstants {
                                 mBundle.putString("pickUpLat", data.getJSONObject("booking").getJSONObject("pickUp").getJSONObject("coordinates").getString("pickUpLat"));
                                 mBundle.putString("shipperName",data.getJSONObject("booking").getJSONObject("shipper").getString("firstName")+" "+
                                         data.getJSONObject("booking").getJSONObject("shipper").getString("lastName"));
-                                mBundle.putString("bookingCreatedAt",data.getJSONObject("booking").getString("bookingCreatedAt"));
-                                mBundle.putString("bookingStatus",data.getJSONObject("booking").getJSONObject("pickUp").getString("date"));
+                                mBundle.putString("bookingCreatedAt",data.getJSONObject("booking").getJSONObject("pickUp").getString("date"));
+                                mBundle.putString("bookingStatus",data.getJSONObject("booking").getString("bookingStatus"));
                                 mBundle.putString("shipperPhoneNumber",data.getJSONObject("booking").getJSONObject("shipper").getString("phoneNumber"));
                                 mBundle.putString("shippingJourney",CommonUtils.toCamelCase(data.getJSONObject("booking").getJSONObject("pickUp").getString("city"))+" to "+
                                         CommonUtils.toCamelCase(data.getJSONObject("booking").getJSONObject("dropOff").getString("city")));

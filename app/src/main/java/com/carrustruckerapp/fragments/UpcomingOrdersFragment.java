@@ -105,7 +105,7 @@ public class UpcomingOrdersFragment extends Fragment implements AppConstants, Sw
 
 
             Log.i("bookingsArrayList", bookingsArrayList.size() + "");
-            homeCallback.getWebServices().getUpComingOrders(homeCallback.getSharedPreference().getString(ACCESS_TOKEN, ""),
+            homeCallback.getWebServices().getUpComingOrders(homeCallback.getSharedPreference().getString(ACCESS_TOKEN, ""),"DESC",
                     new Callback<String>() {
                         @Override
                         public void success(String serverResponse, Response response) {
@@ -123,7 +123,8 @@ public class UpcomingOrdersFragment extends Fragment implements AppConstants, Sw
                                         booking.setShipingJourney(CommonUtils.toCamelCase(jsonObject.getJSONObject("pickUp").getString("city")) + " to " + CommonUtils.toCamelCase(jsonObject.getJSONObject("pickUp").getString("city")));
                                         booking.setStatus(jsonObject.getString("bookingStatus"));
                                         booking.setTimeSlot(jsonObject.getJSONObject("pickUp").getString("time"));
-                                        booking.setTruckName(jsonObject.getJSONObject("truck").getJSONObject("truckType").getString("typeTruckName"));
+                                        booking.setTruckName(jsonObject.getJSONObject("truck").getJSONObject("truckType").getString("typeTruckName")
+                                        +" "+jsonObject.getJSONObject("assignTruck").getString("truckNumber"));
                                         bookingsArrayList.add(booking);
                                     }
                                 }

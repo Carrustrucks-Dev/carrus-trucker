@@ -9,11 +9,15 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.v4.content.LocalBroadcastManager;
 
 import com.carrustruckerapp.interfaces.AppConstants;
 import com.carrustruckerapp.interfaces.WebServices;
 import com.carrustruckerapp.utils.GlobalClass;
 import com.carrustruckerapp.utils.Log;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import retrofit.Callback;
 import retrofit.RetrofitError;
@@ -55,9 +59,9 @@ public class MyService extends Service implements AppConstants, LocationListener
     public synchronized void onDestroy() {
         super.onDestroy();
         Log.d(TAG, "onDestroy");
-        if (!isRunning) {
+        if (isRunning) {
             mythread.interrupt();
-            mythread.stop();
+//            mythread.stop();
         }
     }
 
@@ -132,7 +136,17 @@ public class MyService extends Service implements AppConstants, LocationListener
                         String.valueOf(location.getLatitude()), new Callback<String>() {
                             @Override
                             public void success(String s, Response response) {
+
+                                try {
+                                    JSONObject jsonObject=new JSONObject(s);
+
+                                Intent i = new Intent("custom-event-name");
+                                i.putExtra("bookingStatus", jsonObject.getJSONObject("data").getString("bookingStatus"));
+                                LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(i);
                                 Log.d("Tracking Success", s);
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
                             }
 
                             @Override

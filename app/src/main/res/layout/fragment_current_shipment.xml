@@ -9,7 +9,8 @@
         class="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
         android:layout_height="fill_parent"
-        android:layout_below="@+id/headerView"></fragment>
+        android:layout_below="@+id/headerView"
+        android:layout_above="@+id/bookingDetailsLayout"/>
 
     <RelativeLayout
         android:id="@+id/noBookingLayout"
@@ -64,34 +65,41 @@
                 android:layout_weight="0.95"
                 android:gravity="center">
 
-                <LinearLayout
-                    android:layout_width="60dp"
-                    android:layout_height="60dp"
-                    android:layout_gravity="center_vertical"
+                <RelativeLayout
+                    android:layout_width="@dimen/mediumhieght"
+                    android:layout_height="@dimen/mediumhieght"
+                    android:layout_centerInParent="true"
                     android:background="@drawable/orange_circle"
-                    android:gravity="center"
-                    android:orientation="vertical"
                     >
-
-                    <TextView
-                        android:id="@+id/date"
+                    <LinearLayout
                         android:layout_width="wrap_content"
+                        android:gravity="center"
+                        android:layout_centerInParent="true"
                         android:layout_height="wrap_content"
-                        android:text="31"
-                        android:textColor="@color/white"
-                        android:textSize="18sp" />
+                        android:orientation="vertical">
 
-                    <TextView
-                        android:id="@+id/month"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@+id/date"
-                        android:layout_marginTop="-6dp"
-                        android:text="Oct"
-                        android:textAllCaps="true"
-                        android:textColor="@color/white"
-                        android:textSize="12sp" />
-                </LinearLayout>
+                        <TextView
+                            android:id="@+id/date"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="05"
+                            android:layout_marginBottom="-12dp"
+                            android:textColor="@color/white"
+                            android:textSize="@dimen/toolarge_font"
+                            />
+
+                        <TextView
+                            android:id="@+id/month"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="OCT"
+                            android:textAppearance="@style/CustomTextAppearance"
+                            android:textColor="@color/white"
+                            android:textSize="@dimen/mid_fond"
+                            />
+
+                    </LinearLayout>
+                </RelativeLayout>
             </LinearLayout>
 
             <LinearLayout

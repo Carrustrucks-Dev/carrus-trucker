@@ -44,11 +44,11 @@ public interface WebServices {
                              Callback<String> callback);
 
     @GET("/api/v1/trucker/getPast")
-    public void getPastOrders(@Header("authorization") String accessToken,
+    public void getPastOrders(@Header("authorization") String accessToken, @Query("sort") String sort,
                               Callback<String> callback);
 
     @GET("/api/v1/trucker/getUpComing")
-    public void getUpComingOrders(@Header("authorization") String accessToken,
+    public void getUpComingOrders(@Header("authorization") String accessToken, @Query("sort") String sort,
                                   Callback<String> callback);
 
     @GET("/api/v1/trucker/getBookingDetail/{bookingId}")
@@ -106,5 +106,16 @@ public interface WebServices {
                              @Field("lat") String lat,
                              Callback<String> callback);
 
+    @GET("/api/v1/trucker/getCurrentBooking")
+    public void getCurrentBooking(@Header("authorization") String accessToken,
+                                  Callback<String> callback);
 
+
+    @FormUrlEncoded
+    @PUT("/api/v1/trucker/addRating")
+    public void addRating(@Header("authorization") String accessToken,
+                          @Field("bookingId") String bookingId,
+                          @Field("rating") String rating,
+                          @Field("comment") String comment,
+                          Callback<String> callback);
 }

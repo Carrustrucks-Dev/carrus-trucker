@@ -170,12 +170,17 @@ public class BookingDetails extends BaseActivity implements View.OnClickListener
         findViewById(R.id.collect_cash_button).setOnClickListener(this);
         findViewById(R.id.retry_button).setOnClickListener(this);
         expListView = (ExpandableListView) findViewById(R.id.exListView);
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
         getOrderDetails();
         expListView.setOnChildClickListener(this);
     }
 
-
-    void getOrderDetails() {
+    public void getOrderDetails() {
         commonUtils.showLoadingDialog(BookingDetails.this, getResources().getString(R.string.loading));
         webServices.getBookingDetails(accessToken, bookingId,
                 new Callback<String>() {
@@ -347,9 +352,6 @@ public class BookingDetails extends BaseActivity implements View.OnClickListener
                 });
     }
 
-    private void prepareListData() {
-
-    }
 
 
     @Override

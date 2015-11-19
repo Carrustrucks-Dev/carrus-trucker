@@ -60,6 +60,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter implements 
     public String documentName;
     public Map<String, TypedFile> images;
     ExpandableChildItem expandableChildItem;
+
     public ExpandableListAdapter(Context context, String orderId, List<String> listDataHeader,
                                  HashMap<String, List<ExpandableChildItem>> listChildData) {
         this.orderId = orderId;
@@ -103,7 +104,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter implements 
 
                 break;
             case 1:
-                if(expandableChildItem.getDetail().equalsIgnoreCase("null")) {
+                if (expandableChildItem.getDetail().equalsIgnoreCase("null")) {
                     convertView = infalInflater.inflate(R.layout.upload_documents_layout, null);
                     TextView uploadButtonText = (TextView) convertView.findViewById(R.id.upload_button_text);
                     uploadButtonText.setText(expandableChildItem.getName());
@@ -116,7 +117,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter implements 
 //                            Toast.makeText(v.getContext(), expandableChildItem.getName(), Toast.LENGTH_LONG).show();
 //                        }
 //                    });
-                }else{
+                } else {
                     convertView = infalInflater.inflate(R.layout.uploaded_document_layout, null);
                     TextView uploadButtonText = (TextView) convertView.findViewById(R.id.upload_button_text);
                     uploadButtonText.setText(expandableChildItem.getName());
@@ -152,7 +153,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter implements 
                         if (myNotes.getText().toString().trim().isEmpty()) {
                             CommonUtils.showSingleButtonPopup(_context, "Please enter notes");
                         } else {
-                            final String myNotesData=myNotes.getText().toString().trim();
+                            final String myNotesData = myNotes.getText().toString().trim();
                             CommonUtils.showLoadingDialog((Activity) _context, "Sending...");
                             webServices.addNotes(sharedPreferences.getString(ACCESS_TOKEN, ""), orderId, myNotes.getText().toString().trim(), new Callback<String>() {
                                 @Override
@@ -271,25 +272,26 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter implements 
         dialog.show();
     }
 
-    public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id){
-        if(groupPosition==1){
+    public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
+        if (groupPosition == 1) {
 
             ExpandableChildItem childItem = (ExpandableChildItem) getChild(groupPosition, childPosition);
-            if(childItem.getDetail().equalsIgnoreCase("null")) {
+            if (childItem.getDetail().equalsIgnoreCase("null")) {
                 documentName = childItem.getName();
                 selectImage();
                 Log.e("Document Name", documentName);
-            }else{
-                Intent intent=new Intent(_context, ShowImageActivity.class);
-                intent.putExtra("url",childItem.getDetail());
-                intent.putExtra("orderId",orderId);
-                intent.putExtra("documentName",childItem.getName());
+            } else {
+                Intent intent = new Intent(_context, ShowImageActivity.class);
+                intent.putExtra("url", childItem.getDetail());
+                intent.putExtra("orderId", orderId);
+                intent.putExtra("documentName", childItem.getName());
                 _context.startActivity(intent);
 
             }
         }
-       return true;
+        return true;
     }
+
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         Matrix mat = new Matrix();
         if (requestCode == LOAD_IMAGE_RESULTS && resultCode == -1 && data != null) {
@@ -302,7 +304,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter implements 
                     images.put("pod", new TypedFile("image/*", new File(imagePath)));
                 } else if (documentName.equalsIgnoreCase(_context.getString(R.string.invoice))) {
                     images.put("invoice", new TypedFile("image/*", new File(imagePath)));
-                } else if(documentName.equalsIgnoreCase(_context.getString(R.string.consignment))){
+                } else if (documentName.equalsIgnoreCase(_context.getString(R.string.consignment))) {
                     images.put("consigmentNote", new TypedFile("image/*", new File(imagePath)));
                 }
                 CommonUtils.showLoadingDialog((Activity) _context, "Uploading...");
@@ -313,6 +315,23 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter implements 
                             JSONObject jsonObject = new JSONObject(s);
                             CommonUtils.dismissLoadingDialog();
                             CommonUtils.showSingleButtonPopup(_context, jsonObject.getString("message"));
+                            resultCallback.getOrderDetails();
+//                            ExpandableChildItem childItem;
+//                            switch (documentName) {
+//                                case "POD":
+//                                    childItem = (ExpandableChildItem) getChild(1, 0);
+//                                    childItem.setDetail(jsonObject.getJSONObject("data").getString("podUpload"));
+//
+//                                    break;
+//                                case "Invoice":
+//                                    childItem = (ExpandableChildItem) getChild(1, 1);
+//                                    childItem.setDetail(jsonObject.getJSONObject("data").getString("invoiceUpdate"));
+//                                    break;
+//                                case "Consignment Notes":
+//                                    childItem = (ExpandableChildItem) getChild(1, 2);
+//                                    childItem.setDetail(jsonObject.getJSONObject("data").getString("consigmentNoteUpdate"));
+//                                    break;
+//                            }
                         } catch (JSONException e) {
                             e.printStackTrace();
                             CommonUtils.dismissLoadingDialog();
@@ -330,8 +349,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter implements 
             } catch (Exception ne) {
                 Toast.makeText(_context, _context.getString(R.string.unable_to_perform_action), Toast.LENGTH_LONG).show();
             }
-        }
-        else if(requestCode == LOAD_PDF_FILE && resultCode == -1 && data != null){
+        } else if (requestCode == LOAD_PDF_FILE && resultCode == -1 && data != null) {
             try {
                 imagePath = CommonUtils.getPath(_context, data.getData());
                 mat.postRotate(CommonUtils.getCameraPhotoOrientation(imagePath));
@@ -340,7 +358,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter implements 
                     images.put("pod", new TypedFile("*/*", new File(imagePath)));
                 } else if (documentName.equalsIgnoreCase(_context.getString(R.string.invoice))) {
                     images.put("invoice", new TypedFile("*/*", new File(imagePath)));
-                } else if(documentName.equalsIgnoreCase(_context.getString(R.string.consignment))){
+                } else if (documentName.equalsIgnoreCase(_context.getString(R.string.consignment))) {
                     images.put("consigmentNote", new TypedFile("*/*", new File(imagePath)));
                 }
                 CommonUtils.showLoadingDialog((Activity) _context, "Uploading...");

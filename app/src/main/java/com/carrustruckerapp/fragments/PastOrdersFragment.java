@@ -160,7 +160,7 @@ public class PastOrdersFragment extends Fragment implements AppConstants, SwipeR
             }
 
 
-            homeCallback.getWebServices().getPastOrders(homeCallback.getSharedPreference().getString(ACCESS_TOKEN, ""),
+            homeCallback.getWebServices().getPastOrders(homeCallback.getSharedPreference().getString(ACCESS_TOKEN, ""),"ASC",
                     new Callback<String>() {
                         @Override
                         public void success(String serverResponse, Response response) {
@@ -178,7 +178,8 @@ public class PastOrdersFragment extends Fragment implements AppConstants, SwipeR
                                         booking.setShipingJourney(CommonUtils.toCamelCase(jsonObject.getJSONObject("pickUp").getString("city")) + " to " + CommonUtils.toCamelCase(jsonObject.getJSONObject("pickUp").getString("city")));
                                         booking.setStatus(jsonObject.getString("bookingStatus"));
                                         booking.setTimeSlot(jsonObject.getJSONObject("pickUp").getString("time"));
-                                        booking.setTruckName(jsonObject.getJSONObject("truck").getJSONObject("truckType").getString("typeTruckName"));
+                                        booking.setTruckName(jsonObject.getJSONObject("truck").getJSONObject("truckType").getString("typeTruckName")
+                                                +" "+jsonObject.getJSONObject("assignTruck").getString("truckNumber"));
                                         pastBookingArrayList.add(booking);
                                     }
                                 }

@@ -47,6 +47,8 @@ public class ShowImageActivity extends Activity implements AppConstants {
     public GlobalClass globalClass;
     public SharedPreferences sharedPreferences;
     public Map<String, TypedFile> images;
+    private String url;
+    private ImageView imageView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,10 +62,10 @@ public class ShowImageActivity extends Activity implements AppConstants {
         webServices = globalClass.getWebServices();
         sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, Context.MODE_PRIVATE);
         Intent intent=getIntent();
-        String url=intent.getStringExtra("url");
+        url=intent.getStringExtra("url");
         orderId=intent.getStringExtra("orderId");
         documentName=intent.getStringExtra("documentName");
-        ImageView imageView=(ImageView) findViewById(R.id.image);
+        imageView=(ImageView) findViewById(R.id.image);
         Picasso.with(this).
                 load(url).
                 placeholder(R.drawable.loading_placeholder)
@@ -143,6 +145,21 @@ public class ShowImageActivity extends Activity implements AppConstants {
                             JSONObject jsonObject = new JSONObject(s);
                             CommonUtils.dismissLoadingDialog();
                             CommonUtils.showSingleButtonPopup(ShowImageActivity.this, jsonObject.getString("message"));
+                            switch (documentName){
+                                case "POD":
+                                    url=jsonObject.getJSONObject("data").getString("podUpload");
+                                    break;
+                                case "Invoice":
+                                    url=jsonObject.getJSONObject("data").getString("invoiceUpdate");
+                                    break;
+                                case "Consignment Notes":
+                                    url=jsonObject.getJSONObject("data").getString("consigmentNoteUpdate");
+                                    break;
+                            }
+                            Picasso.with(ShowImageActivity.this).
+                                    load(url).
+                                    placeholder(R.drawable.loading_placeholder)
+                                    .into(imageView);
                         } catch (JSONException e) {
                             e.printStackTrace();
                             CommonUtils.dismissLoadingDialog();

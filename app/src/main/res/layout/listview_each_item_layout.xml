@@ -1,113 +1,239 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="fill_parent"
-    android:paddingLeft="10dp"
-    android:paddingRight="10dp"
-    android:layout_marginTop="16dp"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:paddingTop="@dimen/ten"
+    android:paddingBottom="@dimen/ten"
+    android:paddingLeft="@dimen/five"
+    android:paddingRight="@dimen/five"
     android:orientation="horizontal"
-    android:gravity="center"
-    android:weightSum="4.5">
+    android:weightSum="1">
 
-    <LinearLayout
+
+    <RelativeLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight="0.95"
-        android:gravity="center">
+        android:layout_weight="0.2">
 
-        <LinearLayout
-            android:layout_width="60dp"
-            android:layout_height="60dp"
+        <RelativeLayout
+            android:layout_width="@dimen/mediumhieght"
+            android:layout_height="@dimen/mediumhieght"
+            android:layout_centerInParent="true"
             android:background="@drawable/circle"
-            android:gravity="center"
-            android:layout_gravity="center_vertical"
-            android:orientation="vertical"
             >
-
-            <TextView
-                android:id="@+id/date"
+            <LinearLayout
                 android:layout_width="wrap_content"
+                android:gravity="center"
+                android:layout_centerInParent="true"
                 android:layout_height="wrap_content"
-                android:text="31"
-                android:textColor="@color/white"
-                android:textSize="18sp" />
+                android:orientation="vertical">
 
-            <TextView
-                android:layout_marginTop="-6dp"
-                android:id="@+id/month"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/date"
-                android:text="Oct"
-                android:textAllCaps="true"
-                android:textColor="@color/white"
-                android:textSize="12sp" />
-        </LinearLayout>
-    </LinearLayout>
+                <TextView
+                    android:id="@+id/date"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="05"
+                    android:layout_marginBottom="-12dp"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/toolarge_font"
+                    />
+
+                <TextView
+                    android:id="@+id/month"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="OCT"
+                    android:textAppearance="@style/CustomTextAppearance"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/mid_fond"
+                    />
+
+            </LinearLayout>
+        </RelativeLayout>
+    </RelativeLayout>
 
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="5dp"
-        android:layout_weight="1.9"
-        android:orientation="vertical">
-
+        android:orientation="vertical"
+        android:paddingLeft="@dimen/five"
+        android:paddingRight="@dimen/five"
+        android:layout_weight="0.42">
         <TextView
             android:id="@+id/name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Test Test"
+            android:text="Name"
             android:textAppearance="@style/CustomTextAppearance"
             android:textColor="@color/blue"
-            android:textSize="14sp" />
+            android:textSize="@dimen/mid_fond"
+            />
 
         <TextView
             android:id="@+id/truckName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Tata Ace, CH 01 A 1111"
+            android:text="Code"
             android:textAppearance="@style/CustomTextAppearance"
+            android:singleLine="true"
             android:textColor="@color/dark_gery"
-            android:textSize="14sp" />
+            android:textSize="@dimen/low_font"
+            />
 
         <TextView
             android:id="@+id/shipingJourney"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Chandigarh to Delhi"
+            android:text="Address"
             android:textAppearance="@style/CustomTextAppearance"
             android:textColor="@color/orange"
-            android:textSize="14sp" />
+            android:textSize="@dimen/low_font"
+            />
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="5dp"
-        android:layout_weight="1.65"
-        android:orientation="vertical">
+        android:layout_height="fill_parent"
+        android:orientation="vertical"
+        android:gravity="right"
+        android:paddingLeft="@dimen/five"
+        android:paddingRight="@dimen/five"
+        android:layout_weight="0.38">
 
         <TextView
             android:id="@+id/timeSlot"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="right"
-            android:text="Monday, 4PM - 8PM"
+            android:text="Time"
             android:textAppearance="@style/CustomTextAppearance"
             android:textColor="@color/dark_gery"
-            android:textSize="13sp" />
+            android:textSize="@dimen/low_font"
+            />
 
         <TextView
             android:id="@+id/status"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="right"
-            android:text="Reached Pickup Location"
+            android:text="Status"
             android:textAppearance="@style/CustomTextAppearance"
-            android:textColor="@color/dark_gery"
-            android:textSize="13sp" />
-
+            android:textColor="@android:color/darker_gray"
+            android:textSize="@dimen/low_font"
+            />
     </LinearLayout>
 
-
 </LinearLayout>
+
+    <!--<?xml version="1.0" encoding="utf-8"?>-->
+    <!--<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="fill_parent"-->
+    <!--android:paddingLeft="10dp"-->
+    <!--android:paddingRight="10dp"-->
+    <!--android:layout_marginTop="16dp"-->
+    <!--android:orientation="horizontal"-->
+    <!--android:gravity="center"-->
+    <!--android:weightSum="4.5">-->
+
+    <!--<LinearLayout-->
+    <!--android:layout_width="0dp"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_weight="0.95"-->
+    <!--android:gravity="center">-->
+
+    <!--<LinearLayout-->
+    <!--android:layout_width="60dp"-->
+    <!--android:layout_height="60dp"-->
+    <!--android:background="@drawable/circle"-->
+    <!--android:gravity="center"-->
+    <!--android:layout_gravity="center_vertical"-->
+    <!--android:orientation="vertical"-->
+    <!-->-->
+
+    <!--<TextView-->
+    <!--android:id="@+id/date"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:text="31"-->
+    <!--android:textColor="@color/white"-->
+    <!--android:textSize="18sp" />-->
+
+    <!--<TextView-->
+    <!--android:layout_marginTop="-6dp"-->
+    <!--android:id="@+id/month"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_below="@+id/date"-->
+    <!--android:text="Oct"-->
+    <!--android:textAllCaps="true"-->
+    <!--android:textColor="@color/white"-->
+    <!--android:textSize="12sp" />-->
+    <!--</LinearLayout>-->
+    <!--</LinearLayout>-->
+
+    <!--<LinearLayout-->
+    <!--android:layout_width="0dp"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_marginLeft="5dp"-->
+    <!--android:layout_weight="1.9"-->
+    <!--android:orientation="vertical">-->
+
+    <!--<TextView-->
+    <!--android:id="@+id/name"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:text="Test Test"-->
+    <!--android:textAppearance="@style/CustomTextAppearance"-->
+    <!--android:textColor="@color/blue"-->
+    <!--android:textSize="14sp" />-->
+
+    <!--<TextView-->
+    <!--android:id="@+id/truckName"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:text="Tata Ace, CH 01 A 1111"-->
+    <!--android:textAppearance="@style/CustomTextAppearance"-->
+    <!--android:textColor="@color/dark_gery"-->
+    <!--android:textSize="14sp" />-->
+
+    <!--<TextView-->
+    <!--android:id="@+id/shipingJourney"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:text="Chandigarh to Delhi"-->
+    <!--android:textAppearance="@style/CustomTextAppearance"-->
+    <!--android:textColor="@color/orange"-->
+    <!--android:textSize="14sp" />-->
+    <!--</LinearLayout>-->
+
+    <!--<LinearLayout-->
+    <!--android:layout_width="0dp"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_marginLeft="5dp"-->
+    <!--android:layout_weight="1.65"-->
+    <!--android:orientation="vertical">-->
+
+    <!--<TextView-->
+    <!--android:id="@+id/timeSlot"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_gravity="right"-->
+    <!--android:text="Monday, 4PM - 8PM"-->
+    <!--android:textAppearance="@style/CustomTextAppearance"-->
+    <!--android:textColor="@color/dark_gery"-->
+    <!--android:textSize="13sp" />-->
+
+    <!--<TextView-->
+    <!--android:id="@+id/status"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_gravity="right"-->
+    <!--android:text="Reached Pickup Location"-->
+    <!--android:textAppearance="@style/CustomTextAppearance"-->
+    <!--android:textColor="@color/dark_gery"-->
+    <!--android:textSize="13sp" />-->
+
+    <!--</LinearLayout>-->
+
+
+    <!--</LinearLayout>-->

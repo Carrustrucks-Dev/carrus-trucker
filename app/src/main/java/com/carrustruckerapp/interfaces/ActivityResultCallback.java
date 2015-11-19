@@ -8,4 +8,5 @@ import android.content.Intent;
 public interface ActivityResultCallback {
 
     void startActivityResult(Intent intent,int requestCode,int resultCode);
+    void getOrderDetails();
 }

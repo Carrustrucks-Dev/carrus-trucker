@@ -1,9 +1,14 @@
 package com.carrustruckerapp.fragments;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.content.LocalBroadcastManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +17,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.carrustruckerapp.R;
+import com.carrustruckerapp.interfaces.AppConstants;
 import com.carrustruckerapp.interfaces.WebServices;
 import com.carrustruckerapp.services.MyService;
 import com.carrustruckerapp.utils.CommonUtils;
@@ -27,6 +33,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
@@ -52,11 +60,11 @@ import retrofit.client.Response;
 /**
  * Created by Saurbhv on 10/28/15.
  */
-public class CurrentShipmentFragment extends android.support.v4.app.Fragment implements View.OnClickListener {
+public class CurrentShipmentFragment extends android.support.v4.app.Fragment implements View.OnClickListener,AppConstants {
 
     private GoogleMap googleMap;
     private GPSTracker gpsTracker;
-    public WebServices googleWebServices;
+    public WebServices googleWebServices,webServices;
     public GlobalClass globalClass;
     private GMapV2GetRouteDirection v2GetRouteDirection;
     private Bundle bundle;
@@ -64,7 +72,7 @@ public class CurrentShipmentFragment extends android.support.v4.app.Fragment imp
     private TextView tvName, tvDate, tvMonth, tvShipingJourney,tvBookingStatus,tvTimeSlot,tvTruckName;
     private ImageView callShipper;
     private String shipperNumber;
-
+    public SharedPreferences sharedPreferences;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -75,16 +83,19 @@ public class CurrentShipmentFragment extends android.support.v4.app.Fragment imp
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_current_shipment, container, false);
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mMessageReceiver,
+                new IntentFilter("custom-event-name"));
         globalClass = (GlobalClass) getActivity().getApplicationContext();
         googleWebServices = globalClass.getGoogleWebServices();
+        webServices=globalClass.getWebServices();
         gpsTracker = new GPSTracker(getActivity());
         googleMap = ((SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map)).getMap();
         googleMap.setMyLocationEnabled(true);
         googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
         googleMap.getUiSettings().setZoomGesturesEnabled(true);
-//        googleMap.getUiSettings().setZoomControlsEnabled(false);
+        googleMap.getUiSettings().setZoomControlsEnabled(true);
         googleMap.getUiSettings().setTiltGesturesEnabled(false);
-        googleMap.getUiSettings().setMyLocationButtonEnabled(false);
+        googleMap.getUiSettings().setMyLocationButtonEnabled(true);
         noBookingLayout = (RelativeLayout) v.findViewById(R.id.noBookingLayout);
         bookingDetailsLayout = (RelativeLayout) v.findViewById(R.id.bookingDetailsLayout);
         tvName = (TextView) v.findViewById(R.id.name);
@@ -107,46 +118,25 @@ public class CurrentShipmentFragment extends android.support.v4.app.Fragment imp
         return v;
     }
 
+    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            // Get extra data included in the Intent
+            tvBookingStatus.setText(intent.getStringExtra("bookingStatus").replace("_", " "));
+            Log.i("tvBookingStatus",intent.getStringExtra("bookingStatus"));
+        }
+    };
+
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        sharedPreferences = getActivity().getSharedPreferences(SHARED_PREFERENCES, Context.MODE_PRIVATE);
+        getCurrentBookings();
         v2GetRouteDirection = new GMapV2GetRouteDirection();
         bundle = getArguments();
-        shipperNumber=bundle.getString("shipperPhoneNumber");
+//        shipperNumber=bundle.getString("shipperPhoneNumber");
         Log.e("isbooking", "" + bundle.getBoolean("isBooking"));
-        if (bundle.getBoolean("isBooking")) {
-            bookingDetailsLayout.setVisibility(View.VISIBLE);
-            Calendar cal = Calendar.getInstance();
-            TimeZone tz = cal.getTimeZone();
-            DateFormat f = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-            f.setTimeZone(TimeZone.getTimeZone("ISO"));
-            try {
-                Date d = f.parse(bundle.getString("bookingCreatedAt"));
-                DateFormat date = new SimpleDateFormat("dd");
-                DateFormat month = new SimpleDateFormat("MMM");
-                DateFormat dayName = new SimpleDateFormat("EEE");
-                tvDate.setText(date.format(d));
-                tvMonth.setText(month.format(d));
-                tvTimeSlot.setText(dayName.format(d)+", "+bundle.getString("timeSlot"));
-                tvTruckName.setText(bundle.getString("truckNameNumber"));
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
 
-            tvShipingJourney.setText(bundle.getString("shippingJourney"));
-            tvName.setText(CommonUtils.toCamelCase(bundle.getString("shipperName")));
-            tvBookingStatus.setText(bundle.getString("bookingStatus").replace("_", " "));
-
-            getDriectionToDestination(new LatLng(gpsTracker.getLatitude(), gpsTracker.getLongitude()), bundle.getString("pickUpLat") + ", " + bundle.getString("pickUpLong"), bundle.getString("dropOffLat") + ", " + bundle.getString("dropOffLong"), GMapV2GetRouteDirection.MODE_DRIVING);
-            if (bundle.getString("tracking").equalsIgnoreCase("YES")) {
-                Intent intent = new Intent(getActivity(), MyService.class);
-                intent.putExtra("bookingId", bundle.getString("bookingId"));
-
-                getActivity().startService(intent);
-            }
-        } else {
-            noBookingLayout.setVisibility(View.VISIBLE);
-        }
 
     }
 
@@ -154,6 +144,74 @@ public class CurrentShipmentFragment extends android.support.v4.app.Fragment imp
     public void onResume() {
         super.onResume();
 
+    }
+
+    private void getCurrentBookings(){
+        CommonUtils.showLoadingDialog(getActivity(),"loading...");
+        webServices.getCurrentBooking(sharedPreferences.getString(ACCESS_TOKEN, ""), new Callback<String>() {
+            @Override
+            public void success(String s, Response response) {
+                try {
+                    JSONObject serverResponse=new JSONObject(s);
+                    JSONObject data=serverResponse.getJSONObject("data");
+                    if(data.isNull("bookingData")){
+                        noBookingLayout.setVisibility(View.VISIBLE);
+                    }else{
+                        bookingDetailsLayout.setVisibility(View.VISIBLE);
+                        JSONObject bookingData=data.getJSONObject("bookingData");
+                        Calendar cal = Calendar.getInstance();
+                        TimeZone tz = cal.getTimeZone();
+                        DateFormat f = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+                        f.setTimeZone(TimeZone.getTimeZone("ISO"));
+                        try {
+                            Date d = f.parse(bookingData.getJSONObject("pickUp").getString("date"));
+                            DateFormat date = new SimpleDateFormat("dd");
+                            DateFormat month = new SimpleDateFormat("MMM");
+                            DateFormat dayName = new SimpleDateFormat("EEE");
+                            tvDate.setText(date.format(d));
+                            tvMonth.setText(month.format(d));
+                            tvTimeSlot.setText(dayName.format(d)+", "+bookingData.getJSONObject("pickUp").getString("time"));
+                            tvTruckName.setText(bookingData.getJSONObject("truck").getJSONObject("truckType").getString("typeTruckName")
+                            +" "+bookingData.getJSONObject("assignTruck").getString("truckNumber"));
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+
+                        tvShipingJourney.setText(CommonUtils.toCamelCase(bookingData.getJSONObject("pickUp").getString("city"))+" to "+
+                                CommonUtils.toCamelCase(bookingData.getJSONObject("dropOff").getString("city")));
+                        tvName.setText(CommonUtils.toCamelCase(bookingData.getJSONObject("shipper").getString("firstName") + " " +
+                                bookingData.getJSONObject("shipper").getString("lastName")));
+                        tvBookingStatus.setText(bookingData.getString("bookingStatus").replace("_", " "));
+
+                        shipperNumber=bookingData.getJSONObject("shipper").getString("phoneNumber");
+
+                        getDriectionToDestination(new LatLng(gpsTracker.getLatitude(), gpsTracker.getLongitude()),
+                                bookingData.getJSONObject("pickUp").getJSONObject("coordinates").getString("pickUpLat") + ", " + bookingData.getJSONObject("pickUp").getJSONObject("coordinates").getString("pickUpLong"),
+                                bookingData.getJSONObject("dropOff").getJSONObject("coordinates").getString("dropOffLat") + ", " + bookingData.getJSONObject("dropOff").getJSONObject("coordinates").getString("dropOffLong"),
+                                GMapV2GetRouteDirection.MODE_DRIVING);
+
+
+                        if (bookingData.getString("tracking").equalsIgnoreCase("YES")) {
+                            Intent intent = new Intent(getActivity(), MyService.class);
+                            intent.putExtra("bookingId", bookingData.getString("_id"));
+                            getActivity().startService(intent);
+                        }
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    CommonUtils.dismissLoadingDialog();
+                }
+
+                CommonUtils.dismissLoadingDialog();
+                Log.d("Response",s);
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                Log.d("failure",""+error);
+                CommonUtils.dismissLoadingDialog();
+            }
+        });
     }
 
     //Path Direction Call
