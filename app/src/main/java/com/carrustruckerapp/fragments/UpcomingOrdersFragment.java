@@ -105,7 +105,7 @@ public class UpcomingOrdersFragment extends Fragment implements AppConstants, Sw
 
 
             Log.i("bookingsArrayList", bookingsArrayList.size() + "");
-            homeCallback.getWebServices().getUpComingOrders(homeCallback.getSharedPreference().getString(ACCESS_TOKEN, ""),"DESC",
+            homeCallback.getWebServices().getUpComingOrders(homeCallback.getSharedPreference().getString(ACCESS_TOKEN, ""),"ASC",
                     new Callback<String>() {
                         @Override
                         public void success(String serverResponse, Response response) {

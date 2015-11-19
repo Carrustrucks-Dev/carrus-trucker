@@ -12,7 +12,12 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.LocalBroadcastManager;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.EditText;
 
+import com.carrustruckerapp.interfaces.AppConstants;
 import com.carrustruckerapp.interfaces.GPSDailogCallBack;
 import com.carrustruckerapp.utils.CommonUtils;
 import com.carrustruckerapp.utils.Log;
@@ -20,7 +25,7 @@ import com.carrustruckerapp.utils.Log;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 
-public class BaseActivity extends FragmentActivity implements GPSDailogCallBack{
+public class BaseActivity extends FragmentActivity implements GPSDailogCallBack,AppConstants{
     private Activity activity;
 
     @Override
@@ -66,6 +71,33 @@ if(!(activity instanceof SplashScreen)) {
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver);
         if(dialog!=null)
             dialog.dismiss();
+    }
+
+    public void setupUI(View view) {
+
+        //Set up touch listener for non-text box views to hide keyboard.
+        if (!(view instanceof EditText)) {
+
+            view.setOnTouchListener(new View.OnTouchListener() {
+
+                public boolean onTouch(View v, MotionEvent event) {
+                    CommonUtils.hideSoftKeyboard(BaseActivity.this);
+                    return false;
+                }
+
+            });
+        }
+
+        //If a layout container, iterate over children and seed recursion.
+        if (view instanceof ViewGroup) {
+
+            for (int i = 0; i < ((ViewGroup) view).getChildCount(); i++) {
+
+                View innerView = ((ViewGroup) view).getChildAt(i);
+
+                setupUI(innerView);
+            }
+        }
     }
 
     @Override

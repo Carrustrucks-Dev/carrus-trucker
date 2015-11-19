@@ -85,6 +85,15 @@
         <item name="android:maxHeight">30dip</item>
     </style>
 
+    <style name="Theme.UserDialog" parent="android:style/Theme.Dialog">
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:background">@android:color/transparent</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowMinWidthMajor">@android:dimen/dialog_min_width_major</item>
+        <item name="android:windowMinWidthMinor">@android:dimen/dialog_min_width_minor</item>
+
+    </style>
+
 
     <!--Pop up Theme-->
 

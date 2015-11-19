@@ -166,7 +166,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter implements 
                                 @Override
                                 public void failure(RetrofitError error) {
                                     CommonUtils.showRetrofitError((Activity) _context, error);
-                                    CommonUtils.showSingleButtonPopup(_context, "Oops!! Some error occurred. Please try again. ");
+//                                    CommonUtils.showSingleButtonPopup(_context, "Oops!! Some error occurred. Please try again. ");
                                     CommonUtils.dismissLoadingDialog();
                                 }
                             });

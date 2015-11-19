@@ -65,10 +65,12 @@ public class BookingDetails extends BaseActivity implements View.OnClickListener
     private Button orderStatusButton;
 
 
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_booking_details);
+        setupUI(getWindow().getDecorView().getRootView());
         init();
 
 
@@ -171,6 +173,7 @@ public class BookingDetails extends BaseActivity implements View.OnClickListener
         findViewById(R.id.retry_button).setOnClickListener(this);
         expListView = (ExpandableListView) findViewById(R.id.exListView);
 
+
     }
 
     @Override
@@ -213,7 +216,7 @@ public class BookingDetails extends BaseActivity implements View.OnClickListener
                                 orderStatusLayout.setBackgroundColor(getResources().getColor(R.color.green));
                             }
                             if (jsonObject.getJSONObject("data").getString("bookingStatus").equals("HALT") ||
-                                    jsonObject.getJSONObject("data").getString("bookingStatus").equals("COMPLETED")||
+                                    jsonObject.getJSONObject("data").getString("bookingStatus").equals("COMPLETED") ||
                                     jsonObject.getJSONObject("data").getString("bookingStatus").equals("ON_THE_WAY")) {
                                 orderStatusLayout.setBackgroundColor(getResources().getColor(R.color.dark_gery));
                             }
@@ -353,7 +356,6 @@ public class BookingDetails extends BaseActivity implements View.OnClickListener
     }
 
 
-
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -423,7 +425,9 @@ public class BookingDetails extends BaseActivity implements View.OnClickListener
                             Log.i("Success", "" + s);
                             orderStatusButton.setVisibility(View.GONE);
                             commonUtils.dismissLoadingDialog();
-                            getOrderDetails();
+                            Intent intent=new Intent(BookingDetails.this,RatingDialogActivity.class);
+                            intent.putExtra("bookingId", bookingId);
+                            startActivity(intent);
                         }
 
                         @Override
@@ -469,8 +473,11 @@ public class BookingDetails extends BaseActivity implements View.OnClickListener
                 }
                 break;
 
+
         }
     }
+
+
 
     @Override
     public void onBackPressed() {

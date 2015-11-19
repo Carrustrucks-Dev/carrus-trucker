@@ -123,7 +123,8 @@ public class CurrentShipmentFragment extends android.support.v4.app.Fragment imp
         public void onReceive(Context context, Intent intent) {
             // Get extra data included in the Intent
             tvBookingStatus.setText(intent.getStringExtra("bookingStatus").replace("_", " "));
-            Log.i("tvBookingStatus",intent.getStringExtra("bookingStatus"));
+
+
         }
     };
 
@@ -186,8 +187,8 @@ public class CurrentShipmentFragment extends android.support.v4.app.Fragment imp
                         shipperNumber=bookingData.getJSONObject("shipper").getString("phoneNumber");
 
                         getDriectionToDestination(new LatLng(gpsTracker.getLatitude(), gpsTracker.getLongitude()),
-                                bookingData.getJSONObject("pickUp").getJSONObject("coordinates").getString("pickUpLat") + ", " + bookingData.getJSONObject("pickUp").getJSONObject("coordinates").getString("pickUpLong"),
-                                bookingData.getJSONObject("dropOff").getJSONObject("coordinates").getString("dropOffLat") + ", " + bookingData.getJSONObject("dropOff").getJSONObject("coordinates").getString("dropOffLong"),
+                                bookingData.getJSONObject("pickUp").getJSONObject("coordinates").getString("pickUpLong") + ", " + bookingData.getJSONObject("pickUp").getJSONObject("coordinates").getString("pickUpLat"),
+                                bookingData.getJSONObject("dropOff").getJSONObject("coordinates").getString("dropOffLong") + ", " + bookingData.getJSONObject("dropOff").getJSONObject("coordinates").getString("dropOffLat"),
                                 GMapV2GetRouteDirection.MODE_DRIVING);
 
 
@@ -227,7 +228,7 @@ public class CurrentShipmentFragment extends android.support.v4.app.Fragment imp
                     builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
                     Document doc = builder.parse(in);
                     ArrayList<LatLng> directionPoint = v2GetRouteDirection.getDirection(doc);
-                    PolylineOptions rectLine = new PolylineOptions().width(6).color(Color.GREEN);
+                    PolylineOptions rectLine = new PolylineOptions().width(6).color(Color.BLUE);
 
                     for (int i = 0; i < directionPoint.size(); i++) {
                         rectLine.add(directionPoint.get(i));
@@ -236,8 +237,9 @@ public class CurrentShipmentFragment extends android.support.v4.app.Fragment imp
                     googleMap.addPolyline(rectLine);
                     MarkerOptions markerOptions = new MarkerOptions();
                     markerOptions.position(currentposition);
-                    markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
+                    markerOptions.icon(BitmapDescriptorFactory.fromResource(R.mipmap.icon_van));
                     googleMap.addMarker(markerOptions);
+
                 } catch (ParserConfigurationException e) {
                     e.printStackTrace();
                 } catch (SAXException e) {

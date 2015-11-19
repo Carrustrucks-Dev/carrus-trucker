@@ -14,6 +14,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ViewFlipper;
 
 import com.carrustruckerapp.R;
@@ -53,6 +54,7 @@ public class LoginActivity extends BaseActivity implements AppConstants {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        setupUI(getWindow().getDecorView().getRootView());
         init();
         View.OnClickListener handler = new View.OnClickListener() {
             public void onClick(View v) {
@@ -340,6 +342,7 @@ public class LoginActivity extends BaseActivity implements AppConstants {
                                 mBundle.putBoolean("isBooking",false);
                             }
                             intent.putExtras(mBundle);
+                            Toast.makeText(getApplicationContext(), jsonObject.getString("message"), Toast.LENGTH_SHORT).show();
                             startActivity(intent);
                             overridePendingTransition(R.anim.anim_slide_in_left, R.anim.anim_slide_out_left);
                             finish();

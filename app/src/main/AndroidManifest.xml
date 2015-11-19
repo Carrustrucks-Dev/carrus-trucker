@@ -68,11 +68,13 @@
             android:label="@string/title_activity_home_screen"
             android:screenOrientation="portrait" >
         </activity>
+
         <receiver
             android:name=".gcm.GcmBroadcastReceiver"
             android:permission="com.google.android.c2dm.permission.SEND" >
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+
                 <category android:name="com.carrustruckerapp" />
             </intent-filter>
         </receiver>
@@ -83,29 +85,37 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyBCaphzVCkJ1JlE8Z3zJCy2lDY0xnfseFE" />
 
-        <receiver android:name=".receivers.LocationStateReceiver">
+        <receiver android:name=".receivers.LocationStateReceiver" >
             <intent-filter>
-                <action android:name="android.location.PROVIDERS_CHANGED"/>
-                <category android:name="android.intent.category.DEFAULT"/>
+                <action android:name="android.location.PROVIDERS_CHANGED" />
+
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </receiver>
 
         <activity
             android:name=".activities.BookingDetails"
-            android:label="@string/title_activity_booking_details" >
+            android:label="@string/title_activity_booking_details"
+            android:screenOrientation="portrait">
         </activity>
-
         <activity
             android:name=".activities.ShowImageActivity"
             android:label=""
-            >
+            android:screenOrientation="portrait">
         </activity>
 
-        <service android:name=".services.MyService"></service>
+        <service android:name=".services.MyService" />
 
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="9a344ba4644c7661f8ee12e1e5573f21396bbaf0" />
+
+        <activity
+            android:name=".activities.RatingDialogActivity"
+            android:label="@string/title_activity_rating_dialog"
+            android:theme="@style/Theme.UserDialog"
+            android:screenOrientation="portrait">
+        </activity>
     </application>
 
 </manifest>

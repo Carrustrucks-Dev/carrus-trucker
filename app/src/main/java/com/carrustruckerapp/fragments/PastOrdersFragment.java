@@ -160,7 +160,7 @@ public class PastOrdersFragment extends Fragment implements AppConstants, SwipeR
             }
 
 
-            homeCallback.getWebServices().getPastOrders(homeCallback.getSharedPreference().getString(ACCESS_TOKEN, ""),"ASC",
+            homeCallback.getWebServices().getPastOrders(homeCallback.getSharedPreference().getString(ACCESS_TOKEN, ""),"DESC",
                     new Callback<String>() {
                         @Override
                         public void success(String serverResponse, Response response) {
