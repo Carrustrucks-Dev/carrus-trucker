@@ -9,9 +9,8 @@ import android.widget.ImageView;
 import android.widget.RatingBar;
 
 import com.carrustruckerapp.R;
-import com.carrustruckerapp.interfaces.WebServices;
+import com.carrustruckerapp.retrofit.RestClient;
 import com.carrustruckerapp.utils.CommonUtils;
-import com.carrustruckerapp.utils.GlobalClass;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -25,8 +24,6 @@ public class RatingDialogActivity extends BaseActivity implements View.OnClickLi
     private EditText etComment;
     private RatingBar ratingBar;
     private ImageView crossButton;
-    public GlobalClass globalClass;
-    public WebServices webServices;
     public SharedPreferences sharedPreferences;
     private String bookingId;
 
@@ -46,8 +43,6 @@ public class RatingDialogActivity extends BaseActivity implements View.OnClickLi
         crossButton.setOnClickListener(this);
         findViewById(R.id.ratingSubmitBtn).setOnClickListener(this);
         sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, Context.MODE_PRIVATE);
-        globalClass = (GlobalClass) getApplicationContext();
-        webServices = globalClass.getWebServices();
         bookingId = getIntent().getStringExtra("bookingId");
     }
 
@@ -70,7 +65,7 @@ public class RatingDialogActivity extends BaseActivity implements View.OnClickLi
 
     public void sendRating() {
         CommonUtils.showSingleButtonPopup(RatingDialogActivity.this,"Sending...");
-        webServices.addRating(sharedPreferences.getString(ACCESS_TOKEN, ""), bookingId, String.valueOf(ratingBar.getRating()), etComment.getText().toString(), new Callback<String>() {
+        RestClient.getWebServices().addRating(sharedPreferences.getString(ACCESS_TOKEN, ""), bookingId, String.valueOf(ratingBar.getRating()), etComment.getText().toString(), new Callback<String>() {
             @Override
             public void success(String s, Response response) {
                 try {
@@ -87,7 +82,7 @@ public class RatingDialogActivity extends BaseActivity implements View.OnClickLi
             @Override
             public void failure(RetrofitError error) {
                 CommonUtils.dismissLoadingDialog();
-                CommonUtils.showSingleButtonPopup(RatingDialogActivity.this, "Please try again.");
+                CommonUtils.showRetrofitError(RatingDialogActivity.this,error);
             }
         });
     }

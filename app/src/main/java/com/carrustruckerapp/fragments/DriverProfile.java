@@ -54,7 +54,7 @@ public class DriverProfile extends Fragment implements AppConstants {
 
 
     private void init(View v) {
-        driverImage = (CircleImageView) v.findViewById(R.id.profile_picture);
+        driverImage = (CircleImageView) v.findViewById(R.id.driverImage);
         driverName = (TextView) v.findViewById(R.id.driverName);
         driverRating = (RatingBar) v.findViewById(R.id.driverRating);
         driverId = (TextView) v.findViewById(R.id.tvDriverId);
@@ -87,13 +87,13 @@ public class DriverProfile extends Fragment implements AppConstants {
 
             }else{
                 Picasso.with(getActivity())
-                        .load(sharedPreferences.getString(DRIVER_IMAGE, "")).fit()
+                        .load(path).fit()
                         .centerCrop().memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE).skipMemoryCache()
                         .placeholder(R.mipmap.icon_placeholder)// optional
                         .into(driverImage);
             }
         } catch (Exception e) {
-
+            e.printStackTrace();
         }
 
     }

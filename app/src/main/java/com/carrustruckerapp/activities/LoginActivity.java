@@ -18,11 +18,13 @@ import android.widget.Toast;
 import android.widget.ViewFlipper;
 
 import com.carrustruckerapp.R;
-import com.carrustruckerapp.interfaces.WebServices;
+import com.carrustruckerapp.entities.ProfileData;
+import com.carrustruckerapp.retrofit.RestClient;
 import com.carrustruckerapp.utils.CommonUtils;
 import com.carrustruckerapp.utils.Connectivity;
-import com.carrustruckerapp.utils.GlobalClass;
 import com.carrustruckerapp.utils.MaterialDesignAnimations;
+import com.carrustruckerapp.utils.Prefs;
+import com.google.gson.Gson;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -36,8 +38,6 @@ public class LoginActivity extends BaseActivity  {
 
     private EditText etDriverId, etOtp;
     private Button submitButton, loginButton;
-    public WebServices webServices;
-    public GlobalClass globalClass;
     public String driverId, otp;
     public CommonUtils commonUtils;
     public SharedPreferences sharedPreferences;
@@ -152,8 +152,6 @@ public class LoginActivity extends BaseActivity  {
         etOtp = (EditText) findViewById(R.id.otp);
         submitButton = (Button) findViewById(R.id.submitButton);
         loginButton = (Button) findViewById(R.id.loginButton);
-        globalClass = (GlobalClass) getApplicationContext();
-        webServices = globalClass.getWebServices();
         driverIdLayout = (LinearLayout) findViewById(R.id.driverIdLayout);
         otpLayout = (LinearLayout) findViewById(R.id.otpLayout);
         flipper = (ViewFlipper) findViewById(R.id.flipper);
@@ -230,11 +228,11 @@ public class LoginActivity extends BaseActivity  {
 
     public void sendDriverId() {
         commonUtils.showLoadingDialog(LoginActivity.this, getResources().getString(R.string.sending));
-        webServices.checkDriverId(driverId, DEVICE_TYPE, DEVICE_NAME, sharedPreferences.getString(REGISTRATION_ID, ""),
+        RestClient.getWebServices().checkDriverId(driverId, DEVICE_TYPE, DEVICE_NAME, sharedPreferences.getString(REGISTRATION_ID, ""),
                 new Callback<String>() {
                     @Override
                     public void success(String serverResponse, Response response) {
-                        if(!isResendOtp) {
+                        if (!isResendOtp) {
                             try {
                                 flipper.setInAnimation(slideLeftIn);
                                 flipper.setOutAnimation(slideLeftOut);
@@ -250,7 +248,7 @@ public class LoginActivity extends BaseActivity  {
                     @Override
                     public void failure(RetrofitError retrofitError) {
                         int statusCode = retrofitError.getResponse().getStatus();
-                        if (statusCode == 401){
+                        if (statusCode == 401) {
                             String json = new String(((TypedByteArray) retrofitError.getResponse()
                                     .getBody()).getBytes());
                             try {
@@ -261,8 +259,7 @@ public class LoginActivity extends BaseActivity  {
                                 e.printStackTrace();
                             }
                             commonUtils.dismissLoadingDialog();
-                        }
-                        else {
+                        } else {
                             commonUtils.showRetrofitError(LoginActivity.this, retrofitError);
                             commonUtils.dismissLoadingDialog();
                         }
@@ -293,55 +290,71 @@ public class LoginActivity extends BaseActivity  {
 
     public void sendOtp() {
         commonUtils.showLoadingDialog(LoginActivity.this, getResources().getString(R.string.verifying));
-        webServices.checkOtp(driverId, otp,
+        RestClient.getWebServices().checkOtp(driverId, otp,
                 new Callback<String>() {
                     @Override
                     public void success(String serverResponse, Response response) {
                         try {
-                            SharedPreferences.Editor editor = sharedPreferences.edit();
-                            JSONObject jsonObject = new JSONObject(serverResponse);
-                            JSONObject data = jsonObject.getJSONObject("data");
-                            editor.putString(ACCESS_TOKEN, data.getString("accessToken"));
-                            editor.putString(DRIVER_ID, data.getJSONObject("profileData").getString("driverId"));
-                            editor.putString(DRIVER_NO,data.getJSONObject("profileData").getString("_id"));
-                            editor.putString(DRIVAR_NAME, data.getJSONObject("profileData").getString("driverName"));
-                            editor.putString(DRIVING_LICENSE, data.getJSONObject("profileData").getJSONObject("drivingLicense").getString("drivingLicenseNo"));
-                            editor.putString(VALIDITY,data.getJSONObject("profileData").getJSONObject("drivingLicense").getString("validity"));
-                            editor.putString(DRIVER_PHONENO, data.getJSONObject("profileData").getString("phoneNumber"));
-                            editor.putString(DL_STATE, data.getJSONObject("profileData").getString("stateDl"));
-                            editor.putString(RATING, data.getJSONObject("profileData").getString("rating"));
-//                            editor.putString(EMAIL, data.getString("email"));
-                            if (!data.getJSONObject("profileData").isNull("profilePicture")) {
-                                    JSONObject profilePicture = data.getJSONObject("profileData").getJSONObject("profilePicture");
-                                    editor.putString(DRIVER_IMAGE, profilePicture.getString("thumb"));
-                            } else {
-                                editor.putString(DRIVER_IMAGE, null);
+                            JSONObject data = new JSONObject(new JSONObject(serverResponse).getString("data"));
+                            Toast.makeText(getApplicationContext(), new JSONObject(serverResponse).getString("message"), Toast.LENGTH_SHORT).show();
+                            Gson gson = new Gson();
+                            ProfileData profileData = gson.fromJson(data.getString("profileData"), ProfileData.class);
+                            Prefs.with(LoginActivity.this).save(ACCESS_TOKEN, data.getString("accessToken"));
+                            Prefs.with(LoginActivity.this).save(DRIVER_ID, profileData.driverId);
+                            Prefs.with(LoginActivity.this).save(DRIVER_NO, profileData._id);
+                            Prefs.with(LoginActivity.this).save(DRIVAR_NAME, profileData.driverName);
+                            Prefs.with(LoginActivity.this).save(DRIVING_LICENSE, profileData.drivingLicense.drivingLicenseNo);
+                            Prefs.with(LoginActivity.this).save(VALIDITY, profileData.drivingLicense.validity);
+                            Prefs.with(LoginActivity.this).save(DRIVER_PHONENO, profileData.phoneNumber);
+                            Prefs.with(LoginActivity.this).save(DL_STATE, profileData.stateDl);
+                            Prefs.with(LoginActivity.this).save(RATING, profileData.rating);
+                            Prefs.with(LoginActivity.this).save(FLEET_OWNER_NO, profileData.fleetOwner.get(0).phoneNumber);
+                            if(profileData.profilePicture!=null){
+                                Prefs.with(LoginActivity.this).save(DRIVER_IMAGE, profileData.profilePicture.thumb);
                             }
-                            editor.commit();
+//                            SharedPreferences.Editor editor = sharedPreferences.edit();
+//                            JSONObject jsonObject = new JSONObject(serverResponse);
+//                            JSONObject data = jsonObject.getJSONObject("data");
+//                            editor.putString(ACCESS_TOKEN, data.getString("accessToken"));
+//                            editor.putString(DRIVER_ID, data.getJSONObject("profileData").getString("driverId"));
+//                            editor.putString(DRIVER_NO, data.getJSONObject("profileData").getString("_id"));
+//                            editor.putString(DRIVAR_NAME, data.getJSONObject("profileData").getString("driverName"));
+//                            editor.putString(DRIVING_LICENSE, data.getJSONObject("profileData").getJSONObject("drivingLicense").getString("drivingLicenseNo"));
+//                            editor.putString(VALIDITY, data.getJSONObject("profileData").getJSONObject("drivingLicense").getString("validity"));
+//                            editor.putString(DRIVER_PHONENO, data.getJSONObject("profileData").getString("phoneNumber"));
+//                            editor.putString(DL_STATE, data.getJSONObject("profileData").getString("stateDl"));
+//                            editor.putString(RATING, data.getJSONObject("profileData").getString("rating"));
+////                            editor.putString(EMAIL, data.getString("email"));
+//                            if (!data.getJSONObject("profileData").isNull("profilePicture")) {
+//                                JSONObject profilePicture = data.getJSONObject("profileData").getJSONObject("profilePicture");
+//                                editor.putString(DRIVER_IMAGE, profilePicture.getString("thumb"));
+//                            } else {
+//                                editor.putString(DRIVER_IMAGE, null);
+//                            }
+//                            editor.commit();
                             Intent intent = new Intent(LoginActivity.this, HomeScreen.class);
                             Bundle mBundle = new Bundle();
-                            if(data.has("booking")) {
-                                mBundle.putBoolean("isBooking",true);
-                                mBundle.putString("bookingId", data.getJSONObject("booking").getString("_id"));
-                                mBundle.putString("tracking", data.getJSONObject("booking").getString("tracking"));
-                                mBundle.putString("dropOffLong", data.getJSONObject("booking").getJSONObject("dropOff").getJSONObject("coordinates").getString("dropOffLong"));
-                                mBundle.putString("dropOffLat", data.getJSONObject("booking").getJSONObject("dropOff").getJSONObject("coordinates").getString("dropOffLat"));
-                                mBundle.putString("pickUpLong", data.getJSONObject("booking").getJSONObject("pickUp").getJSONObject("coordinates").getString("pickUpLong"));
-                                mBundle.putString("pickUpLat", data.getJSONObject("booking").getJSONObject("pickUp").getJSONObject("coordinates").getString("pickUpLat"));
-                                mBundle.putString("shipperName",data.getJSONObject("booking").getJSONObject("shipper").getString("firstName")+" "+
-                                        data.getJSONObject("booking").getJSONObject("shipper").getString("lastName"));
-                                mBundle.putString("bookingCreatedAt",data.getJSONObject("booking").getJSONObject("pickUp").getString("date"));
-                                mBundle.putString("bookingStatus",data.getJSONObject("booking").getString("bookingStatus"));
-                                mBundle.putString("shipperPhoneNumber",data.getJSONObject("booking").getJSONObject("shipper").getString("phoneNumber"));
-                                mBundle.putString("shippingJourney",CommonUtils.toCamelCase(data.getJSONObject("booking").getJSONObject("pickUp").getString("city"))+" to "+
-                                        CommonUtils.toCamelCase(data.getJSONObject("booking").getJSONObject("dropOff").getString("city")));
-                                mBundle.putString("timeSlot",data.getJSONObject("booking").getJSONObject("pickUp").getString("time"));
-                                mBundle.putString("truckNameNumber",data.getJSONObject("booking").getJSONObject("truck").getJSONObject("truckType").getString("typeTruckName"));
-                            }else {
-                                mBundle.putBoolean("isBooking",false);
-                            }
+//                            if (data.has("booking")) {
+//                                mBundle.putBoolean("isBooking", true);
+//                                mBundle.putString("bookingId", data.getJSONObject("booking").getString("_id"));
+//                                mBundle.putString("tracking", data.getJSONObject("booking").getString("tracking"));
+//                                mBundle.putString("dropOffLong", data.getJSONObject("booking").getJSONObject("dropOff").getJSONObject("coordinates").getString("dropOffLong"));
+//                                mBundle.putString("dropOffLat", data.getJSONObject("booking").getJSONObject("dropOff").getJSONObject("coordinates").getString("dropOffLat"));
+//                                mBundle.putString("pickUpLong", data.getJSONObject("booking").getJSONObject("pickUp").getJSONObject("coordinates").getString("pickUpLong"));
+//                                mBundle.putString("pickUpLat", data.getJSONObject("booking").getJSONObject("pickUp").getJSONObject("coordinates").getString("pickUpLat"));
+//                                mBundle.putString("shipperName", data.getJSONObject("booking").getJSONObject("shipper").getString("firstName") + " " +
+//                                        data.getJSONObject("booking").getJSONObject("shipper").getString("lastName"));
+//                                mBundle.putString("bookingCreatedAt", data.getJSONObject("booking").getJSONObject("pickUp").getString("date"));
+//                                mBundle.putString("bookingStatus", data.getJSONObject("booking").getString("bookingStatus"));
+//                                mBundle.putString("shipperPhoneNumber", data.getJSONObject("booking").getJSONObject("shipper").getString("phoneNumber"));
+//                                mBundle.putString("shippingJourney", CommonUtils.toCamelCase(data.getJSONObject("booking").getJSONObject("pickUp").getString("city")) + " to " +
+//                                        CommonUtils.toCamelCase(data.getJSONObject("booking").getJSONObject("dropOff").getString("city")));
+//                                mBundle.putString("timeSlot", data.getJSONObject("booking").getJSONObject("pickUp").getString("time"));
+//                                mBundle.putString("truckNameNumber", data.getJSONObject("booking").getJSONObject("truck").getJSONObject("truckType").getString("typeTruckName"));
+//                            } else {
+//                                mBundle.putBoolean("isBooking", false);
+//                            }
                             intent.putExtras(mBundle);
-                            Toast.makeText(getApplicationContext(), jsonObject.getString("message"), Toast.LENGTH_SHORT).show();
                             startActivity(intent);
                             overridePendingTransition(R.anim.anim_slide_in_left, R.anim.anim_slide_out_left);
                             finish();
@@ -354,10 +367,10 @@ public class LoginActivity extends BaseActivity  {
                     @Override
                     public void failure(RetrofitError retrofitError) {
                         int statusCode = retrofitError.getResponse().getStatus();
-                        if (statusCode == 400){
+                        if (statusCode == 400) {
                             etOtp.setText("");
                         }
-                        commonUtils.showRetrofitError(LoginActivity.this,retrofitError);
+                        commonUtils.showRetrofitError(LoginActivity.this, retrofitError);
 //                        try {
 //                            Log.e("request succesfull", "RetrofitError = " + retrofitError.toString());
 //                            if (((RetrofitError) retrofitError).getKind() == RetrofitError.Kind.NETWORK) {

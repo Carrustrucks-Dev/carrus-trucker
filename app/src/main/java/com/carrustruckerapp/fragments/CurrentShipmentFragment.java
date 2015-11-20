@@ -17,18 +17,20 @@ import android.widget.TextView;
 
 import com.carrustruckerapp.R;
 import com.carrustruckerapp.interfaces.AppConstants;
-import com.carrustruckerapp.interfaces.WebServices;
+import com.carrustruckerapp.retrofit.RestClient;
 import com.carrustruckerapp.services.MyService;
 import com.carrustruckerapp.utils.CommonUtils;
 import com.carrustruckerapp.utils.GMapV2GetRouteDirection;
 import com.carrustruckerapp.utils.GPSTracker;
-import com.carrustruckerapp.utils.GlobalClass;
 import com.carrustruckerapp.utils.Log;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 
@@ -63,8 +65,6 @@ public class CurrentShipmentFragment extends android.support.v4.app.Fragment imp
 
     private GoogleMap googleMap;
     private GPSTracker gpsTracker;
-    public WebServices googleWebServices,webServices;
-    public GlobalClass globalClass;
     private GMapV2GetRouteDirection v2GetRouteDirection;
     private Bundle bundle;
     private RelativeLayout noBookingLayout, bookingDetailsLayout;
@@ -72,6 +72,10 @@ public class CurrentShipmentFragment extends android.support.v4.app.Fragment imp
     private ImageView callShipper;
     private String shipperNumber;
     public SharedPreferences sharedPreferences;
+    private double []latitude=new double[2];
+    private double []longitude=new double[2];
+    public String name[]=new String[2];
+    private ArrayList<Marker> mMarkerArray = new ArrayList<Marker>();
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -84,9 +88,6 @@ public class CurrentShipmentFragment extends android.support.v4.app.Fragment imp
         View v = inflater.inflate(R.layout.fragment_current_shipment, container, false);
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mMessageReceiver,
                 new IntentFilter("custom-event-name"));
-        globalClass = (GlobalClass) getActivity().getApplicationContext();
-        googleWebServices = globalClass.getGoogleWebServices();
-        webServices=globalClass.getWebServices();
         gpsTracker = new GPSTracker(getActivity());
         googleMap = ((SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map)).getMap();
         googleMap.setMyLocationEnabled(true);
@@ -148,17 +149,17 @@ public class CurrentShipmentFragment extends android.support.v4.app.Fragment imp
 
     private void getCurrentBookings(){
         CommonUtils.showLoadingDialog(getActivity(),"loading...");
-        webServices.getCurrentBooking(sharedPreferences.getString(ACCESS_TOKEN, ""), new Callback<String>() {
+        RestClient.getWebServices().getCurrentBooking(sharedPreferences.getString(ACCESS_TOKEN, ""), new Callback<String>() {
             @Override
             public void success(String s, Response response) {
                 try {
-                    JSONObject serverResponse=new JSONObject(s);
-                    JSONObject data=serverResponse.getJSONObject("data");
-                    if(data.isNull("bookingData")){
+                    JSONObject serverResponse = new JSONObject(s);
+                    JSONObject data = serverResponse.getJSONObject("data");
+                    if (data.isNull("bookingData")) {
                         noBookingLayout.setVisibility(View.VISIBLE);
-                    }else{
+                    } else {
                         bookingDetailsLayout.setVisibility(View.VISIBLE);
-                        JSONObject bookingData=data.getJSONObject("bookingData");
+                        JSONObject bookingData = data.getJSONObject("bookingData");
                         Calendar cal = Calendar.getInstance();
                         TimeZone tz = cal.getTimeZone();
                         DateFormat f = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
@@ -170,20 +171,20 @@ public class CurrentShipmentFragment extends android.support.v4.app.Fragment imp
                             DateFormat dayName = new SimpleDateFormat("EEE");
                             tvDate.setText(date.format(d));
                             tvMonth.setText(month.format(d));
-                            tvTimeSlot.setText(dayName.format(d)+", "+bookingData.getJSONObject("pickUp").getString("time"));
+                            tvTimeSlot.setText(dayName.format(d) + ", " + bookingData.getJSONObject("pickUp").getString("time"));
                             tvTruckName.setText(bookingData.getJSONObject("truck").getJSONObject("truckType").getString("typeTruckName")
-                            +" "+bookingData.getJSONObject("assignTruck").getString("truckNumber"));
+                                    + " " + bookingData.getJSONObject("assignTruck").getString("truckNumber"));
                         } catch (ParseException e) {
                             e.printStackTrace();
                         }
 
-                        tvShipingJourney.setText(CommonUtils.toCamelCase(bookingData.getJSONObject("pickUp").getString("city"))+" to "+
+                        tvShipingJourney.setText(CommonUtils.toCamelCase(bookingData.getJSONObject("pickUp").getString("city")) + " to " +
                                 CommonUtils.toCamelCase(bookingData.getJSONObject("dropOff").getString("city")));
                         tvName.setText(CommonUtils.toCamelCase(bookingData.getJSONObject("shipper").getString("firstName") + " " +
                                 bookingData.getJSONObject("shipper").getString("lastName")));
                         tvBookingStatus.setText(bookingData.getString("bookingStatus").replace("_", " "));
 
-                        shipperNumber=bookingData.getJSONObject("shipper").getString("phoneNumber");
+                        shipperNumber = bookingData.getJSONObject("shipper").getString("phoneNumber");
 
                         getDriectionToDestination(new LatLng(gpsTracker.getLatitude(), gpsTracker.getLongitude()),
                                 bookingData.getJSONObject("pickUp").getJSONObject("coordinates").getString("pickUpLong") + ", " + bookingData.getJSONObject("pickUp").getJSONObject("coordinates").getString("pickUpLat"),
@@ -203,20 +204,20 @@ public class CurrentShipmentFragment extends android.support.v4.app.Fragment imp
                 }
 
                 CommonUtils.dismissLoadingDialog();
-                Log.d("Response",s);
+                Log.d("Response", s);
             }
 
             @Override
             public void failure(RetrofitError error) {
-                Log.d("failure",""+error);
+                Log.d("failure", "" + error);
                 CommonUtils.dismissLoadingDialog();
             }
         });
     }
 
     //Path Direction Call
-    private void getDriectionToDestination(final LatLng currentposition, String start, String end, String mode) {
-        googleWebServices.getDriections(start, end, "false", "metric", mode, new Callback<String>() {
+    private void getDriectionToDestination(final LatLng currentposition, final String start, final String end, String mode) {
+        RestClient.getGoogleApiService().getDriections(start, end, "false", "metric", mode, new Callback<String>() {
             @Override
             public void success(String s, Response response) {
                 googleMap.clear();
@@ -239,6 +240,36 @@ public class CurrentShipmentFragment extends android.support.v4.app.Fragment imp
                     markerOptions.icon(BitmapDescriptorFactory.fromResource(R.mipmap.icon_van));
                     googleMap.addMarker(markerOptions);
 
+                    String source[] = start.split(",");
+                    longitude[0]=Double.valueOf(source[1]);
+                    latitude[0]=Double.valueOf(source[0]);
+
+//                    MarkerOptions sourceMarker = new MarkerOptions();
+//                    sourceMarker.position(new LatLng(Double.valueOf(source[0]), Double.valueOf(source[1])));
+//                    sourceMarker.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
+//                    googleMap.addMarker(sourceMarker);
+
+                    String destination[] = end.split(",");
+                    longitude[1]=Double.valueOf(destination[1]);
+                    latitude[1]=Double.valueOf(destination[0]);
+
+//                    MarkerOptions destinationMarker = new MarkerOptions();
+//                    destinationMarker.position(new LatLng(Double.valueOf(destination[0]), Double.valueOf(destination[1])));
+//                    destinationMarker.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
+//                    googleMap.addMarker(destinationMarker);
+
+                    addmarkers();
+                    LatLngBounds.Builder builder1 = new LatLngBounds.Builder();
+                    for (Marker marker : mMarkerArray) {
+                        builder1.include(marker.getPosition());
+                    }
+                    LatLngBounds bounds = builder1.build();
+
+                    int padding = 0; // offset from edges of the map in pixels
+                    CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
+                    googleMap.animateCamera(cu);
+
+
                 } catch (ParserConfigurationException e) {
                     e.printStackTrace();
                 } catch (SAXException e) {
@@ -254,6 +285,22 @@ public class CurrentShipmentFragment extends android.support.v4.app.Fragment imp
                 Log.e("error", "" + error);
             }
         });
+    }
+
+
+    public void addmarkers() {
+
+        for (int i = 0; i < latitude.length; i++) {
+
+            LatLng location = new LatLng(latitude[i],longitude[i]);
+
+            Marker marker = googleMap.addMarker(new MarkerOptions().position(location)
+                            .title(name[i])
+                            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
+            );
+
+            mMarkerArray.add(marker);
+        }
     }
 
     @Override

@@ -14,9 +14,8 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.carrustruckerapp.R;
-import com.carrustruckerapp.interfaces.WebServices;
+import com.carrustruckerapp.retrofit.RestClient;
 import com.carrustruckerapp.utils.CommonUtils;
-import com.carrustruckerapp.utils.GlobalClass;
 import com.carrustruckerapp.utils.Log;
 import com.squareup.picasso.Picasso;
 
@@ -41,8 +40,6 @@ public class ShowImageActivity extends BaseActivity  {
     public ImageView closeButton;
     private   Button uploadNewButton;
     String orderId,documentName,imagePath;
-    public WebServices webServices;
-    public GlobalClass globalClass;
     public SharedPreferences sharedPreferences;
     public Map<String, TypedFile> images;
     private String url;
@@ -56,8 +53,6 @@ public class ShowImageActivity extends BaseActivity  {
         images = new HashMap<String, TypedFile>();
         closeButton=(ImageView)findViewById(R.id.imageView_close);
         uploadNewButton=(Button)findViewById(R.id.upload_new_document);
-        globalClass = (GlobalClass) getApplicationContext();
-        webServices = globalClass.getWebServices();
         sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, Context.MODE_PRIVATE);
         Intent intent=getIntent();
         url=intent.getStringExtra("url");
@@ -136,22 +131,22 @@ public class ShowImageActivity extends BaseActivity  {
                     images.put("consigmentNote", new TypedFile("image/*", new File(imagePath)));
                 }
                 CommonUtils.showLoadingDialog(ShowImageActivity.this, "Uploading...");
-                webServices.uploadDocument(sharedPreferences.getString(ACCESS_TOKEN, ""), new TypedString(orderId), images, new Callback<String>() {
+                RestClient.getWebServices().uploadDocument(sharedPreferences.getString(ACCESS_TOKEN, ""), new TypedString(orderId), images, new Callback<String>() {
                     @Override
                     public void success(String s, Response response) {
                         try {
                             JSONObject jsonObject = new JSONObject(s);
                             CommonUtils.dismissLoadingDialog();
                             CommonUtils.showSingleButtonPopup(ShowImageActivity.this, jsonObject.getString("message"));
-                            switch (documentName){
+                            switch (documentName) {
                                 case "POD":
-                                    url=jsonObject.getJSONObject("data").getString("podUpload");
+                                    url = jsonObject.getJSONObject("data").getString("podUpload");
                                     break;
                                 case "Invoice":
-                                    url=jsonObject.getJSONObject("data").getString("invoiceUpdate");
+                                    url = jsonObject.getJSONObject("data").getString("invoiceUpdate");
                                     break;
                                 case "Consignment Notes":
-                                    url=jsonObject.getJSONObject("data").getString("consigmentNoteUpdate");
+                                    url = jsonObject.getJSONObject("data").getString("consigmentNoteUpdate");
                                     break;
                             }
                             Picasso.with(ShowImageActivity.this).
@@ -189,7 +184,7 @@ public class ShowImageActivity extends BaseActivity  {
                     images.put("consigmentNote", new TypedFile("*/*", new File(imagePath)));
                 }
                 CommonUtils.showLoadingDialog(ShowImageActivity.this, "Uploading...");
-                webServices.uploadDocument(sharedPreferences.getString(ACCESS_TOKEN, ""), new TypedString(orderId), images, new Callback<String>() {
+                RestClient.getWebServices().uploadDocument(sharedPreferences.getString(ACCESS_TOKEN, ""), new TypedString(orderId), images, new Callback<String>() {
                     @Override
                     public void success(String s, Response response) {
                         try {

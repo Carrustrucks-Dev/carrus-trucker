@@ -22,9 +22,8 @@ import com.carrustruckerapp.activities.ShowImageActivity;
 import com.carrustruckerapp.entities.ExpandableChildItem;
 import com.carrustruckerapp.interfaces.ActivityResultCallback;
 import com.carrustruckerapp.interfaces.AppConstants;
-import com.carrustruckerapp.interfaces.WebServices;
+import com.carrustruckerapp.retrofit.RestClient;
 import com.carrustruckerapp.utils.CommonUtils;
-import com.carrustruckerapp.utils.GlobalClass;
 import com.carrustruckerapp.utils.Log;
 
 import org.json.JSONException;
@@ -51,8 +50,6 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter implements 
     private List<String> _listDataHeader; // header titles
     // child data in format of header title, child title
     private HashMap<String, List<ExpandableChildItem>> _listDataChild;
-    public WebServices webServices;
-    public GlobalClass globalClass;
     public String orderId;
     public SharedPreferences sharedPreferences;
     public String imagePath;
@@ -67,8 +64,6 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter implements 
         this._context = context;
         this._listDataHeader = listDataHeader;
         this._listDataChild = listChildData;
-        globalClass = (GlobalClass) _context.getApplicationContext();
-        webServices = globalClass.getWebServices();
         sharedPreferences = _context.getSharedPreferences(SHARED_PREFERENCES, Context.MODE_PRIVATE);
         this.resultCallback = (ActivityResultCallback) context;
         images = new HashMap<String, TypedFile>();
@@ -155,7 +150,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter implements 
                         } else {
                             final String myNotesData = myNotes.getText().toString().trim();
                             CommonUtils.showLoadingDialog((Activity) _context, "Sending...");
-                            webServices.addNotes(sharedPreferences.getString(ACCESS_TOKEN, ""), orderId, myNotes.getText().toString().trim(), new Callback<String>() {
+                            RestClient.getWebServices().addNotes(sharedPreferences.getString(ACCESS_TOKEN, ""), orderId, myNotes.getText().toString().trim(), new Callback<String>() {
                                 @Override
                                 public void success(String s, Response response) {
                                     expandableChildItem.setName(myNotesData);
@@ -308,7 +303,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter implements 
                     images.put("consigmentNote", new TypedFile("image/*", new File(imagePath)));
                 }
                 CommonUtils.showLoadingDialog((Activity) _context, "Uploading...");
-                webServices.uploadDocument(sharedPreferences.getString(ACCESS_TOKEN, ""), new TypedString(orderId), images, new Callback<String>() {
+                RestClient.getWebServices().uploadDocument(sharedPreferences.getString(ACCESS_TOKEN, ""), new TypedString(orderId), images, new Callback<String>() {
                     @Override
                     public void success(String s, Response response) {
                         try {
@@ -362,7 +357,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter implements 
                     images.put("consigmentNote", new TypedFile("*/*", new File(imagePath)));
                 }
                 CommonUtils.showLoadingDialog((Activity) _context, "Uploading...");
-                webServices.uploadDocument(sharedPreferences.getString(ACCESS_TOKEN, ""), new TypedString(orderId), images, new Callback<String>() {
+                RestClient.getWebServices().uploadDocument(sharedPreferences.getString(ACCESS_TOKEN, ""), new TypedString(orderId), images, new Callback<String>() {
                     @Override
                     public void success(String s, Response response) {
                         try {

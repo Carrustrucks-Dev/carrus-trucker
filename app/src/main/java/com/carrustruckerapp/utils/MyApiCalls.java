@@ -32,10 +32,11 @@ public class MyApiCalls implements AppConstants {
             pushClientManager.registerIfNeeded(new GCMClientManager.RegistrationCompletedHandler() {
                 @Override
                 public void onSuccess(String registrationId, boolean isNewRegistration) {
-                    sharedPreferences = activity.getSharedPreferences(SHARED_PREFERENCES, Context.MODE_PRIVATE);
-                    SharedPreferences.Editor editor = sharedPreferences.edit();
-                    editor.putString(REGISTRATION_ID, registrationId);
-                    editor.commit();
+                    Prefs.with(activity).save(REGISTRATION_ID, registrationId);
+//                    sharedPreferences = activity.getSharedPreferences(SHARED_PREFERENCES, Context.MODE_PRIVATE);
+//                    SharedPreferences.Editor editor = sharedPreferences.edit();
+//                    editor.putString(REGISTRATION_ID, registrationId);
+//                    editor.commit();
                     Log.v("hello reg_id = ", registrationId);
                 }
                 @Override

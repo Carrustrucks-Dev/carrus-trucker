@@ -12,8 +12,7 @@ import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
 
 import com.carrustruckerapp.interfaces.AppConstants;
-import com.carrustruckerapp.interfaces.WebServices;
-import com.carrustruckerapp.utils.GlobalClass;
+import com.carrustruckerapp.retrofit.RestClient;
 import com.carrustruckerapp.utils.Log;
 
 import org.json.JSONException;
@@ -29,8 +28,6 @@ public class MyService extends Service implements AppConstants, LocationListener
     private MyThread mythread;
     public boolean isRunning = false;
     private String orderId;
-    public WebServices webServices;
-    public GlobalClass globalClass;
     private SharedPreferences sharedPreferences;
     LocationManager locationManager;
     Location location;
@@ -45,8 +42,6 @@ public class MyService extends Service implements AppConstants, LocationListener
     @Override
     public void onCreate() {
         super.onCreate();
-        globalClass = (GlobalClass) getApplicationContext();
-        webServices = globalClass.getWebServices();
         sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, Context.MODE_PRIVATE);
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
         isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
@@ -130,7 +125,7 @@ public class MyService extends Service implements AppConstants, LocationListener
                     }
                 }
 
-                webServices.sendTracking(orderId,
+                RestClient.getWebServices().sendTracking(orderId,
                         sharedPreferences.getString(DRIVER_NO, ""),
                         String.valueOf(location.getLongitude()),
                         String.valueOf(location.getLatitude()), new Callback<String>() {
@@ -138,12 +133,12 @@ public class MyService extends Service implements AppConstants, LocationListener
                             public void success(String s, Response response) {
 
                                 try {
-                                    JSONObject jsonObject=new JSONObject(s);
+                                    JSONObject jsonObject = new JSONObject(s);
 
-                                Intent i = new Intent("custom-event-name");
-                                i.putExtra("bookingStatus", jsonObject.getJSONObject("data").getString("bookingStatus"));
-                                LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(i);
-                                Log.d("Tracking Success", s);
+                                    Intent i = new Intent("custom-event-name");
+                                    i.putExtra("bookingStatus", jsonObject.getJSONObject("data").getString("bookingStatus"));
+                                    LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(i);
+                                    Log.d("Tracking Success", s);
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }

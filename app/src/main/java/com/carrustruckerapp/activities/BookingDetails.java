@@ -20,9 +20,8 @@ import com.carrustruckerapp.adapters.ExpandableListAdapter;
 import com.carrustruckerapp.entities.ExpandableChildItem;
 import com.carrustruckerapp.interfaces.ActivityResultCallback;
 import com.carrustruckerapp.interfaces.AppConstants;
-import com.carrustruckerapp.interfaces.WebServices;
+import com.carrustruckerapp.retrofit.RestClient;
 import com.carrustruckerapp.utils.CommonUtils;
-import com.carrustruckerapp.utils.GlobalClass;
 import com.carrustruckerapp.utils.Log;
 import com.carrustruckerapp.utils.MaterialDesignAnimations;
 
@@ -45,9 +44,6 @@ public class BookingDetails extends BaseActivity implements View.OnClickListener
     ExpandableListView expListView;
     List<String> listDataHeader;
     HashMap<String, List<ExpandableChildItem>> listDataChild;
-    ExpandableChildItem expandableChildItem;
-    public GlobalClass globalClass;
-    public WebServices webServices;
     public CommonUtils commonUtils;
     public String accessToken;
     public SharedPreferences sharedPreferences;
@@ -116,8 +112,6 @@ public class BookingDetails extends BaseActivity implements View.OnClickListener
         findViewById(R.id.back_button).setOnClickListener(this);
         sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, Context.MODE_PRIVATE);
         accessToken = sharedPreferences.getString(ACCESS_TOKEN, "");
-        globalClass = (GlobalClass) getApplicationContext();
-        webServices = globalClass.getWebServices();
         commonUtils = new CommonUtils();
         crnNumber = (TextView) findViewById(R.id.crn_number);
         orderStatus = (TextView) findViewById(R.id.order_status);
@@ -166,7 +160,7 @@ public class BookingDetails extends BaseActivity implements View.OnClickListener
 
     public void getOrderDetails() {
         commonUtils.showLoadingDialog(BookingDetails.this, getResources().getString(R.string.loading));
-        webServices.getBookingDetails(accessToken, bookingId,
+        RestClient.getWebServices().getBookingDetails(accessToken, bookingId,
                 new Callback<String>() {
                     @Override
                     public void success(String serverResponse, Response response) {
@@ -345,7 +339,7 @@ public class BookingDetails extends BaseActivity implements View.OnClickListener
         switch (v.getId()) {
             case R.id.collect_cash_button:
                 commonUtils.showLoadingDialog(BookingDetails.this, getResources().getString(R.string.loading));
-                webServices.collectCash(accessToken, bookingId, "PAID", new Callback<String>() {
+                RestClient.getWebServices().collectCash(accessToken, bookingId, "PAID", new Callback<String>() {
                     @Override
                     public void success(String serverResponse, Response response) {
                         Log.i("Success", "" + serverResponse);
@@ -405,7 +399,7 @@ public class BookingDetails extends BaseActivity implements View.OnClickListener
             case R.id.status_button:
                 if (orderStatusButton.getText().equals("END TRIP")) {
                     commonUtils.showLoadingDialog(BookingDetails.this, getResources().getString(R.string.loading));
-                    webServices.completeOrder(accessToken, bookingId, "COMPLETED", new Callback<String>() {
+                    RestClient.getWebServices().completeOrder(accessToken, bookingId, "COMPLETED", new Callback<String>() {
                         @Override
                         public void success(String s, Response response) {
                             Log.i("Success", "" + s);
@@ -425,7 +419,7 @@ public class BookingDetails extends BaseActivity implements View.OnClickListener
                     });
                 } else if (orderStatusButton.getText().equals("ON THE WAY")) {
                     commonUtils.showLoadingDialog(BookingDetails.this, getResources().getString(R.string.loading));
-                    webServices.changeOrderStatus(accessToken, bookingId, "ON_THE_WAY", new Callback<String>() {
+                    RestClient.getWebServices().changeOrderStatus(accessToken, bookingId, "ON_THE_WAY", new Callback<String>() {
                         @Override
                         public void success(String s, Response response) {
                             Log.i("Success", "" + s);
@@ -443,7 +437,7 @@ public class BookingDetails extends BaseActivity implements View.OnClickListener
                     });
                 } else if (orderStatusButton.getText().equals("START TRIP")) {
                     commonUtils.showLoadingDialog(BookingDetails.this, getResources().getString(R.string.loading));
-                    webServices.changeOrderStatus(accessToken, bookingId, "ON_GOING", new Callback<String>() {
+                    RestClient.getWebServices().changeOrderStatus(accessToken, bookingId, "ON_GOING", new Callback<String>() {
                         @Override
                         public void success(String s, Response response) {
                             Log.i("Success", "" + s);

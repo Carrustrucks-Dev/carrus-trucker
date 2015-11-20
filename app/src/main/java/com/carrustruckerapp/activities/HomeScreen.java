@@ -32,10 +32,10 @@ import com.carrustruckerapp.fragments.CurrentShipmentFragment;
 import com.carrustruckerapp.fragments.DriverProfile;
 import com.carrustruckerapp.interfaces.HomeCallback;
 import com.carrustruckerapp.interfaces.WebServices;
+import com.carrustruckerapp.retrofit.RestClient;
 import com.carrustruckerapp.services.MyService;
 import com.carrustruckerapp.utils.CommonUtils;
 import com.carrustruckerapp.utils.Connectivity;
-import com.carrustruckerapp.utils.GlobalClass;
 import com.carrustruckerapp.utils.Log;
 import com.squareup.picasso.MemoryPolicy;
 import com.squareup.picasso.Picasso;
@@ -64,8 +64,6 @@ public class HomeScreen extends BaseActivity implements HomeCallback {
     private TextView driverName;
     private TextView headerTitle;
     public Connectivity connectivity;
-    public GlobalClass globalClass;
-    public WebServices webServices;
     public CommonUtils commonUtils;
     public String accessToken;
     public LinearLayout errorLayout;
@@ -148,21 +146,19 @@ public class HomeScreen extends BaseActivity implements HomeCallback {
         accessToken = sharedPreferences.getString(ACCESS_TOKEN, "");
         headerTitle=(TextView) findViewById(R.id.headerTitle);
         connectivity=new Connectivity(HomeScreen.this);
-        globalClass = (GlobalClass) getApplicationContext();
-        webServices = globalClass.getWebServices();
         commonUtils = new CommonUtils();
         errorLayout = (LinearLayout) findViewById(R.id.errorLayout);
         bundle=getIntent().getExtras();
     }
 
-    @Override
-    public GlobalClass getGlobalClass() {
-        return globalClass;
-    }
+//    @Override
+//    public GlobalClass getGlobalClass() {
+//        return globalClass;
+//    }
 
     @Override
     public WebServices getWebServices() {
-        return webServices;
+        return RestClient.getWebServices();
     }
 
     @Override
@@ -230,7 +226,7 @@ public class HomeScreen extends BaseActivity implements HomeCallback {
     public void logout() {
         commonUtils.showLoadingDialog(HomeScreen.this, "Please wait...");
         if (connectivity.isConnectingToInternet()) {
-            webServices.logoutDriver(accessToken,/*accessToken,*/
+            RestClient.getWebServices().logoutDriver(accessToken,/*accessToken,*/
                     new Callback<String>() {
                         @Override
                         public void success(String serverResponse, Response response) {

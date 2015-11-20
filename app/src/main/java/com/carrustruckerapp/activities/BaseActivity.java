@@ -21,6 +21,7 @@ import com.carrustruckerapp.interfaces.AppConstants;
 import com.carrustruckerapp.interfaces.GPSDailogCallBack;
 import com.carrustruckerapp.utils.CommonUtils;
 import com.carrustruckerapp.utils.Log;
+import com.carrustruckerapp.utils.Prefs;
 
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
@@ -29,11 +30,13 @@ public class BaseActivity extends FragmentActivity implements GPSDailogCallBack,
 
     private Activity activity;
     private Dialog dialog;
+    public String accessToken;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         activity = this;
+        accessToken= Prefs.with(this).getString(ACCESS_TOKEN, "");
         mMessageReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
