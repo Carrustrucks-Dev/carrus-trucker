@@ -1,6 +1,5 @@
 package com.carrustruckerapp.activities;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -15,7 +14,6 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.carrustruckerapp.R;
-import com.carrustruckerapp.interfaces.AppConstants;
 import com.carrustruckerapp.interfaces.WebServices;
 import com.carrustruckerapp.utils.CommonUtils;
 import com.carrustruckerapp.utils.GlobalClass;
@@ -38,7 +36,7 @@ import retrofit.mime.TypedString;
 /**
  * Created by Saurbhv on 11/17/15.
  */
-public class ShowImageActivity extends Activity implements AppConstants {
+public class ShowImageActivity extends BaseActivity  {
 
     public ImageView closeButton;
     private   Button uploadNewButton;
@@ -51,7 +49,7 @@ public class ShowImageActivity extends Activity implements AppConstants {
     private ImageView imageView;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_show_image);

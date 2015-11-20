@@ -18,7 +18,6 @@ import android.widget.Toast;
 import android.widget.ViewFlipper;
 
 import com.carrustruckerapp.R;
-import com.carrustruckerapp.interfaces.AppConstants;
 import com.carrustruckerapp.interfaces.WebServices;
 import com.carrustruckerapp.utils.CommonUtils;
 import com.carrustruckerapp.utils.Connectivity;
@@ -33,7 +32,7 @@ import retrofit.RetrofitError;
 import retrofit.client.Response;
 import retrofit.mime.TypedByteArray;
 
-public class LoginActivity extends BaseActivity implements AppConstants {
+public class LoginActivity extends BaseActivity  {
 
     private EditText etDriverId, etOtp;
     private Button submitButton, loginButton;

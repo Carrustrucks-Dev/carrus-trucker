@@ -25,22 +25,22 @@ import com.carrustruckerapp.utils.Log;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 
-public class BaseActivity extends FragmentActivity implements GPSDailogCallBack,AppConstants{
+public class BaseActivity extends FragmentActivity implements GPSDailogCallBack, AppConstants {
+
     private Activity activity;
+    private Dialog dialog;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
-        activity=this;
+        activity = this;
         mMessageReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                if(dialog!=null)
+                if (dialog != null)
                     dialog.dismiss();
                 boolean enabled = CommonUtils.isGPSEnabled(activity);
                 Log.e("GPS Online Status", "" + enabled);
-
             }
         };
     }
@@ -56,28 +56,25 @@ public class BaseActivity extends FragmentActivity implements GPSDailogCallBack,
         super.onResume();
         LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver,
                 new IntentFilter("gpstracker"));
-if(!(activity instanceof SplashScreen)) {
-    Intent i = new Intent("gpstracker");
-
-    LocalBroadcastManager.getInstance(activity).sendBroadcast(i);
-}
+        if (!(activity instanceof SplashScreen)) {
+            Intent i = new Intent("gpstracker");
+            LocalBroadcastManager.getInstance(activity).sendBroadcast(i);
+        }
     }
 
-    private BroadcastReceiver mMessageReceiver ;
+    private BroadcastReceiver mMessageReceiver;
 
     @Override
     protected void onPause() {
         super.onPause();
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver);
-        if(dialog!=null)
+        if (dialog != null)
             dialog.dismiss();
     }
 
     public void setupUI(View view) {
-
         //Set up touch listener for non-text box views to hide keyboard.
         if (!(view instanceof EditText)) {
-
             view.setOnTouchListener(new View.OnTouchListener() {
 
                 public boolean onTouch(View v, MotionEvent event) {
@@ -90,11 +87,8 @@ if(!(activity instanceof SplashScreen)) {
 
         //If a layout container, iterate over children and seed recursion.
         if (view instanceof ViewGroup) {
-
             for (int i = 0; i < ((ViewGroup) view).getChildCount(); i++) {
-
                 View innerView = ((ViewGroup) view).getChildAt(i);
-
                 setupUI(innerView);
             }
         }
@@ -110,39 +104,30 @@ if(!(activity instanceof SplashScreen)) {
         super.onDestroy();
     }
 
-    Dialog dialog;
+
     @Override
     public void showGSP() {
-        Log.e("showGSP","showGSP");
+        Log.e("showGSP", "showGSP");
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(activity);
-
-        // Setting Dialog Title
         alertDialog.setTitle("GPS is settings");
-
-        // Setting Dialog Message
         alertDialog.setMessage("GPS is not enabled. Do you want to go to settings menu?");
-
-        // On pressing Settings button
         alertDialog.setPositiveButton("Settings", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
                 Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-               startActivity(intent);
-
+                startActivity(intent);
             }
         });
-
         alertDialog.setCancelable(false);
-
 //         on pressing cancel button
-    /*    alertDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.cancel();
-            }
-        });*/
+//       alertDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+//            public void onClick(DialogInterface dialog, int which) {
+//                dialog.cancel();
+//            }
+//        });
 
         // Showing Alert Message
-          dialog=alertDialog.create();
+        dialog = alertDialog.create();
         dialog.show();
     }
 }

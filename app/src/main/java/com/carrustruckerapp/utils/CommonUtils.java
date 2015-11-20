@@ -29,6 +29,12 @@ import com.carrustruckerapp.activities.LoginActivity;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -147,8 +153,8 @@ public class CommonUtils {
         }
     }
 
-    public static void showSingleButtonPopup(Context context, String msg){
-        final Dialog dialog = new Dialog(context,android.R.style.Theme_Translucent_NoTitleBar);
+    public static void showSingleButtonPopup(Context context, String msg) {
+        final Dialog dialog = new Dialog(context, android.R.style.Theme_Translucent_NoTitleBar);
 
         //setting custom layout to dialog
         dialog.setContentView(R.layout.single_button_custom_dialog);
@@ -174,7 +180,7 @@ public class CommonUtils {
         dialog.show();
     }
 
-    public static void showRetrofitError(Activity activity,RetrofitError retrofitError){
+    public static void showRetrofitError(Activity activity, RetrofitError retrofitError) {
         try {
             Log.e("request succesfull", "RetrofitError = " + retrofitError.toString());
             if (((RetrofitError) retrofitError).getKind() == RetrofitError.Kind.NETWORK) {
@@ -206,16 +212,15 @@ public class CommonUtils {
     }
 
     /**
-     *
      * @param ctx
      * @param v
      */
-    public static void slide_down(Context ctx, View v){
+    public static void slide_down(Context ctx, View v) {
 
         Animation a = AnimationUtils.loadAnimation(ctx, R.anim.slide_down);
-        if(a != null){
+        if (a != null) {
             a.reset();
-            if(v != null){
+            if (v != null) {
                 v.clearAnimation();
                 v.startAnimation(a);
                 v.setVisibility(View.VISIBLE);
@@ -224,12 +229,12 @@ public class CommonUtils {
         }
     }
 
-    public static void slide_up(Context ctx, View v){
+    public static void slide_up(Context ctx, View v) {
 
         Animation a = AnimationUtils.loadAnimation(ctx, R.anim.slide_up);
-        if(a != null){
+        if (a != null) {
             a.reset();
-            if(v != null){
+            if (v != null) {
                 v.clearAnimation();
                 v.startAnimation(a);
                 v.setVisibility(View.GONE);
@@ -237,46 +242,62 @@ public class CommonUtils {
         }
     }
 
-    public  String getDateSuffix( int i) {
+    public String getDateSuffix(int i) {
         switch (i) {
-            case 1: case 21: case 31:
+            case 1:
+            case 21:
+            case 31:
                 return ("st");
 
-            case 2: case 22:
+            case 2:
+            case 22:
                 return ("nd");
 
-            case 3: case 23:
+            case 3:
+            case 23:
                 return ("rd");
 
-            case 4: case 5:
-            case 6: case 7:
-            case 8: case 9:
-            case 10: case 11:
-            case 12: case 13:
-            case 14: case 15:
-            case 16: case 17:
-            case 18: case 19:
-            case 20: case 24:
-            case 25: case 26:
-            case 27: case 28:
-            case 29: case 30:
+            case 4:
+            case 5:
+            case 6:
+            case 7:
+            case 8:
+            case 9:
+            case 10:
+            case 11:
+            case 12:
+            case 13:
+            case 14:
+            case 15:
+            case 16:
+            case 17:
+            case 18:
+            case 19:
+            case 20:
+            case 24:
+            case 25:
+            case 26:
+            case 27:
+            case 28:
+            case 29:
+            case 30:
                 return ("th");
             default:
                 return ("");
         }
     }
 
-    public static boolean isGPSEnabled(Context context){
-        GPSTracker gpsTracker=new GPSTracker(context);
-        if(gpsTracker.canGetLocation()){
+    public static boolean isGPSEnabled(Context context) {
+        GPSTracker gpsTracker = new GPSTracker(context);
+        if (gpsTracker.canGetLocation()) {
             return true;
-        }else{
+        } else {
             gpsTracker.showSettingsAlert();
             return false;
         }
     }
 
-    public static int getCameraPhotoOrientation( String imagePath){
+    public static int getCameraPhotoOrientation(String imagePath) {
         int rotate = 0;
         try {
             //context.getContentResolver().notifyChange(imageUri, null);
@@ -313,7 +334,7 @@ public class CommonUtils {
      * other file-based ContentProviders.
      *
      * @param context The context.
-     * @param uri The Uri to query.
+     * @param uri     The Uri to query.
      * @author paulburke
      */
     public static String getPath(final Context context, final Uri uri) {
@@ -359,7 +380,7 @@ public class CommonUtils {
                 }
 
                 final String selection = "_id=?";
-                final String[] selectionArgs = new String[] {
+                final String[] selectionArgs = new String[]{
                         split[1]
                 };
 
@@ -387,9 +408,9 @@ public class CommonUtils {
      * Get the value of the data column for this Uri. This is useful for
      * MediaStore Uris, and other file-based ContentProviders.
      *
-     * @param context The context.
-     * @param uri The Uri to query.
-     * @param selection (Optional) Filter used in the query.
+     * @param context       The context.
+     * @param uri           The Uri to query.
+     * @param selection     (Optional) Filter used in the query.
      * @param selectionArgs (Optional) Selection arguments used in the query.
      * @return The value of the _data column, which is typically a file path.
      */
@@ -454,5 +475,59 @@ public class CommonUtils {
         inputMethodManager.hideSoftInputFromWindow(activity.getCurrentFocus().getWindowToken(), 0);
     }
 
+    public static String getMonthNameFromUTC(String date) {
+        Calendar cal = Calendar.getInstance();
+        TimeZone tz = cal.getTimeZone();
+        DateFormat f = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+        f.setTimeZone(TimeZone.getTimeZone("ISO"));
+        try {
+            Date d = f.parse(date);
+            DateFormat month = new SimpleDateFormat("MMMM");
+            return month.format(d);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return "";
+        }
+    }
+
+    public static int getDayNumberFromUTC(String date) {
+        Calendar cal = Calendar.getInstance();
+        TimeZone tz = cal.getTimeZone();
+        DateFormat f = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+        f.setTimeZone(TimeZone.getTimeZone("ISO"));
+        try {
+            Date d = f.parse(date);
+            DateFormat dayNumber = new SimpleDateFormat("d");
+            return Integer.parseInt(dayNumber.format(d));
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
+    public static String getDayNameNumberFromUTC(String date) {
+        Calendar cal = Calendar.getInstance();
+        TimeZone tz = cal.getTimeZone();
+        DateFormat f = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+        f.setTimeZone(TimeZone.getTimeZone("ISO"));
+        try {
+            Date d = f.parse(date);
+            DateFormat day = new SimpleDateFormat("EEEE, d");
+            return day.format(d);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return "";
+        }
+    }
+
+    public static void phoneCall(Context context,String phoneNumber){
+        try {
+            Intent call = new Intent(Intent.ACTION_DIAL);
+            call.setData(Uri.parse("tel:" + "+91" + phoneNumber));
+            context.startActivity(call);
+        } catch (Exception e) {
+            CommonUtils.showSingleButtonPopup(context, "Unable to perform action.");
+        }
+    }
 
 }

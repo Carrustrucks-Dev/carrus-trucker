@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Color;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.view.LayoutInflater;
@@ -261,13 +260,15 @@ public class CurrentShipmentFragment extends android.support.v4.app.Fragment imp
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.callShipperButton:
-                try {
-                    Intent call = new Intent(Intent.ACTION_DIAL);
-                    call.setData(Uri.parse("tel:" + "+91" + shipperNumber));
-                    startActivity(call);
-                } catch (Exception e) {
-                    CommonUtils.showSingleButtonPopup(getActivity(),"Unable to perform action.");
-                }
+
+                CommonUtils.phoneCall(getActivity(),shipperNumber);
+//                try {
+//                    Intent call = new Intent(Intent.ACTION_DIAL);
+//                    call.setData(Uri.parse("tel:" + "+91" + shipperNumber));
+//                    startActivity(call);
+//                } catch (Exception e) {
+//                    CommonUtils.showSingleButtonPopup(getActivity(),"Unable to perform action.");
+//                }
                 break;
         }
     }

@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.TypedArray;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -31,7 +30,6 @@ import com.carrustruckerapp.entities.NavDrawerItem;
 import com.carrustruckerapp.fragments.BookingsFragment;
 import com.carrustruckerapp.fragments.CurrentShipmentFragment;
 import com.carrustruckerapp.fragments.DriverProfile;
-import com.carrustruckerapp.interfaces.AppConstants;
 import com.carrustruckerapp.interfaces.HomeCallback;
 import com.carrustruckerapp.interfaces.WebServices;
 import com.carrustruckerapp.services.MyService;
@@ -53,7 +51,7 @@ import retrofit.RetrofitError;
 import retrofit.client.Response;
 import retrofit.mime.TypedByteArray;
 
-public class HomeScreen extends BaseActivity implements AppConstants,HomeCallback {
+public class HomeScreen extends BaseActivity implements HomeCallback {
 
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
@@ -204,14 +202,14 @@ public class HomeScreen extends BaseActivity implements AppConstants,HomeCallbac
                 fragment = new BookingsFragment();
                 break;
             case 2:
-                try {
-                    Intent call = new Intent(Intent.ACTION_DIAL);
-                    call.setData(Uri.parse("tel:" + "+91"+sharedPreferences.getString(FLEET_OWNER_NO,"")));
-                    startActivity(call);
-                } catch (Exception e) {
-                    commonUtils.showSingleButtonPopup(HomeScreen.this,"Unable to perform action.");
-                }
-
+                CommonUtils.phoneCall(HomeScreen.this,sharedPreferences.getString(FLEET_OWNER_NO,""));
+//                try {
+//                    Intent call = new Intent(Intent.ACTION_DIAL);
+//                    call.setData(Uri.parse("tel:" + "+91"+sharedPreferences.getString(FLEET_OWNER_NO,"")));
+//                    startActivity(call);
+//                } catch (Exception e) {
+//                    commonUtils.showSingleButtonPopup(HomeScreen.this,"Unable to perform action.");
+//                }
                 break;
             case 3:
                 logoutPopup();
@@ -220,12 +218,9 @@ public class HomeScreen extends BaseActivity implements AppConstants,HomeCallbac
                 break;
         }
         if (fragment != null) {
-
             FragmentManager fragmentManager = getSupportFragmentManager();
-
             fragmentManager.beginTransaction()
                     .replace(R.id.frame_container, fragment).commit();
-
         } else {
             // error in creating fragment
             Log.e("MainActivity", "Error in creating fragment");

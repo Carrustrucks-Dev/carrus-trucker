@@ -11,12 +11,10 @@ import android.widget.ProgressBar;
 
 import com.carrustruckerapp.R;
 import com.carrustruckerapp.gcm.GCMClientManager;
-import com.carrustruckerapp.interfaces.AppConstants;
 import com.carrustruckerapp.interfaces.WebServices;
 import com.carrustruckerapp.utils.CommonUtils;
 import com.carrustruckerapp.utils.Connectivity;
 import com.carrustruckerapp.utils.GlobalClass;
-import com.carrustruckerapp.utils.MaterialDesignAnimations;
 import com.carrustruckerapp.utils.MyApiCalls;
 
 import org.json.JSONObject;
@@ -26,7 +24,7 @@ import retrofit.RetrofitError;
 import retrofit.client.Response;
 
 
-public class SplashScreen extends BaseActivity implements AppConstants {
+public class SplashScreen extends BaseActivity {
 
     private ProgressBar progressBar;
     public WebServices webServices;
@@ -156,7 +154,7 @@ public class SplashScreen extends BaseActivity implements AppConstants {
                     @Override
                     public void failure(RetrofitError retrofitError) {
                         if (((RetrofitError) retrofitError).getKind() == RetrofitError.Kind.NETWORK) {
-                            MaterialDesignAnimations.fadeIn(getApplicationContext(), errorLayout, getResources().getString(R.string.internetConnectionError), 0);
+//                            MaterialDesignAnimations.fadeIn(getApplicationContext(), errorLayout, getResources().getString(R.string.internetConnectionError), 0);
                             progressBar.setVisibility(View.GONE);
                             findViewById(R.id.retry_button).setVisibility(View.VISIBLE);
                         } else {

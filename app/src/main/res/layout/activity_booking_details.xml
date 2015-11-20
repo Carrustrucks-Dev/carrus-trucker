@@ -370,11 +370,37 @@
                 android:layout_below="@+id/total_amount_layout"
                 android:background="@color/grey" />
 
+            <RelativeLayout
+                android:id="@+id/payment_collected_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/total_amount_layout"
+                android:padding="10dp"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/payment_collected"
+                    android:textAllCaps="true"
+                    android:textAppearance="@style/CustomTextAppearance"
+                    android:textColor="@color/blue" />
+
+                <TextView
+                    android:id="@+id/payment_status"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:textAllCaps="true"
+                    android:textAppearance="@style/CustomTextAppearance"
+                    android:textColor="@color/orange" />
+            </RelativeLayout>
+
             <Button
                 android:id="@+id/status_button"
                 android:layout_width="fill_parent"
                 android:layout_height="40dp"
-                android:layout_below="@+id/total_amount_layout"
+                android:layout_below="@+id/payment_collected_layout"
                 android:background="@drawable/button_background_selector"
                 android:textAppearance="@style/CustomTextAppearance"
                 android:textColor="@color/white"
