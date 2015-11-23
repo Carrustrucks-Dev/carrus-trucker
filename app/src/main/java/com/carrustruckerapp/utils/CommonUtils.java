@@ -520,6 +520,52 @@ public class CommonUtils {
         }
     }
 
+    public static String getDateFromUTC(String date) {
+        Calendar cal = Calendar.getInstance();
+        TimeZone tz = cal.getTimeZone();
+        DateFormat f = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+        f.setTimeZone(TimeZone.getTimeZone("ISO"));
+        try {
+            Date d = f.parse(date);
+            DateFormat day = new SimpleDateFormat("dd");
+            return day.format(d);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return "";
+        }
+    }
+
+    public static String getDayNameFromUTC(String date) {
+        Calendar cal = Calendar.getInstance();
+        TimeZone tz = cal.getTimeZone();
+        DateFormat f = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+        f.setTimeZone(TimeZone.getTimeZone("ISO"));
+        try {
+            Date d = f.parse(date);
+            DateFormat day = new SimpleDateFormat("EEEE");
+            return day.format(d);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return "";
+        }
+    }
+
+
+    public static String getShortMonthNameFromUTC(String date) {
+        Calendar cal = Calendar.getInstance();
+        TimeZone tz = cal.getTimeZone();
+        DateFormat f = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+        f.setTimeZone(TimeZone.getTimeZone("ISO"));
+        try {
+            Date d = f.parse(date);
+            DateFormat day = new SimpleDateFormat("EEE");
+            return day.format(d);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return "";
+        }
+    }
+
     public static void phoneCall(Context context,String phoneNumber){
         try {
             Intent call = new Intent(Intent.ACTION_DIAL);

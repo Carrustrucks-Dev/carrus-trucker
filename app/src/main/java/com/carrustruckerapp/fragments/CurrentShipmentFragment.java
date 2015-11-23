@@ -42,13 +42,7 @@ import org.xml.sax.SAXException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.TimeZone;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -160,23 +154,12 @@ public class CurrentShipmentFragment extends android.support.v4.app.Fragment imp
                     } else {
                         bookingDetailsLayout.setVisibility(View.VISIBLE);
                         JSONObject bookingData = data.getJSONObject("bookingData");
-                        Calendar cal = Calendar.getInstance();
-                        TimeZone tz = cal.getTimeZone();
-                        DateFormat f = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-                        f.setTimeZone(TimeZone.getTimeZone("ISO"));
-                        try {
-                            Date d = f.parse(bookingData.getJSONObject("pickUp").getString("date"));
-                            DateFormat date = new SimpleDateFormat("dd");
-                            DateFormat month = new SimpleDateFormat("MMM");
-                            DateFormat dayName = new SimpleDateFormat("EEE");
-                            tvDate.setText(date.format(d));
-                            tvMonth.setText(month.format(d));
-                            tvTimeSlot.setText(dayName.format(d) + ", " + bookingData.getJSONObject("pickUp").getString("time"));
+
+                            tvDate.setText(CommonUtils.getDateFromUTC(bookingData.getJSONObject("pickUp").getString("date")));
+                            tvMonth.setText(CommonUtils.getShortMonthNameFromUTC(bookingData.getJSONObject("pickUp").getString("date")));
+                            tvTimeSlot.setText(CommonUtils.getDayNameFromUTC(bookingData.getJSONObject("pickUp").getString("date")) + ", " + bookingData.getJSONObject("pickUp").getString("time"));
                             tvTruckName.setText(bookingData.getJSONObject("truck").getJSONObject("truckType").getString("typeTruckName")
                                     + " " + bookingData.getJSONObject("assignTruck").getString("truckNumber"));
-                        } catch (ParseException e) {
-                            e.printStackTrace();
-                        }
 
                         tvShipingJourney.setText(CommonUtils.toCamelCase(bookingData.getJSONObject("pickUp").getString("city")) + " to " +
                                 CommonUtils.toCamelCase(bookingData.getJSONObject("dropOff").getString("city")));
@@ -187,8 +170,8 @@ public class CurrentShipmentFragment extends android.support.v4.app.Fragment imp
                         shipperNumber = bookingData.getJSONObject("shipper").getString("phoneNumber");
 
                         getDriectionToDestination(new LatLng(gpsTracker.getLatitude(), gpsTracker.getLongitude()),
-                                bookingData.getJSONObject("pickUp").getJSONObject("coordinates").getString("pickUpLong") + ", " + bookingData.getJSONObject("pickUp").getJSONObject("coordinates").getString("pickUpLat"),
-                                bookingData.getJSONObject("dropOff").getJSONObject("coordinates").getString("dropOffLong") + ", " + bookingData.getJSONObject("dropOff").getJSONObject("coordinates").getString("dropOffLat"),
+                                bookingData.getJSONObject("pickUp").getJSONObject("coordinates").getString("pickUpLat") + ", " + bookingData.getJSONObject("pickUp").getJSONObject("coordinates").getString("pickUpLong"),
+                                bookingData.getJSONObject("dropOff").getJSONObject("coordinates").getString("dropOffLat") + ", " + bookingData.getJSONObject("dropOff").getJSONObject("coordinates").getString("dropOffLong"),
                                 GMapV2GetRouteDirection.MODE_DRIVING);
 
 
@@ -241,8 +224,13 @@ public class CurrentShipmentFragment extends android.support.v4.app.Fragment imp
                     googleMap.addMarker(markerOptions);
 
                     String source[] = start.split(",");
-                    longitude[0]=Double.valueOf(source[1]);
-                    latitude[0]=Double.valueOf(source[0]);
+                    try {
+                        longitude[0]=Double.valueOf(source[1]);
+                        latitude[0]=Double.valueOf(source[0]);
+                    } catch (NumberFormatException e) {
+                        e.printStackTrace();
+                    }
+
 
 //                    MarkerOptions sourceMarker = new MarkerOptions();
 //                    sourceMarker.position(new LatLng(Double.valueOf(source[0]), Double.valueOf(source[1])));
@@ -250,8 +238,14 @@ public class CurrentShipmentFragment extends android.support.v4.app.Fragment imp
 //                    googleMap.addMarker(sourceMarker);
 
                     String destination[] = end.split(",");
-                    longitude[1]=Double.valueOf(destination[1]);
-                    latitude[1]=Double.valueOf(destination[0]);
+                    try {
+                        longitude[1]=Double.valueOf(destination[1]);
+                        latitude[1]=Double.valueOf(destination[0]);
+                    } catch (NumberFormatException e) {
+                        e.printStackTrace();
+                        longitude[1]=0;
+                        latitude[1]=0;
+                    }
 
 //                    MarkerOptions destinationMarker = new MarkerOptions();
 //                    destinationMarker.position(new LatLng(Double.valueOf(destination[0]), Double.valueOf(destination[1])));
@@ -307,15 +301,7 @@ public class CurrentShipmentFragment extends android.support.v4.app.Fragment imp
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.callShipperButton:
-
                 CommonUtils.phoneCall(getActivity(),shipperNumber);
-//                try {
-//                    Intent call = new Intent(Intent.ACTION_DIAL);
-//                    call.setData(Uri.parse("tel:" + "+91" + shipperNumber));
-//                    startActivity(call);
-//                } catch (Exception e) {
-//                    CommonUtils.showSingleButtonPopup(getActivity(),"Unable to perform action.");
-//                }
                 break;
         }
     }

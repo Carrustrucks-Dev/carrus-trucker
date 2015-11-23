@@ -24,7 +24,7 @@ public class MyApiCalls implements AppConstants {
         globalClass = (GlobalClass) activity.getApplication();
         sharedPreferences = activity.getSharedPreferences(SHARED_PREFERENCES, Context.MODE_PRIVATE);
         commonUtils=new CommonUtils();
-        pushClientManager = new GCMClientManager(activity, SENDER_ID);
+        pushClientManager = new GCMClientManager(activity, Config.getGCMProjectNumber());
     }
 
     public void getRegistrationId() {
@@ -33,11 +33,8 @@ public class MyApiCalls implements AppConstants {
                 @Override
                 public void onSuccess(String registrationId, boolean isNewRegistration) {
                     Prefs.with(activity).save(REGISTRATION_ID, registrationId);
-//                    sharedPreferences = activity.getSharedPreferences(SHARED_PREFERENCES, Context.MODE_PRIVATE);
-//                    SharedPreferences.Editor editor = sharedPreferences.edit();
-//                    editor.putString(REGISTRATION_ID, registrationId);
-//                    editor.commit();
-                    Log.v("hello reg_id = ", registrationId);
+                    Log.v("reg_id",registrationId);
+                    Log.v("hello reg_id from shared prefrence= ", Prefs.with(activity).getString(REGISTRATION_ID, ""));
                 }
                 @Override
                 public void onFailure(String ex) {

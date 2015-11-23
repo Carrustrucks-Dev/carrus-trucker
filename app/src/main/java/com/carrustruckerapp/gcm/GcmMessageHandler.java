@@ -9,21 +9,32 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.v4.app.NotificationCompat;
+import android.util.Log;
 
 import com.carrustruckerapp.R;
-import com.carrustruckerapp.activities.SplashScreen;
+import com.carrustruckerapp.activities.BookingDetails;
 import com.carrustruckerapp.interfaces.AppConstants;
-import com.carrustruckerapp.utils.Log;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
+import org.json.JSONObject;
 
 
 public class GcmMessageHandler extends IntentService implements AppConstants {
+    public static final int MESSAGE_NOTIFICATION_ID = 435345;
+
     private NotificationManager mNotificationManager;
+    int numMessages;
+    //    public static ArrayList<Integer> chatScreenId=new ArrayList<>();
+//    public static ArrayList<Integer> bookingScreenId=new ArrayList<>();
+    public static String previousChatMessage;
+    public static String previousBookingMessage;
+
     public GcmMessageHandler() {
         super("GcmMessageHandler");
     }
+
     public static void ClearNotification(Context c) {
+
         Log.v("ClearNotification", "ClearNotification");
         NotificationManager notifManager = (NotificationManager) c.getSystemService(Context.NOTIFICATION_SERVICE);
         notifManager.cancelAll();
@@ -31,25 +42,42 @@ public class GcmMessageHandler extends IntentService implements AppConstants {
 
     @Override
     protected void onHandleIntent(Intent intent) {
+        // Retrieve data extras from push notification
         Bundle extras = intent.getExtras();
         GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(this);
+        // The getMessageType() intent parameter must be the intent you received
+        // in your BroadcastReceiver.
         String messageType = gcm.getMessageType(intent);
-        Log.v("extras value","--->"+extras.toString());
+        // Keys in the data are shown as extras
+        Log.v("extras value", "--->" + extras.toString());
         try {
             String msg = extras.getString("message");
-            sendNotification(msg);
+            JSONObject mJSONObject = new JSONObject(extras.getString("flag"));
+            String bookingId = mJSONObject.getString("bookingId");
+//
+            sendNotification(msg, bookingId);
+            // Create notification or otherwise manage incoming push
+
         } catch (Exception e) {
-            sendNotification("");
+            sendNotification("", "");
         }
+        // Log receiving message
+        //    Bundle[{message=Checklist has been sent to you. Please verify., android.support.content.wakelockid=1, flag=1, collapse_key=demo, from=799492082381, bookingID=949646}]
         Log.i("GCM", "Received : (" + messageType + ")  " + extras.toString());
+        // Notify receiver the intent is completed
         GcmBroadcastReceiver.completeWakefulIntent(intent);
     }
 
-    private void sendNotification(String msg) {
+    private void sendNotification(String msg, String bookingId) {
         mNotificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
-        final Intent notificationIntent = new Intent(this, SplashScreen.class);
+
+        final Intent notificationIntent;
+
+
+        notificationIntent = new Intent(this, BookingDetails.class);
         notificationIntent.setAction(Intent.ACTION_MAIN);
         notificationIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+        notificationIntent.putExtra("bookingId", bookingId);
         PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         NotificationCompat.Builder mBuilder =
@@ -65,7 +93,8 @@ public class GcmMessageHandler extends IntentService implements AppConstants {
         int id = (int) System.currentTimeMillis();
         mBuilder.setSound(Settings.System.DEFAULT_NOTIFICATION_URI);
         mBuilder.setVibrate(new long[]{1000, 1000});
-        mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
+        mNotificationManager.notify(id, mBuilder.build());
     }
+
 
 }

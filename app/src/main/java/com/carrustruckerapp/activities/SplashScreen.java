@@ -78,7 +78,7 @@ public class SplashScreen extends BaseActivity implements View.OnClickListener {
                             Prefs.with(SplashScreen.this).save(DL_STATE, profileData.stateDl);
                             Prefs.with(SplashScreen.this).save(RATING, profileData.rating);
                             Prefs.with(SplashScreen.this).save(FLEET_OWNER_NO, profileData.fleetOwner.get(0).phoneNumber);
-                            if(profileData.profilePicture!=null){
+                            if (profileData.profilePicture != null) {
                                 Prefs.with(SplashScreen.this).save(DRIVER_IMAGE, profileData.profilePicture.thumb);
                             }
 
@@ -154,4 +154,6 @@ public class SplashScreen extends BaseActivity implements View.OnClickListener {
                 break;
         }
     }
+
+
 }
