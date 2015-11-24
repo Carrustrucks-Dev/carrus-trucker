@@ -124,49 +124,49 @@ public class ShowImageActivity extends BaseActivity {
                 imagePath = CommonUtils.getPath(this, data.getData());
                 mat.postRotate(CommonUtils.getCameraPhotoOrientation(imagePath));
                 Log.e("Imagepath", "" + imagePath);
-                filenameAndUpload();
+//                filenameAndUpload();
 //                uploadDocumentApi();
-//                if (documentName.equalsIgnoreCase(getResources().getString(R.string.pod))) {
-//                    images.put("pod", new TypedFile("image/*", new File(imagePath)));
-//                } else if (documentName.equalsIgnoreCase(getResources().getString(R.string.invoice))) {
-//                    images.put("invoice", new TypedFile("image/*", new File(imagePath)));
-//                } else if(documentName.equalsIgnoreCase(getResources().getString(R.string.consignment))){
-//                    images.put("consigmentNote", new TypedFile("image/*", new File(imagePath)));
-//                }
-//                CommonUtils.showLoadingDialog(ShowImageActivity.this, "Uploading...");
-//                RestClient.getWebServices().uploadDocument(sharedPreferences.getString(ACCESS_TOKEN, ""), new TypedString(orderId), images, new Callback<String>() {
-//                    @Override
-//                    public void success(String s, Response response) {
-//                        try {
-//                            JSONObject jsonObject = new JSONObject(s);
-//                            CommonUtils.dismissLoadingDialog();
-//                            CommonUtils.showSingleButtonPopup(ShowImageActivity.this, jsonObject.getString("message"));
-//                            switch (documentName) {
-//                                case "POD":
-//                                    url = jsonObject.getJSONObject("data").getString("podUpload");
-//                                    break;
-//                                case "Invoice":
-//                                    url = jsonObject.getJSONObject("data").getString("invoiceUpdate");
-//                                    break;
-//                                case "Consignment Notes":
-//                                    url = jsonObject.getJSONObject("data").getString("consigmentNoteUpdate");
-//                                    break;
-//                            }
-//                            showDocument(url);
-//                        } catch (JSONException e) {
-//                            e.printStackTrace();
-//                            CommonUtils.dismissLoadingDialog();
-//                        }
-//
-//                    }
-//
-//                    @Override
-//                    public void failure(RetrofitError error) {
-//                        CommonUtils.showRetrofitError(ShowImageActivity.this, error);
-//                        CommonUtils.showSingleButtonPopup(ShowImageActivity.this, "Oops!! Some error occurred. Please try again. ");
-//                        CommonUtils.dismissLoadingDialog();
-//                    }
-//                });
+                if (documentName.equalsIgnoreCase(getResources().getString(R.string.pod))) {
+                    images.put("pod", new TypedFile("image/*", new File(imagePath)));
+                } else if (documentName.equalsIgnoreCase(getResources().getString(R.string.invoice))) {
+                    images.put("invoice", new TypedFile("image/*", new File(imagePath)));
+                } else if(documentName.equalsIgnoreCase(getResources().getString(R.string.consignment))){
+                    images.put("consigmentNote", new TypedFile("image/*", new File(imagePath)));
+                }
+                CommonUtils.showLoadingDialog(ShowImageActivity.this, "Uploading...");
+                RestClient.getWebServices().uploadDocument(sharedPreferences.getString(ACCESS_TOKEN, ""), new TypedString(orderId), images, new Callback<String>() {
+                    @Override
+                    public void success(String s, Response response) {
+                        try {
+                            JSONObject jsonObject = new JSONObject(s);
+                            CommonUtils.dismissLoadingDialog();
+                            CommonUtils.showSingleButtonPopup(ShowImageActivity.this, jsonObject.getString("message"));
+                            switch (documentName) {
+                                case "POD":
+                                    url = jsonObject.getJSONObject("data").getString("podUpload");
+                                    break;
+                                case "Invoice":
+                                    url = jsonObject.getJSONObject("data").getString("invoiceUpdate");
+                                    break;
+                                case "Consignment Notes":
+                                    url = jsonObject.getJSONObject("data").getString("consigmentNoteUpdate");
+                                    break;
+                            }
+                            showDocument(url);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                            CommonUtils.dismissLoadingDialog();
+                        }
+
+                    }
+
+                    @Override
+                    public void failure(RetrofitError error) {
+                        CommonUtils.showRetrofitError(ShowImageActivity.this, error);
+                        CommonUtils.showSingleButtonPopup(ShowImageActivity.this, "Oops!! Some error occurred. Please try again. ");
+                        CommonUtils.dismissLoadingDialog();
+                    }
+                });
             } catch (Exception ne) {
                 Toast.makeText(ShowImageActivity.this, getResources().getString(R.string.unable_to_perform_action), Toast.LENGTH_LONG).show();
             }
@@ -175,49 +175,49 @@ public class ShowImageActivity extends BaseActivity {
                 imagePath = CommonUtils.getPath(this, data.getData());
                 mat.postRotate(CommonUtils.getCameraPhotoOrientation(imagePath));
                 Log.e("Imagepath", "" + imagePath);
-                filenameAndUpload();
+//                filenameAndUpload();
 //                uploadDocumentApi();
-//                if (documentName.equalsIgnoreCase(getResources().getString(R.string.pod))) {
-//                    images.put("pod", new TypedFile("*/*", new File(imagePath)));
-//                } else if (documentName.equalsIgnoreCase(getResources().getString(R.string.invoice))) {
-//                    images.put("invoice", new TypedFile("*/*", new File(imagePath)));
-//                } else if(documentName.equalsIgnoreCase(getResources().getString(R.string.consignment))){
-//                    images.put("consigmentNote", new TypedFile("*/*", new File(imagePath)));
-//                }
-//                CommonUtils.showLoadingDialog(ShowImageActivity.this, "Uploading...");
-//                RestClient.getWebServices().uploadDocument(sharedPreferences.getString(ACCESS_TOKEN, ""), new TypedString(orderId), images, new Callback<String>() {
-//                    @Override
-//                    public void success(String s, Response response) {
-//                        try {
-//                            JSONObject jsonObject = new JSONObject(s);
-//                            CommonUtils.dismissLoadingDialog();
-//                            CommonUtils.showSingleButtonPopup(ShowImageActivity.this, jsonObject.getString("message"));
-//                            switch (documentName) {
-//                                case "POD":
-//                                    url = jsonObject.getJSONObject("data").getString("podUpload");
-//                                    break;
-//                                case "Invoice":
-//                                    url = jsonObject.getJSONObject("data").getString("invoiceUpdate");
-//                                    break;
-//                                case "Consignment Notes":
-//                                    url = jsonObject.getJSONObject("data").getString("consigmentNoteUpdate");
-//                                    break;
-//                            }
-//                            showDocument(url);
-//                        } catch (JSONException e) {
-//                            e.printStackTrace();
-//                            CommonUtils.dismissLoadingDialog();
-//                        }
-//
-//                    }
-//
-//                    @Override
-//                    public void failure(RetrofitError error) {
-//                        CommonUtils.showRetrofitError(ShowImageActivity.this, error);
-//                        CommonUtils.showSingleButtonPopup(ShowImageActivity.this, "Oops!! Some error occurred. Please try again. ");
-//                        CommonUtils.dismissLoadingDialog();
-//                    }
-//                });
+                if (documentName.equalsIgnoreCase(getResources().getString(R.string.pod))) {
+                    images.put("pod", new TypedFile("*/*", new File(imagePath)));
+                } else if (documentName.equalsIgnoreCase(getResources().getString(R.string.invoice))) {
+                    images.put("invoice", new TypedFile("*/*", new File(imagePath)));
+                } else if(documentName.equalsIgnoreCase(getResources().getString(R.string.consignment))){
+                    images.put("consigmentNote", new TypedFile("*/*", new File(imagePath)));
+                }
+                CommonUtils.showLoadingDialog(ShowImageActivity.this, "Uploading...");
+                RestClient.getWebServices().uploadDocument(sharedPreferences.getString(ACCESS_TOKEN, ""), new TypedString(orderId), images, new Callback<String>() {
+                    @Override
+                    public void success(String s, Response response) {
+                        try {
+                            JSONObject jsonObject = new JSONObject(s);
+                            CommonUtils.dismissLoadingDialog();
+                            CommonUtils.showSingleButtonPopup(ShowImageActivity.this, jsonObject.getString("message"));
+                            switch (documentName) {
+                                case "POD":
+                                    url = jsonObject.getJSONObject("data").getString("podUpload");
+                                    break;
+                                case "Invoice":
+                                    url = jsonObject.getJSONObject("data").getString("invoiceUpdate");
+                                    break;
+                                case "Consignment Notes":
+                                    url = jsonObject.getJSONObject("data").getString("consigmentNoteUpdate");
+                                    break;
+                            }
+                            showDocument(url);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                            CommonUtils.dismissLoadingDialog();
+                        }
+
+                    }
+
+                    @Override
+                    public void failure(RetrofitError error) {
+                        CommonUtils.showRetrofitError(ShowImageActivity.this, error);
+                        CommonUtils.showSingleButtonPopup(ShowImageActivity.this, "Oops!! Some error occurred. Please try again. ");
+                        CommonUtils.dismissLoadingDialog();
+                    }
+                });
             } catch (Exception ne) {
                 Toast.makeText(ShowImageActivity.this, getResources().getString(R.string.unable_to_perform_action), Toast.LENGTH_LONG).show();
             }
