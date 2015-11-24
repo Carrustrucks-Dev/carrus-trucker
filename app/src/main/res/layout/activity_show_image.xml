@@ -6,9 +6,10 @@
     tools:context="com.magicgeniehscp.Activities.ShowImageActivity">
 
     <RelativeLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:layout_centerInParent="true"
+        android:layout_above="@+id/upload_new_document"
         android:background="#000">
 
         <com.magicgeniehscp.util.TouchImageView
@@ -25,6 +26,11 @@
             android:layout_alignTop="@+id/image"
             android:clickable="true"
             android:src="@mipmap/icon_cross" />
+
+        <WebView
+            android:id="@+id/webView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
     </RelativeLayout>
 
     <Button

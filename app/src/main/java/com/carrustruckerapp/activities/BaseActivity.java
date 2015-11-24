@@ -77,11 +77,16 @@ public class BaseActivity extends FragmentActivity implements GPSDailogCallBack,
 
     public void setupUI(View view) {
         //Set up touch listener for non-text box views to hide keyboard.
+
         if (!(view instanceof EditText)) {
             view.setOnTouchListener(new View.OnTouchListener() {
 
                 public boolean onTouch(View v, MotionEvent event) {
-                    CommonUtils.hideSoftKeyboard(BaseActivity.this);
+                    try {
+                        CommonUtils.hideSoftKeyboard(BaseActivity.this);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                     return false;
                 }
 

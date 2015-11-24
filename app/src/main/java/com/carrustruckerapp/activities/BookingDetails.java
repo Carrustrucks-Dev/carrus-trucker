@@ -110,6 +110,7 @@ public class BookingDetails extends BaseActivity implements View.OnClickListener
     private void init() {
         bookingId = getIntent().getStringExtra("bookingId");
         findViewById(R.id.back_button).setOnClickListener(this);
+        setupUI(getWindow().getDecorView().getRootView());
         sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, Context.MODE_PRIVATE);
         accessToken = sharedPreferences.getString(ACCESS_TOKEN, "");
         commonUtils = new CommonUtils();

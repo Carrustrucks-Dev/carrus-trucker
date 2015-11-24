@@ -74,6 +74,7 @@ public class HomeScreen extends BaseActivity implements HomeCallback {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_screen);
+        setupUI(getWindow().getDecorView().getRootView());
         init();
         View.OnClickListener handler = new View.OnClickListener() {
             public void onClick(View v) {
@@ -224,8 +225,9 @@ public class HomeScreen extends BaseActivity implements HomeCallback {
     }
 
     public void logout() {
-        commonUtils.showLoadingDialog(HomeScreen.this, "Please wait...");
+
         if (connectivity.isConnectingToInternet()) {
+            commonUtils.showLoadingDialog(HomeScreen.this, "Please wait...");
             RestClient.getWebServices().logoutDriver(accessToken,/*accessToken,*/
                     new Callback<String>() {
                         @Override

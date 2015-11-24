@@ -12,6 +12,8 @@
         android:layout_above="@+id/bookingDetailsLayout"
         android:layout_below="@+id/headerView"/>
 
+
+
     <RelativeLayout
         android:id="@+id/noBookingLayout"
         android:layout_width="match_parent"

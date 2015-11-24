@@ -70,6 +70,7 @@ public class CurrentShipmentFragment extends android.support.v4.app.Fragment imp
     private double []longitude=new double[2];
     public String name[]=new String[2];
     private ArrayList<Marker> mMarkerArray = new ArrayList<Marker>();
+    private Marker currentMarker=null;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -117,7 +118,13 @@ public class CurrentShipmentFragment extends android.support.v4.app.Fragment imp
         public void onReceive(Context context, Intent intent) {
             // Get extra data included in the Intent
             tvBookingStatus.setText(intent.getStringExtra("bookingStatus").replace("_", " "));
+            MarkerOptions markerOptions = new MarkerOptions();
+            markerOptions.position(new LatLng(intent.getDoubleExtra("latitude",0.0),intent.getDoubleExtra("longitude",0.0)));
+            markerOptions.icon(BitmapDescriptorFactory.fromResource(R.mipmap.icon_van));
+            if(currentMarker!=null)
+                currentMarker.remove();
 
+            currentMarker=googleMap.addMarker(markerOptions);
 
         }
     };
@@ -176,9 +183,11 @@ public class CurrentShipmentFragment extends android.support.v4.app.Fragment imp
 
 
                         if (bookingData.getString("tracking").equalsIgnoreCase("YES")) {
-                            Intent intent = new Intent(getActivity(), MyService.class);
-                            intent.putExtra("bookingId", bookingData.getString("_id"));
-                            getActivity().startService(intent);
+                            if(!bookingData.getString("_id").isEmpty()) {
+                                Intent intent = new Intent(getActivity(), MyService.class);
+                                intent.putExtra("bookingId", bookingData.getString("_id"));
+                                getActivity().startService(intent);
+                            }
                         }
                     }
                 } catch (JSONException e) {
@@ -221,8 +230,7 @@ public class CurrentShipmentFragment extends android.support.v4.app.Fragment imp
                     MarkerOptions markerOptions = new MarkerOptions();
                     markerOptions.position(currentposition);
                     markerOptions.icon(BitmapDescriptorFactory.fromResource(R.mipmap.icon_van));
-                    googleMap.addMarker(markerOptions);
-
+                    currentMarker=googleMap.addMarker(markerOptions);
                     String source[] = start.split(",");
                     try {
                         longitude[0]=Double.valueOf(source[1]);

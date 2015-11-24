@@ -137,6 +137,8 @@ public class MyService extends Service implements AppConstants, LocationListener
 
                                     Intent i = new Intent("custom-event-name");
                                     i.putExtra("bookingStatus", jsonObject.getJSONObject("data").getString("bookingStatus"));
+                                    i.putExtra("longitude",location.getLongitude());
+                                    i.putExtra("latitude",location.getLatitude());
                                     LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(i);
                                     Log.d("Tracking Success", s);
                                 } catch (JSONException e) {
