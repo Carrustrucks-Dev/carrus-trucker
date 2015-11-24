@@ -82,7 +82,7 @@ public class GcmMessageHandler extends IntentService implements AppConstants {
 
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
-                        .setSmallIcon(R.mipmap.ic_launcher).setLargeIcon(BitmapFactory.decodeResource(getResources(),
+                        .setSmallIcon(R.mipmap.notification_icon).setLargeIcon(BitmapFactory.decodeResource(getResources(),
                         R.mipmap.ic_launcher))
                         .setContentTitle(getResources().getString(R.string.app_name))
                         .setStyle(new NotificationCompat.BigTextStyle()

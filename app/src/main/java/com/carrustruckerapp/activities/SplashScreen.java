@@ -60,6 +60,7 @@ public class SplashScreen extends BaseActivity implements View.OnClickListener {
     }
 
     public void afterConfigTrue() {
+
         RestClient.getWebServices().verifyUser(accessToken,
                 new Callback<String>() {
                     @Override

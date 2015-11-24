@@ -120,7 +120,7 @@ public class UpcomingOrdersFragment extends Fragment implements AppConstants, Sw
                                         booking.setBooking_id(jsonObject.getString("_id"));
                                         booking.setBookingTime(jsonObject.getJSONObject("pickUp").getString("date"));
                                         booking.setName(jsonObject.getJSONObject("shipper").getString("firstName") + " " + jsonObject.getJSONObject("shipper").getString("lastName"));
-                                        booking.setShipingJourney(CommonUtils.toCamelCase(jsonObject.getJSONObject("pickUp").getString("city")) + " to " + CommonUtils.toCamelCase(jsonObject.getJSONObject("pickUp").getString("city")));
+                                        booking.setShipingJourney(CommonUtils.toCamelCase(jsonObject.getJSONObject("pickUp").getString("city")) + " to " + CommonUtils.toCamelCase(jsonObject.getJSONObject("dropOff").getString("city")));
                                         booking.setStatus(jsonObject.getString("bookingStatus"));
                                         booking.setTimeSlot(jsonObject.getJSONObject("pickUp").getString("time"));
                                         booking.setTruckName(jsonObject.getJSONObject("truck").getJSONObject("truckType").getString("typeTruckName")

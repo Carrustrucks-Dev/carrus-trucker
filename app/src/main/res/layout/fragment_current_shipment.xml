@@ -45,7 +45,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="#90000000"
-            android:drawableLeft="@mipmap/icon_shipment_detail3"
+            android:drawableLeft="@mipmap/icon_location_pinn2"
             android:drawablePadding="5dp"
             android:padding="10dp"
             android:text="Chandigarh to New Delhi"

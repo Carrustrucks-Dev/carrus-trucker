@@ -219,8 +219,8 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter implements 
                 .findViewById(R.id.lblListHeader);
         ImageView indicator = (ImageView) convertView.findViewById(R.id.indicator);
         lblListHeader.setText(headerTitle);
-        int imageResourceId = isExpanded ? R.mipmap.icon_cross
-                : R.mipmap.icon_add;
+        int imageResourceId = isExpanded ? R.mipmap.btn_minus
+                : R.mipmap.btn_plus;
         indicator.setImageResource(imageResourceId);
 
         return convertView;
@@ -295,7 +295,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter implements 
                 imagePath = CommonUtils.getPath(_context, data.getData());
                 mat.postRotate(CommonUtils.getCameraPhotoOrientation(imagePath));
                 Log.e("Imagepath", "" + imagePath);
-                filename();
+                filenameAndUpload();
 //                if (documentName.equalsIgnoreCase(_context.getString(R.string.pod))) {
 //                    images.put("pod", new TypedFile("image/*", new File(imagePath)));
 //                } else if (documentName.equalsIgnoreCase(_context.getString(R.string.invoice))) {
@@ -303,7 +303,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter implements 
 //                } else if (documentName.equalsIgnoreCase(_context.getString(R.string.consignment))) {
 //                    images.put("consigmentNote", new TypedFile("image/*", new File(imagePath)));
 //                }
-                uploadDocumentApi();
+//                uploadDocumentApi();
 
 //                CommonUtils.showLoadingDialog((Activity) _context, "Uploading...");
 //                RestClient.getWebServices().uploadDocument(sharedPreferences.getString(ACCESS_TOKEN, ""), new TypedString(orderId), images, new Callback<String>() {
@@ -352,7 +352,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter implements 
                 imagePath = CommonUtils.getPath(_context, data.getData());
                 mat.postRotate(CommonUtils.getCameraPhotoOrientation(imagePath));
                 Log.e("Imagepath", "" + imagePath);
-                filename();
+                filenameAndUpload();
 //                if (documentName.equalsIgnoreCase(_context.getString(R.string.pod))) {
 //                    images.put("pod", new TypedFile("*/*", new File(imagePath)));
 //                } else if (documentName.equalsIgnoreCase(_context.getString(R.string.invoice))) {
@@ -360,7 +360,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter implements 
 //                } else if (documentName.equalsIgnoreCase(_context.getString(R.string.consignment))) {
 //                    images.put("consigmentNote", new TypedFile("*/*", new File(imagePath)));
 //                }
-                uploadDocumentApi();
+//                uploadDocumentApi();
             } catch (Exception ne) {
                 Toast.makeText(_context, _context.getString(R.string.unable_to_perform_action), Toast.LENGTH_LONG).show();
             }
@@ -368,7 +368,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter implements 
         }
     }
 
-    private void filename() {
+    private void filenameAndUpload() {
         switch (documentName.toUpperCase()) {
             case "POD":
                 images.put("pod", new TypedFile("*/*", new File(imagePath)));
@@ -380,6 +380,8 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter implements 
                 images.put("consigmentNote", new TypedFile("*/*", new File(imagePath)));
                 break;
         }
+
+        uploadDocumentApi();
 
     }
 

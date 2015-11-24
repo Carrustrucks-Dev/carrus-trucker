@@ -9,7 +9,9 @@ import android.graphics.Matrix;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
+import android.webkit.WebChromeClient;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -36,11 +38,11 @@ import retrofit.mime.TypedString;
 /**
  * Created by Saurbhv on 11/17/15.
  */
-public class ShowImageActivity extends BaseActivity  {
+public class ShowImageActivity extends BaseActivity {
 
     public ImageView closeButton;
-    private   Button uploadNewButton;
-    String orderId,documentName,imagePath;
+    private Button uploadNewButton;
+    String orderId, documentName, imagePath;
     public SharedPreferences sharedPreferences;
     public Map<String, TypedFile> images;
     private String url;
@@ -53,22 +55,22 @@ public class ShowImageActivity extends BaseActivity  {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_show_image);
         images = new HashMap<String, TypedFile>();
-        closeButton=(ImageView)findViewById(R.id.imageView_close);
-        uploadNewButton=(Button)findViewById(R.id.upload_new_document);
+        closeButton = (ImageView) findViewById(R.id.imageView_close);
+        uploadNewButton = (Button) findViewById(R.id.upload_new_document);
         sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, Context.MODE_PRIVATE);
-        Intent intent=getIntent();
-        url=intent.getStringExtra("url");
-        orderId=intent.getStringExtra("orderId");
-        documentName=intent.getStringExtra("documentName");
-        imageView=(ImageView) findViewById(R.id.image);
-        webView=(WebView) findViewById(R.id.webView);
+        Intent intent = getIntent();
+        url = intent.getStringExtra("url");
+        orderId = intent.getStringExtra("orderId");
+        documentName = intent.getStringExtra("documentName");
+        imageView = (ImageView) findViewById(R.id.image);
+        webView = (WebView) findViewById(R.id.webView);
         showDocument(url);
         View.OnClickListener handler = new View.OnClickListener() {
             public void onClick(View v) {
                 switch (v.getId()) {
                     case R.id.imageView_close:
                         finish();
-                        overridePendingTransition(0,0);
+                        overridePendingTransition(0, 0);
                         break;
                     case R.id.upload_new_document:
                         selectImage();
@@ -96,7 +98,7 @@ public class ShowImageActivity extends BaseActivity  {
                         startActivityForResult(intent, LOAD_IMAGE_RESULTS);
 //                        startActivityForResult(Intent.createChooser(intent, _context.getString(R.string.select_picture)), LOAD_IMAGE_RESULTS);
                     } catch (Exception ex) {
-                        Toast.makeText(ShowImageActivity.this,getResources().getString(R.string.unable_to_perform_action), Toast.LENGTH_LONG).show();
+                        Toast.makeText(ShowImageActivity.this, getResources().getString(R.string.unable_to_perform_action), Toast.LENGTH_LONG).show();
                     }
 
                 } else if (item == 1) {
@@ -122,8 +124,8 @@ public class ShowImageActivity extends BaseActivity  {
                 imagePath = CommonUtils.getPath(this, data.getData());
                 mat.postRotate(CommonUtils.getCameraPhotoOrientation(imagePath));
                 Log.e("Imagepath", "" + imagePath);
-                filename();
-                uploadDocumentApi();
+                filenameAndUpload();
+//                uploadDocumentApi();
 //                if (documentName.equalsIgnoreCase(getResources().getString(R.string.pod))) {
 //                    images.put("pod", new TypedFile("image/*", new File(imagePath)));
 //                } else if (documentName.equalsIgnoreCase(getResources().getString(R.string.invoice))) {
@@ -168,14 +170,13 @@ public class ShowImageActivity extends BaseActivity  {
             } catch (Exception ne) {
                 Toast.makeText(ShowImageActivity.this, getResources().getString(R.string.unable_to_perform_action), Toast.LENGTH_LONG).show();
             }
-        }
-        else if(requestCode == LOAD_PDF_FILE && resultCode == -1 && data != null){
+        } else if (requestCode == LOAD_PDF_FILE && resultCode == -1 && data != null) {
             try {
                 imagePath = CommonUtils.getPath(this, data.getData());
                 mat.postRotate(CommonUtils.getCameraPhotoOrientation(imagePath));
                 Log.e("Imagepath", "" + imagePath);
-                filename();
-                uploadDocumentApi();
+                filenameAndUpload();
+//                uploadDocumentApi();
 //                if (documentName.equalsIgnoreCase(getResources().getString(R.string.pod))) {
 //                    images.put("pod", new TypedFile("*/*", new File(imagePath)));
 //                } else if (documentName.equalsIgnoreCase(getResources().getString(R.string.invoice))) {
@@ -230,16 +231,20 @@ public class ShowImageActivity extends BaseActivity  {
         overridePendingTransition(0, 0);
     }
 
-    private void showDocument(String url){
+    private void showDocument(String url) {
         String extension = url.substring(url.lastIndexOf("."));
-        if(extension.equalsIgnoreCase(".pdf")) {
+        if (extension.equalsIgnoreCase(".pdf")) {
             imageView.setVisibility(View.GONE);
             webView.setVisibility(View.VISIBLE);
             webView.getSettings().setJavaScriptEnabled(true);
             webView.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
+//            startWebView("https://docs.google.com/gview?embedded=true&url=" + url);
+//            CommonUtils.showLoadingDialog(ShowImageActivity.this, "Loading...");
+            webView.setWebChromeClient(new WebChromeClient());
             webView.loadUrl("https://docs.google.com/gview?embedded=true&url=" + url);
 
-        }else{
+
+        } else {
             imageView.setVisibility(View.VISIBLE);
             webView.setVisibility(View.GONE);
             Picasso.with(this).
@@ -249,7 +254,7 @@ public class ShowImageActivity extends BaseActivity  {
         }
     }
 
-    private void filename() {
+    private void filenameAndUpload() {
         switch (documentName.toUpperCase()) {
             case "POD":
                 images.put("pod", new TypedFile("*/*", new File(imagePath)));
@@ -261,6 +266,8 @@ public class ShowImageActivity extends BaseActivity  {
                 images.put("consigmentNote", new TypedFile("*/*", new File(imagePath)));
                 break;
         }
+
+        uploadDocumentApi();
 
     }
 
@@ -299,5 +306,28 @@ public class ShowImageActivity extends BaseActivity  {
                 CommonUtils.dismissLoadingDialog();
             }
         });
+    }
+
+
+    private void startWebView(String url) {
+
+
+        webView.setWebViewClient(new WebViewClient() {
+
+            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                view.loadUrl(url);
+                return true;
+            }
+
+            public void onLoadResource(WebView view, String url) {
+//                CommonUtils.showLoadingDialog(ShowImageActivity.this, "Loading...");
+            }
+
+            public void onPageFinished(WebView view, String url) {
+                CommonUtils.dismissLoadingDialog();
+            }
+        });
+        webView.getSettings().setJavaScriptEnabled(true);
+        webView.loadUrl(url);
     }
 }

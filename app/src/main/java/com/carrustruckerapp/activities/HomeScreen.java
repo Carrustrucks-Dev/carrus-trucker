@@ -388,6 +388,7 @@ public class HomeScreen extends BaseActivity implements HomeCallback {
 
 
     public void logoutPopup(){
+
         final Dialog dialog = new Dialog(HomeScreen.this,android.R.style.Theme_Translucent_NoTitleBar);
 
         //setting custom layout to dialog
@@ -408,6 +409,7 @@ public class HomeScreen extends BaseActivity implements HomeCallback {
         yesButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                lastSelectedScreen=0;
                 dialog.dismiss();
                 logout();
 //                finish();

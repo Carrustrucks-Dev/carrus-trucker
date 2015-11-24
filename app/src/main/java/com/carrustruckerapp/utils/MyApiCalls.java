@@ -28,7 +28,7 @@ public class MyApiCalls implements AppConstants {
     }
 
     public void getRegistrationId() {
-        if (connectivity.isConnectingToInternet()) {
+        if (InternetConnectionStatus.getInstance(activity).isOnline()) {
             pushClientManager.registerIfNeeded(new GCMClientManager.RegistrationCompletedHandler() {
                 @Override
                 public void onSuccess(String registrationId, boolean isNewRegistration) {
