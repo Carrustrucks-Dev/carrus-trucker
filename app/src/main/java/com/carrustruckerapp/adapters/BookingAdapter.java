@@ -72,34 +72,58 @@ public class BookingAdapter extends BaseAdapter {
             mViewHolder.name.setText(CommonUtils.toCamelCase(data.get(position).getName()));
             mViewHolder.truckName.setText(data.get(position).getTruckName());
             mViewHolder.shipingJourney.setText(data.get(position).getShipingJourney());
-            mViewHolder.timeSlot.setText(dayName.format(d)+", "+data.get(position).getTimeSlot());
-            if(data.get(position).getStatus().equals("REACHED_DESTINATION")||data.get(position).getStatus().equals("REACHED_PICKUP_LOCATION"))
-                mViewHolder.status.setTextColor(context.getResources().getColor(R.color.orange));
-            if(data.get(position).getStatus().equals("ON_GOING")||data.get(position).getStatus().equals("UP_GOING"))
-                mViewHolder.status.setTextColor(context.getResources().getColor(R.color.blue));
-            if(data.get(position).getStatus().equals("CONFIRMED"))
-                mViewHolder.status.setTextColor(context.getResources().getColor(R.color.green));
-            if(data.get(position).getStatus().equals("HALT")||data.get(position).getStatus().equals("COMPLETED"))
-                mViewHolder.status.setTextColor(context.getResources().getColor(R.color.dark_gery));
-            if(data.get(position).getStatus().equals("CANCELED"))
-                mViewHolder.status.setTextColor(context.getResources().getColor(R.color.red));
-            mViewHolder.status.setText(data.get(position).getStatus().replace("_"," "));
+            mViewHolder.timeSlot.setText(dayName.format(d) + ", " + data.get(position).getTimeSlot());
+            switch (data.get(position).getStatus().toUpperCase()) {
+                case "REACHED_DESTINATION":
+                case "REACHED_PICKUP_LOCATION":
+                    mViewHolder.status.setTextColor(context.getResources().getColor(R.color.orange));
+                    break;
 
-        }catch (Exception e){
+                case "ON_GOING":
+                case "UP_GOING":
+                    mViewHolder.status.setTextColor(context.getResources().getColor(R.color.blue));
+                    break;
+
+                case "CONFIRMED":
+                    mViewHolder.status.setTextColor(context.getResources().getColor(R.color.green));
+                    break;
+
+                case "HALT":
+                case "COMPLETED":
+                    mViewHolder.status.setTextColor(context.getResources().getColor(R.color.dark_gery));
+                    break;
+
+                case "CANCELED":
+                    mViewHolder.status.setTextColor(context.getResources().getColor(R.color.red));
+                    break;
+            }
+//            if(data.get(position).getStatus().equals("REACHED_DESTINATION")||data.get(position).getStatus().equals("REACHED_PICKUP_LOCATION"))
+//                mViewHolder.status.setTextColor(context.getResources().getColor(R.color.orange));
+//            if(data.get(position).getStatus().equals("ON_GOING")||data.get(position).getStatus().equals("UP_GOING"))
+//                mViewHolder.status.setTextColor(context.getResources().getColor(R.color.blue));
+//            if(data.get(position).getStatus().equals("CONFIRMED"))
+//                mViewHolder.status.setTextColor(context.getResources().getColor(R.color.green));
+//            if(data.get(position).getStatus().equals("HALT")||data.get(position).getStatus().equals("COMPLETED"))
+//                mViewHolder.status.setTextColor(context.getResources().getColor(R.color.dark_gery));
+//            if(data.get(position).getStatus().equals("CANCELED"))
+//                mViewHolder.status.setTextColor(context.getResources().getColor(R.color.red));
+            mViewHolder.status.setText(data.get(position).getStatus().replace("_", " "));
+
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return convertView;
     }
 
     private class MyViewHolder {
-        TextView date,month,name,truckName,shipingJourney,timeSlot,status;
+        TextView date, month, name, truckName, shipingJourney, timeSlot, status;
 
 
         public MyViewHolder(View item) {
-            date = (TextView)item.findViewById(R.id.date);
-            month = (TextView)item.findViewById(R.id.month);
-            name = (TextView)item.findViewById(R.id.name);
-            truckName = (TextView)item.findViewById(R.id.truckName);
+            date = (TextView) item.findViewById(R.id.date);
+            month = (TextView) item.findViewById(R.id.month);
+            name = (TextView) item.findViewById(R.id.name);
+            truckName = (TextView) item.findViewById(R.id.truckName);
             shipingJourney = (TextView) item.findViewById(R.id.shipingJourney);
             timeSlot = (TextView) item.findViewById(R.id.timeSlot);
             status = (TextView) item.findViewById(R.id.status);

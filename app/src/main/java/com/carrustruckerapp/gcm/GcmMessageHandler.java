@@ -20,14 +20,8 @@ import org.json.JSONObject;
 
 
 public class GcmMessageHandler extends IntentService implements AppConstants {
-    public static final int MESSAGE_NOTIFICATION_ID = 435345;
 
     private NotificationManager mNotificationManager;
-    int numMessages;
-    //    public static ArrayList<Integer> chatScreenId=new ArrayList<>();
-//    public static ArrayList<Integer> bookingScreenId=new ArrayList<>();
-    public static String previousChatMessage;
-    public static String previousBookingMessage;
 
     public GcmMessageHandler() {
         super("GcmMessageHandler");
@@ -42,33 +36,21 @@ public class GcmMessageHandler extends IntentService implements AppConstants {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        // Retrieve data extras from push notification
         Bundle extras = intent.getExtras();
         GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(this);
-        // The getMessageType() intent parameter must be the intent you received
-        // in your BroadcastReceiver.
         String messageType = gcm.getMessageType(intent);
-        // Keys in the data are shown as extras
         Log.v("extras value", "--->" + extras.toString());
         try {
-            String msg = extras.getString("message");
             JSONObject mJSONObject = new JSONObject(extras.getString("flag"));
-            String bookingId = mJSONObject.getString("bookingId");
-//
-            sendNotification(msg, bookingId);
-            // Create notification or otherwise manage incoming push
-
+            sendNotification(extras.getString("message"), mJSONObject.getString("bookingId"), extras.getString("brand_name"));
         } catch (Exception e) {
-            sendNotification("", "");
+            sendNotification("", "", "");
         }
-        // Log receiving message
-        //    Bundle[{message=Checklist has been sent to you. Please verify., android.support.content.wakelockid=1, flag=1, collapse_key=demo, from=799492082381, bookingID=949646}]
         Log.i("GCM", "Received : (" + messageType + ")  " + extras.toString());
-        // Notify receiver the intent is completed
         GcmBroadcastReceiver.completeWakefulIntent(intent);
     }
 
-    private void sendNotification(String msg, String bookingId) {
+    private void sendNotification(String msg, String bookingId, String brandName) {
         mNotificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
 
         final Intent notificationIntent;
@@ -84,7 +66,7 @@ public class GcmMessageHandler extends IntentService implements AppConstants {
                 new NotificationCompat.Builder(this)
                         .setSmallIcon(R.mipmap.notification_icon).setLargeIcon(BitmapFactory.decodeResource(getResources(),
                         R.mipmap.ic_launcher))
-                        .setContentTitle(getResources().getString(R.string.app_name))
+                        .setContentTitle(brandName)
                         .setStyle(new NotificationCompat.BigTextStyle()
                                 .bigText(msg)).setAutoCancel(true)
                         .setContentText(msg);

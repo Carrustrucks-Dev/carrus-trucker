@@ -199,6 +199,7 @@ public class HomeScreen extends BaseActivity implements HomeCallback {
                 fragment = new BookingsFragment();
                 break;
             case 2:
+                lastSelectedScreen=6;
                 CommonUtils.phoneCall(HomeScreen.this,sharedPreferences.getString(FLEET_OWNER_NO,""));
 //                try {
 //                    Intent call = new Intent(Intent.ACTION_DIAL);

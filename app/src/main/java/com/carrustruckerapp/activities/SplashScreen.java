@@ -31,8 +31,8 @@ public class SplashScreen extends BaseActivity implements View.OnClickListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash_screen);
         init();
-        if (Prefs.with(this).getBoolean(IS_FIRST, true))
-            createShortCut();
+//        if (Prefs.with(this).getBoolean(IS_FIRST, true))
+//            createShortCut();
     }
 
     @Override

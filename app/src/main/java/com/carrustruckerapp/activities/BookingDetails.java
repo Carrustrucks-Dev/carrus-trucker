@@ -21,6 +21,7 @@ import com.carrustruckerapp.entities.ExpandableChildItem;
 import com.carrustruckerapp.interfaces.ActivityResultCallback;
 import com.carrustruckerapp.interfaces.AppConstants;
 import com.carrustruckerapp.retrofit.RestClient;
+import com.carrustruckerapp.utils.ApiResponseFlags;
 import com.carrustruckerapp.utils.CommonUtils;
 import com.carrustruckerapp.utils.Log;
 import com.carrustruckerapp.utils.MaterialDesignAnimations;
@@ -148,6 +149,7 @@ public class BookingDetails extends BaseActivity implements View.OnClickListener
         listDataHeader.add(getResources().getString(R.string.advisory_checkList));
         listDataHeader.add(getResources().getString(R.string.notes));
         listDataHeader.add(getResources().getString(R.string.my_notes));
+        getOrderDetails();
 
 
     }
@@ -155,7 +157,7 @@ public class BookingDetails extends BaseActivity implements View.OnClickListener
     @Override
     protected void onResume() {
         super.onResume();
-        getOrderDetails();
+//        getOrderDetails();
         expListView.setOnChildClickListener(this);
     }
 
@@ -287,7 +289,8 @@ public class BookingDetails extends BaseActivity implements View.OnClickListener
                             notes.add(new ExpandableChildItem(jsonObject.getJSONObject("data").getString("jobNote"), ""));
 
                             ArrayList<ExpandableChildItem> myNotes = new ArrayList<ExpandableChildItem>();
-                            if (jsonObject.getJSONObject("data").has("truckerNote")) {
+                            if (jsonObject.getJSONObject("data").has("truckerNote") && !jsonObject.getJSONObject("data").isNull("truckerNote")) {
+
                                 myNotes.add(new ExpandableChildItem(jsonObject.getJSONObject("data").getString("truckerNote"), ""));
                             } else {
                                 myNotes.add(new ExpandableChildItem("", ""));
@@ -327,8 +330,13 @@ public class BookingDetails extends BaseActivity implements View.OnClickListener
                             findViewById(R.id.retry_button).setVisibility(View.VISIBLE);
                             commonUtils.dismissLoadingDialog();
                         } else {
-                            commonUtils.dismissLoadingDialog();
-                            commonUtils.showRetrofitError(BookingDetails.this, retrofitError);
+                            int statusCode = retrofitError.getResponse().getStatus();
+                            if (ApiResponseFlags.Not_Found.getOrdinal() == statusCode) {
+                                    finish();
+                            } else {
+                                commonUtils.dismissLoadingDialog();
+                                commonUtils.showRetrofitError(BookingDetails.this, retrofitError);
+                            }
                         }
                     }
                 });
@@ -376,7 +384,7 @@ public class BookingDetails extends BaseActivity implements View.OnClickListener
                 break;
 
             case R.id.pickup_call:
-                CommonUtils.phoneCall(BookingDetails.this,pickUpPhoneNumber);
+                CommonUtils.phoneCall(BookingDetails.this, pickUpPhoneNumber);
 //                try {
 //                    Intent call = new Intent(Intent.ACTION_DIAL);
 //                    call.setData(Uri.parse("tel:" + "+91" + pickUpPhoneNumber));
@@ -387,7 +395,7 @@ public class BookingDetails extends BaseActivity implements View.OnClickListener
                 break;
 
             case R.id.dropoff_call:
-                CommonUtils.phoneCall(BookingDetails.this,dropOffPhoneNumber);
+                CommonUtils.phoneCall(BookingDetails.this, dropOffPhoneNumber);
 //                try {
 //                    Intent call = new Intent(Intent.ACTION_DIAL);
 //                    call.setData(Uri.parse("tel:" + "+91" + dropOffPhoneNumber));
@@ -532,8 +540,14 @@ public class BookingDetails extends BaseActivity implements View.OnClickListener
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (listAdapter != null)
-            listAdapter.onActivityResult(requestCode, resultCode, data);
+        if(requestCode==TEN_RESULT_CODE){
+            Log.e("callback","");
+            getOrderDetails();
+            expListView.setOnChildClickListener(this);
+        }else {
+            if (listAdapter != null)
+                listAdapter.onActivityResult(requestCode, resultCode, data);
+        }
     }
 
     @Override

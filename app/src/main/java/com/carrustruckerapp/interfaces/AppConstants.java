@@ -25,4 +25,5 @@ public interface AppConstants {
     int LOAD_PDF_FILE = 2;
     String DRIVER_NO="driver_no";
     String IS_FIRST = "is_first";
+    int TEN_RESULT_CODE=10;
 }

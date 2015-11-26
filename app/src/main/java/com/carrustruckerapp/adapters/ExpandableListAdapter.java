@@ -280,7 +280,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter implements 
                 intent.putExtra("url", childItem.getDetail());
                 intent.putExtra("orderId", orderId);
                 intent.putExtra("documentName", childItem.getName());
-                _context.startActivity(intent);
+                ((Activity)_context).startActivityForResult(intent, TEN_RESULT_CODE);
 
             }
         }
@@ -295,55 +295,55 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter implements 
                 imagePath = CommonUtils.getPath(_context, data.getData());
                 mat.postRotate(CommonUtils.getCameraPhotoOrientation(imagePath));
                 Log.e("Imagepath", "" + imagePath);
-//                filenameAndUpload();
-                if (documentName.equalsIgnoreCase(_context.getString(R.string.pod))) {
-                    images.put("pod", new TypedFile("image/*", new File(imagePath)));
-                } else if (documentName.equalsIgnoreCase(_context.getString(R.string.invoice))) {
-                    images.put("invoice", new TypedFile("image/*", new File(imagePath)));
-                } else if (documentName.equalsIgnoreCase(_context.getString(R.string.consignment))) {
-                    images.put("consigmentNote", new TypedFile("image/*", new File(imagePath)));
-                }
-                uploadDocumentApi();
-
-                CommonUtils.showLoadingDialog((Activity) _context, "Uploading...");
-                RestClient.getWebServices().uploadDocument(sharedPreferences.getString(ACCESS_TOKEN, ""), new TypedString(orderId), images, new Callback<String>() {
-                    @Override
-                    public void success(String s, Response response) {
-                        try {
-                            JSONObject jsonObject = new JSONObject(s);
-                            CommonUtils.dismissLoadingDialog();
-                            CommonUtils.showSingleButtonPopup(_context, jsonObject.getString("message"));
-                            resultCallback.getOrderDetails();
-//                            ExpandableChildItem childItem;
-//                            switch (documentName) {
-//                                case "POD":
-//                                    childItem = (ExpandableChildItem) getChild(1, 0);
-//                                    childItem.setDetail(jsonObject.getJSONObject("data").getString("podUpload"));
+                filenameAndUpload();
+//                if (documentName.equalsIgnoreCase(_context.getString(R.string.pod))) {
+//                    images.put("pod", new TypedFile("image/*", new File(imagePath)));
+//                } else if (documentName.equalsIgnoreCase(_context.getString(R.string.invoice))) {
+//                    images.put("invoice", new TypedFile("image/*", new File(imagePath)));
+//                } else if (documentName.equalsIgnoreCase(_context.getString(R.string.consignment))) {
+//                    images.put("consigmentNote", new TypedFile("image/*", new File(imagePath)));
+//                }
+//                uploadDocumentApi();
 //
-//                                    break;
-//                                case "Invoice":
-//                                    childItem = (ExpandableChildItem) getChild(1, 1);
-//                                    childItem.setDetail(jsonObject.getJSONObject("data").getString("invoiceUpdate"));
-//                                    break;
-//                                case "Consignment Notes":
-//                                    childItem = (ExpandableChildItem) getChild(1, 2);
-//                                    childItem.setDetail(jsonObject.getJSONObject("data").getString("consigmentNoteUpdate"));
-//                                    break;
-//                            }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                            CommonUtils.dismissLoadingDialog();
-                        }
-
-                    }
-
-                    @Override
-                    public void failure(RetrofitError error) {
-                        CommonUtils.showRetrofitError((Activity) _context, error);
-                        CommonUtils.showSingleButtonPopup(_context, "Oops!! Some error occurred. Please try again. ");
-                        CommonUtils.dismissLoadingDialog();
-                    }
-                });
+//                CommonUtils.showLoadingDialog((Activity) _context, "Uploading...");
+//                RestClient.getWebServices().uploadDocument(sharedPreferences.getString(ACCESS_TOKEN, ""), new TypedString(orderId), images, new Callback<String>() {
+//                    @Override
+//                    public void success(String s, Response response) {
+//                        try {
+//                            JSONObject jsonObject = new JSONObject(s);
+//                            CommonUtils.dismissLoadingDialog();
+//                            CommonUtils.showSingleButtonPopup(_context, jsonObject.getString("message"));
+//                            resultCallback.getOrderDetails();
+////                            ExpandableChildItem childItem;
+////                            switch (documentName) {
+////                                case "POD":
+////                                    childItem = (ExpandableChildItem) getChild(1, 0);
+////                                    childItem.setDetail(jsonObject.getJSONObject("data").getString("podUpload"));
+////
+////                                    break;
+////                                case "Invoice":
+////                                    childItem = (ExpandableChildItem) getChild(1, 1);
+////                                    childItem.setDetail(jsonObject.getJSONObject("data").getString("invoiceUpdate"));
+////                                    break;
+////                                case "Consignment Notes":
+////                                    childItem = (ExpandableChildItem) getChild(1, 2);
+////                                    childItem.setDetail(jsonObject.getJSONObject("data").getString("consigmentNoteUpdate"));
+////                                    break;
+////                            }
+//                        } catch (JSONException e) {
+//                            e.printStackTrace();
+//                            CommonUtils.dismissLoadingDialog();
+//                        }
+//
+//                    }
+//
+//                    @Override
+//                    public void failure(RetrofitError error) {
+//                        CommonUtils.showRetrofitError((Activity) _context, error);
+//                        CommonUtils.showSingleButtonPopup(_context, "Oops!! Some error occurred. Please try again. ");
+//                        CommonUtils.dismissLoadingDialog();
+//                    }
+//                });
             } catch (Exception ne) {
                 Toast.makeText(_context, _context.getString(R.string.unable_to_perform_action), Toast.LENGTH_LONG).show();
             }
@@ -352,38 +352,38 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter implements 
                 imagePath = CommonUtils.getPath(_context, data.getData());
                 mat.postRotate(CommonUtils.getCameraPhotoOrientation(imagePath));
                 Log.e("Imagepath", "" + imagePath);
-//                filenameAndUpload();
-                if (documentName.equalsIgnoreCase(_context.getString(R.string.pod))) {
-                    images.put("pod", new TypedFile("*/*", new File(imagePath)));
-                } else if (documentName.equalsIgnoreCase(_context.getString(R.string.invoice))) {
-                    images.put("invoice", new TypedFile("*/*", new File(imagePath)));
-                } else if (documentName.equalsIgnoreCase(_context.getString(R.string.consignment))) {
-                    images.put("consigmentNote", new TypedFile("*/*", new File(imagePath)));
-                }
-
-                CommonUtils.showLoadingDialog((Activity) _context, "Uploading...");
-                RestClient.getWebServices().uploadDocument(sharedPreferences.getString(ACCESS_TOKEN, ""), new TypedString(orderId), images, new Callback<String>() {
-                    @Override
-                    public void success(String s, Response response) {
-                        try {
-                            JSONObject jsonObject = new JSONObject(s);
-                            CommonUtils.dismissLoadingDialog();
-                            CommonUtils.showSingleButtonPopup(_context, jsonObject.getString("message"));
-                            resultCallback.getOrderDetails();
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                            CommonUtils.dismissLoadingDialog();
-                        }
-
-                    }
-
-                    @Override
-                    public void failure(RetrofitError error) {
-                        CommonUtils.showRetrofitError((Activity) _context, error);
-                        CommonUtils.showSingleButtonPopup(_context, "Oops!! Some error occurred. Please try again. ");
-                        CommonUtils.dismissLoadingDialog();
-                    }
-                });
+                filenameAndUpload();
+//                if (documentName.equalsIgnoreCase(_context.getString(R.string.pod))) {
+//                    images.put("pod", new TypedFile("*/*", new File(imagePath)));
+//                } else if (documentName.equalsIgnoreCase(_context.getString(R.string.invoice))) {
+//                    images.put("invoice", new TypedFile("*/*", new File(imagePath)));
+//                } else if (documentName.equalsIgnoreCase(_context.getString(R.string.consignment))) {
+//                    images.put("consigmentNote", new TypedFile("*/*", new File(imagePath)));
+//                }
+//
+//                CommonUtils.showLoadingDialog((Activity) _context, "Uploading...");
+//                RestClient.getWebServices().uploadDocument(sharedPreferences.getString(ACCESS_TOKEN, ""), new TypedString(orderId), images, new Callback<String>() {
+//                    @Override
+//                    public void success(String s, Response response) {
+//                        try {
+//                            JSONObject jsonObject = new JSONObject(s);
+//                            CommonUtils.dismissLoadingDialog();
+//                            CommonUtils.showSingleButtonPopup(_context, jsonObject.getString("message"));
+//                            resultCallback.getOrderDetails();
+//                        } catch (JSONException e) {
+//                            e.printStackTrace();
+//                            CommonUtils.dismissLoadingDialog();
+//                        }
+//
+//                    }
+//
+//                    @Override
+//                    public void failure(RetrofitError error) {
+//                        CommonUtils.showRetrofitError((Activity) _context, error);
+//                        CommonUtils.showSingleButtonPopup(_context, "Oops!! Some error occurred. Please try again. ");
+//                        CommonUtils.dismissLoadingDialog();
+//                    }
+//                });
 //                uploadDocumentApi();
             } catch (Exception ne) {
                 Toast.makeText(_context, _context.getString(R.string.unable_to_perform_action), Toast.LENGTH_LONG).show();
@@ -404,7 +404,6 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter implements 
                 images.put("consigmentNote", new TypedFile("*/*", new File(imagePath)));
                 break;
         }
-
         uploadDocumentApi();
 
     }
@@ -423,7 +422,6 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter implements 
                     e.printStackTrace();
                     CommonUtils.dismissLoadingDialog();
                 }
-
             }
 
             @Override

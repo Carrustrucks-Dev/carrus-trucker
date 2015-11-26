@@ -1,10 +1,8 @@
 package com.carrustruckerapp.activities;
 
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Matrix;
 import android.os.Bundle;
 import android.view.View;
@@ -38,49 +36,34 @@ import retrofit.mime.TypedString;
 /**
  * Created by Saurbhv on 11/17/15.
  */
-public class ShowImageActivity extends BaseActivity {
+public class ShowImageActivity extends BaseActivity  implements View.OnClickListener{
 
     public ImageView closeButton;
     private Button uploadNewButton;
     String orderId, documentName, imagePath;
-    public SharedPreferences sharedPreferences;
     public Map<String, TypedFile> images;
     private String url;
     private ImageView imageView;
     private WebView webView;
+    private boolean uploadFlag=false;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_show_image);
+        setupUI(getWindow().getDecorView().getRootView());
         images = new HashMap<String, TypedFile>();
         closeButton = (ImageView) findViewById(R.id.imageView_close);
         uploadNewButton = (Button) findViewById(R.id.upload_new_document);
-        sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, Context.MODE_PRIVATE);
-        Intent intent = getIntent();
-        url = intent.getStringExtra("url");
-        orderId = intent.getStringExtra("orderId");
-        documentName = intent.getStringExtra("documentName");
+        url = getIntent().getStringExtra("url");
+        orderId = getIntent().getStringExtra("orderId");
+        documentName = getIntent().getStringExtra("documentName");
         imageView = (ImageView) findViewById(R.id.image);
         webView = (WebView) findViewById(R.id.webView);
         showDocument(url);
-        View.OnClickListener handler = new View.OnClickListener() {
-            public void onClick(View v) {
-                switch (v.getId()) {
-                    case R.id.imageView_close:
-                        finish();
-                        overridePendingTransition(0, 0);
-                        break;
-                    case R.id.upload_new_document:
-                        selectImage();
-                        break;
-                }
-            }
-        };
-
-        findViewById(R.id.imageView_close).setOnClickListener(handler);
-        uploadNewButton.setOnClickListener(handler);
+        findViewById(R.id.imageView_close).setOnClickListener(this);
+        uploadNewButton.setOnClickListener(this);
 
     }
 
@@ -90,13 +73,13 @@ public class ShowImageActivity extends BaseActivity {
         dialog.setItems(R.array.image_menu, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int item) {
+
                 if (item == 0) {
                     try {
                         Intent intent = new Intent();
                         intent.setType("image/*");
                         intent.setAction(Intent.ACTION_GET_CONTENT);
                         startActivityForResult(intent, LOAD_IMAGE_RESULTS);
-//                        startActivityForResult(Intent.createChooser(intent, _context.getString(R.string.select_picture)), LOAD_IMAGE_RESULTS);
                     } catch (Exception ex) {
                         Toast.makeText(ShowImageActivity.this, getResources().getString(R.string.unable_to_perform_action), Toast.LENGTH_LONG).show();
                     }
@@ -124,49 +107,7 @@ public class ShowImageActivity extends BaseActivity {
                 imagePath = CommonUtils.getPath(this, data.getData());
                 mat.postRotate(CommonUtils.getCameraPhotoOrientation(imagePath));
                 Log.e("Imagepath", "" + imagePath);
-//                filenameAndUpload();
-//                uploadDocumentApi();
-                if (documentName.equalsIgnoreCase(getResources().getString(R.string.pod))) {
-                    images.put("pod", new TypedFile("image/*", new File(imagePath)));
-                } else if (documentName.equalsIgnoreCase(getResources().getString(R.string.invoice))) {
-                    images.put("invoice", new TypedFile("image/*", new File(imagePath)));
-                } else if(documentName.equalsIgnoreCase(getResources().getString(R.string.consignment))){
-                    images.put("consigmentNote", new TypedFile("image/*", new File(imagePath)));
-                }
-                CommonUtils.showLoadingDialog(ShowImageActivity.this, "Uploading...");
-                RestClient.getWebServices().uploadDocument(sharedPreferences.getString(ACCESS_TOKEN, ""), new TypedString(orderId), images, new Callback<String>() {
-                    @Override
-                    public void success(String s, Response response) {
-                        try {
-                            JSONObject jsonObject = new JSONObject(s);
-                            CommonUtils.dismissLoadingDialog();
-                            CommonUtils.showSingleButtonPopup(ShowImageActivity.this, jsonObject.getString("message"));
-                            switch (documentName) {
-                                case "POD":
-                                    url = jsonObject.getJSONObject("data").getString("podUpload");
-                                    break;
-                                case "Invoice":
-                                    url = jsonObject.getJSONObject("data").getString("invoiceUpdate");
-                                    break;
-                                case "Consignment Notes":
-                                    url = jsonObject.getJSONObject("data").getString("consigmentNoteUpdate");
-                                    break;
-                            }
-                            showDocument(url);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                            CommonUtils.dismissLoadingDialog();
-                        }
-
-                    }
-
-                    @Override
-                    public void failure(RetrofitError error) {
-                        CommonUtils.showRetrofitError(ShowImageActivity.this, error);
-                        CommonUtils.showSingleButtonPopup(ShowImageActivity.this, "Oops!! Some error occurred. Please try again. ");
-                        CommonUtils.dismissLoadingDialog();
-                    }
-                });
+                filenameAndUpload();
             } catch (Exception ne) {
                 Toast.makeText(ShowImageActivity.this, getResources().getString(R.string.unable_to_perform_action), Toast.LENGTH_LONG).show();
             }
@@ -175,49 +116,7 @@ public class ShowImageActivity extends BaseActivity {
                 imagePath = CommonUtils.getPath(this, data.getData());
                 mat.postRotate(CommonUtils.getCameraPhotoOrientation(imagePath));
                 Log.e("Imagepath", "" + imagePath);
-//                filenameAndUpload();
-//                uploadDocumentApi();
-                if (documentName.equalsIgnoreCase(getResources().getString(R.string.pod))) {
-                    images.put("pod", new TypedFile("*/*", new File(imagePath)));
-                } else if (documentName.equalsIgnoreCase(getResources().getString(R.string.invoice))) {
-                    images.put("invoice", new TypedFile("*/*", new File(imagePath)));
-                } else if(documentName.equalsIgnoreCase(getResources().getString(R.string.consignment))){
-                    images.put("consigmentNote", new TypedFile("*/*", new File(imagePath)));
-                }
-                CommonUtils.showLoadingDialog(ShowImageActivity.this, "Uploading...");
-                RestClient.getWebServices().uploadDocument(sharedPreferences.getString(ACCESS_TOKEN, ""), new TypedString(orderId), images, new Callback<String>() {
-                    @Override
-                    public void success(String s, Response response) {
-                        try {
-                            JSONObject jsonObject = new JSONObject(s);
-                            CommonUtils.dismissLoadingDialog();
-                            CommonUtils.showSingleButtonPopup(ShowImageActivity.this, jsonObject.getString("message"));
-                            switch (documentName) {
-                                case "POD":
-                                    url = jsonObject.getJSONObject("data").getString("podUpload");
-                                    break;
-                                case "Invoice":
-                                    url = jsonObject.getJSONObject("data").getString("invoiceUpdate");
-                                    break;
-                                case "Consignment Notes":
-                                    url = jsonObject.getJSONObject("data").getString("consigmentNoteUpdate");
-                                    break;
-                            }
-                            showDocument(url);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                            CommonUtils.dismissLoadingDialog();
-                        }
-
-                    }
-
-                    @Override
-                    public void failure(RetrofitError error) {
-                        CommonUtils.showRetrofitError(ShowImageActivity.this, error);
-                        CommonUtils.showSingleButtonPopup(ShowImageActivity.this, "Oops!! Some error occurred. Please try again. ");
-                        CommonUtils.dismissLoadingDialog();
-                    }
-                });
+                filenameAndUpload();
             } catch (Exception ne) {
                 Toast.makeText(ShowImageActivity.this, getResources().getString(R.string.unable_to_perform_action), Toast.LENGTH_LONG).show();
             }
@@ -228,6 +127,9 @@ public class ShowImageActivity extends BaseActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
+        Intent intent=new Intent();
+        intent.putExtra("uploadFlag", uploadFlag);
+        setResult(RESULT_OK, intent);
         overridePendingTransition(0, 0);
     }
 
@@ -273,7 +175,7 @@ public class ShowImageActivity extends BaseActivity {
 
     private void uploadDocumentApi() {
         CommonUtils.showLoadingDialog(ShowImageActivity.this, "Uploading...");
-        RestClient.getWebServices().uploadDocument(sharedPreferences.getString(ACCESS_TOKEN, ""), new TypedString(orderId), images, new Callback<String>() {
+        RestClient.getWebServices().uploadDocument(accessToken, new TypedString(orderId), images, new Callback<String>() {
             @Override
             public void success(String s, Response response) {
                 try {
@@ -292,6 +194,7 @@ public class ShowImageActivity extends BaseActivity {
                             break;
                     }
                     showDocument(url);
+                    uploadFlag=true;
                 } catch (JSONException e) {
                     e.printStackTrace();
                     CommonUtils.dismissLoadingDialog();
@@ -329,5 +232,21 @@ public class ShowImageActivity extends BaseActivity {
         });
         webView.getSettings().setJavaScriptEnabled(true);
         webView.loadUrl(url);
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.imageView_close:
+                Intent intent=new Intent();
+                intent.putExtra("uploadFlag",uploadFlag);
+                setResult(RESULT_OK, intent);
+                finish();
+                overridePendingTransition(0, 0);
+                break;
+            case R.id.upload_new_document:
+                selectImage();
+                break;
+        }
     }
 }

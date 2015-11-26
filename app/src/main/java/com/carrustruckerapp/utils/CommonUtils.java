@@ -22,6 +22,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.carrustruckerapp.R;
 import com.carrustruckerapp.activities.LoginActivity;
@@ -196,6 +197,7 @@ public class CommonUtils {
                         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |
                                 Intent.FLAG_ACTIVITY_CLEAR_TASK |
                                 Intent.FLAG_ACTIVITY_NEW_TASK);
+                        Toast.makeText(activity,activity.getString(R.string.session_expired),Toast.LENGTH_LONG).show();
                         activity.startActivity(intent);
                         activity.overridePendingTransition(R.anim.anim_slide_in_left, R.anim.anim_slide_out_left);
                     } else {
@@ -560,7 +562,7 @@ public class CommonUtils {
         f.setTimeZone(TimeZone.getTimeZone("ISO"));
         try {
             Date d = f.parse(date);
-            DateFormat day = new SimpleDateFormat("EEE");
+            DateFormat day = new SimpleDateFormat("MMM");
             return day.format(d);
         } catch (ParseException e) {
             e.printStackTrace();
