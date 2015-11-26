@@ -25,6 +25,7 @@ import com.carrustruckerapp.interfaces.AppConstants;
 import com.carrustruckerapp.retrofit.RestClient;
 import com.carrustruckerapp.utils.CommonUtils;
 import com.carrustruckerapp.utils.Log;
+import com.carrustruckerapp.utils.MaterialDesignAnimations;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -155,7 +156,8 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter implements 
                                 public void success(String s, Response response) {
                                     expandableChildItem.setName(myNotesData);
                                     CommonUtils.dismissLoadingDialog();
-                                    CommonUtils.showSingleButtonPopup(_context, "Saved Successfully");
+//                                    CommonUtils.showSingleButtonPopup(_context, "Saved Successfully");
+                                    MaterialDesignAnimations.fadeIn(_context, ((Activity)_context).findViewById(R.id.errorLayout), "Saved Successfully", 1);
                                 }
 
                                 @Override
@@ -419,7 +421,8 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter implements 
                 try {
                     JSONObject jsonObject = new JSONObject(s);
                     CommonUtils.dismissLoadingDialog();
-                    CommonUtils.showSingleButtonPopup(_context, jsonObject.getString("message"));
+                    MaterialDesignAnimations.fadeIn(_context, ((Activity) _context).findViewById(R.id.errorLayout), jsonObject.getString("message"), 1);
+//                    CommonUtils.showSingleButtonPopup(_context, jsonObject.getString("message"));
                     resultCallback.getOrderDetails();
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -430,7 +433,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter implements 
             @Override
             public void failure(RetrofitError error) {
                 CommonUtils.showRetrofitError((Activity) _context, error);
-                CommonUtils.showSingleButtonPopup(_context, "Oops!! Some error occurred. Please try again. ");
+//                CommonUtils.showSingleButtonPopup(_context, "Oops!! Some error occurred. Please try again. ");
                 CommonUtils.dismissLoadingDialog();
             }
         });

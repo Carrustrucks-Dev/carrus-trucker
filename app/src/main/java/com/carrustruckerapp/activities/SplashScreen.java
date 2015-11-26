@@ -9,6 +9,7 @@ import android.widget.ProgressBar;
 import com.carrustruckerapp.R;
 import com.carrustruckerapp.entities.ProfileData;
 import com.carrustruckerapp.retrofit.RestClient;
+import com.carrustruckerapp.utils.ApiResponseFlags;
 import com.carrustruckerapp.utils.CommonUtils;
 import com.carrustruckerapp.utils.InternetConnectionStatus;
 import com.carrustruckerapp.utils.MyApiCalls;
@@ -130,7 +131,19 @@ public class SplashScreen extends BaseActivity implements View.OnClickListener {
                             progressBar.setVisibility(View.GONE);
                             findViewById(R.id.retry_button).setVisibility(View.VISIBLE);
                         } else {
-                            CommonUtils.showRetrofitError(SplashScreen.this, retrofitError);
+                            int statusCode = retrofitError.getResponse().getStatus();
+                            if(statusCode == ApiResponseFlags.Unauthorized.getOrdinal()){
+                                Intent intent = new Intent(SplashScreen.this, LoginActivity.class);
+                                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |
+                                        Intent.FLAG_ACTIVITY_CLEAR_TASK |
+                                        Intent.FLAG_ACTIVITY_NEW_TASK);
+//                                Toast.makeText(SplashScreen.this, getString(R.string.session_expired), Toast.LENGTH_LONG).show();
+                                startActivity(intent);
+                                overridePendingTransition(R.anim.anim_slide_in_left, R.anim.anim_slide_out_left);
+                            }else{
+                                CommonUtils.showRetrofitError(SplashScreen.this, retrofitError);
+                            }
+
                         }
                     }
                 });

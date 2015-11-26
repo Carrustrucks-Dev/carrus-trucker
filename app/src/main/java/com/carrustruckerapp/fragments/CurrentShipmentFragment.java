@@ -2,12 +2,14 @@ package com.carrustruckerapp.fragments;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +18,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.carrustruckerapp.R;
+import com.carrustruckerapp.activities.BookingDetails;
 import com.carrustruckerapp.interfaces.AppConstants;
 import com.carrustruckerapp.retrofit.RestClient;
 import com.carrustruckerapp.services.MyService;
@@ -55,22 +58,24 @@ import retrofit.client.Response;
 /**
  * Created by Saurbhv on 10/28/15.
  */
-public class CurrentShipmentFragment extends android.support.v4.app.Fragment implements View.OnClickListener,AppConstants {
+public class CurrentShipmentFragment extends android.support.v4.app.Fragment implements View.OnClickListener, AppConstants {
 
     private GoogleMap googleMap;
     private GPSTracker gpsTracker;
     private GMapV2GetRouteDirection v2GetRouteDirection;
     private Bundle bundle;
     private RelativeLayout noBookingLayout, bookingDetailsLayout;
-    private TextView tvName, tvDate, tvMonth, tvShipingJourney,tvBookingStatus,tvTimeSlot,tvTruckName;
+    private TextView tvName, tvDate, tvMonth, tvShipingJourney, tvBookingStatus, tvTimeSlot, tvTruckName;
     private ImageView callShipper;
     private String shipperNumber;
     public SharedPreferences sharedPreferences;
-    private double []latitude=new double[2];
-    private double []longitude=new double[2];
-    public String name[]=new String[2];
+    private double[] latitude = new double[2];
+    private double[] longitude = new double[2];
+    public String name[] = new String[2];
     private ArrayList<Marker> mMarkerArray = new ArrayList<Marker>();
-    private Marker currentMarker=null;
+    private Marker currentMarker = null;
+    private String bookingId;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -97,11 +102,12 @@ public class CurrentShipmentFragment extends android.support.v4.app.Fragment imp
         tvDate = (TextView) v.findViewById(R.id.date);
         tvMonth = (TextView) v.findViewById(R.id.month);
         tvShipingJourney = (TextView) v.findViewById(R.id.shipingJourney);
-        tvBookingStatus=(TextView) v.findViewById(R.id.status);
-        callShipper=(ImageView) v.findViewById(R.id.callShipperButton);
-        tvTimeSlot=(TextView)v.findViewById(R.id.timeSlot);
-        tvTruckName=(TextView)v.findViewById(R.id.truckName);
+        tvBookingStatus = (TextView) v.findViewById(R.id.status);
+        callShipper = (ImageView) v.findViewById(R.id.callShipperButton);
+        tvTimeSlot = (TextView) v.findViewById(R.id.timeSlot);
+        tvTruckName = (TextView) v.findViewById(R.id.truckName);
         callShipper.setOnClickListener(this);
+        v.findViewById(R.id.bookingDetailsLayout).setOnClickListener(this);
         if (gpsTracker.canGetLocation()) {
             googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(gpsTracker.getLatitude(), gpsTracker.getLongitude()), 14));
 //            getDriectionToDestination(new LatLng(gpsTracker.getLatitude(), gpsTracker.getLongitude()), gpsTracker.getLatitude() + ", " + gpsTracker.getLongitude(), "11.723512, 78.466287", GMapV2GetRouteDirection.MODE_DRIVING);
@@ -119,12 +125,12 @@ public class CurrentShipmentFragment extends android.support.v4.app.Fragment imp
             // Get extra data included in the Intent
             tvBookingStatus.setText(intent.getStringExtra("bookingStatus").replace("_", " "));
             MarkerOptions markerOptions = new MarkerOptions();
-            markerOptions.position(new LatLng(intent.getDoubleExtra("latitude",0.0),intent.getDoubleExtra("longitude",0.0)));
+            markerOptions.position(new LatLng(intent.getDoubleExtra("latitude", 0.0), intent.getDoubleExtra("longitude", 0.0)));
             markerOptions.icon(BitmapDescriptorFactory.fromResource(R.mipmap.icon_van));
-            if(currentMarker!=null)
+            if (currentMarker != null)
                 currentMarker.remove();
 
-            currentMarker=googleMap.addMarker(markerOptions);
+            currentMarker = googleMap.addMarker(markerOptions);
 
         }
     };
@@ -148,8 +154,8 @@ public class CurrentShipmentFragment extends android.support.v4.app.Fragment imp
 
     }
 
-    private void getCurrentBookings(){
-        CommonUtils.showLoadingDialog(getActivity(),"loading...");
+    private void getCurrentBookings() {
+        CommonUtils.showLoadingDialog(getActivity(), "loading...");
         RestClient.getWebServices().getCurrentBooking(sharedPreferences.getString(ACCESS_TOKEN, ""), new Callback<String>() {
             @Override
             public void success(String s, Response response) {
@@ -161,12 +167,13 @@ public class CurrentShipmentFragment extends android.support.v4.app.Fragment imp
                     } else {
                         bookingDetailsLayout.setVisibility(View.VISIBLE);
                         JSONObject bookingData = data.getJSONObject("bookingData");
+                        bookingId=bookingData.getString("_id");
 
-                            tvDate.setText(CommonUtils.getDateFromUTC(bookingData.getJSONObject("pickUp").getString("date")));
-                            tvMonth.setText(CommonUtils.getShortMonthNameFromUTC(bookingData.getJSONObject("pickUp").getString("date")));
-                            tvTimeSlot.setText(CommonUtils.getDayNameFromUTC(bookingData.getJSONObject("pickUp").getString("date")) + ", " + bookingData.getJSONObject("pickUp").getString("time"));
-                            tvTruckName.setText(bookingData.getJSONObject("truck").getJSONObject("truckType").getString("typeTruckName")
-                                    + " " + bookingData.getJSONObject("assignTruck").getString("truckNumber"));
+                        tvDate.setText(CommonUtils.getDateFromUTC(bookingData.getJSONObject("pickUp").getString("date")));
+                        tvMonth.setText(CommonUtils.getShortMonthNameFromUTC(bookingData.getJSONObject("pickUp").getString("date")));
+                        tvTimeSlot.setText(CommonUtils.getDayNameFromUTC(bookingData.getJSONObject("pickUp").getString("date")) + ", " + bookingData.getJSONObject("pickUp").getString("time"));
+                        tvTruckName.setText(bookingData.getJSONObject("truck").getJSONObject("truckType").getString("typeTruckName")
+                                + " " + bookingData.getJSONObject("assignTruck").getString("truckNumber"));
 
                         tvShipingJourney.setText(CommonUtils.toCamelCase(bookingData.getJSONObject("pickUp").getString("city")) + " to " +
                                 CommonUtils.toCamelCase(bookingData.getJSONObject("dropOff").getString("city")));
@@ -183,7 +190,7 @@ public class CurrentShipmentFragment extends android.support.v4.app.Fragment imp
 
 
                         if (bookingData.getString("tracking").equalsIgnoreCase("YES")) {
-                            if(!bookingData.getString("_id").isEmpty()) {
+                            if (!bookingData.getString("_id").isEmpty()) {
                                 Intent intent = new Intent(getActivity(), MyService.class);
                                 intent.putExtra("bookingId", bookingData.getString("_id"));
                                 getActivity().startService(intent);
@@ -203,6 +210,11 @@ public class CurrentShipmentFragment extends android.support.v4.app.Fragment imp
             public void failure(RetrofitError error) {
                 Log.d("failure", "" + error);
                 CommonUtils.dismissLoadingDialog();
+                if (((RetrofitError) error).getKind() == RetrofitError.Kind.NETWORK) {
+                    showRetryPopup(getActivity().getString(R.string.no_internet_access));
+                } else {
+                    showRetryPopup(getActivity().getString(R.string.some_ereor_ocurred));
+                }
             }
         });
     }
@@ -230,11 +242,11 @@ public class CurrentShipmentFragment extends android.support.v4.app.Fragment imp
                     MarkerOptions markerOptions = new MarkerOptions();
                     markerOptions.position(currentposition);
                     markerOptions.icon(BitmapDescriptorFactory.fromResource(R.mipmap.icon_van));
-                    currentMarker=googleMap.addMarker(markerOptions);
+                    currentMarker = googleMap.addMarker(markerOptions);
                     String source[] = start.split(",");
                     try {
-                        longitude[0]=Double.valueOf(source[1]);
-                        latitude[0]=Double.valueOf(source[0]);
+                        longitude[0] = Double.valueOf(source[1]);
+                        latitude[0] = Double.valueOf(source[0]);
                     } catch (NumberFormatException e) {
                         e.printStackTrace();
                     }
@@ -247,12 +259,12 @@ public class CurrentShipmentFragment extends android.support.v4.app.Fragment imp
 
                     String destination[] = end.split(",");
                     try {
-                        longitude[1]=Double.valueOf(destination[1]);
-                        latitude[1]=Double.valueOf(destination[0]);
+                        longitude[1] = Double.valueOf(destination[1]);
+                        latitude[1] = Double.valueOf(destination[0]);
                     } catch (NumberFormatException e) {
                         e.printStackTrace();
-                        longitude[1]=0;
-                        latitude[1]=0;
+                        longitude[1] = 0;
+                        latitude[1] = 0;
                     }
 
 //                    MarkerOptions destinationMarker = new MarkerOptions();
@@ -267,7 +279,7 @@ public class CurrentShipmentFragment extends android.support.v4.app.Fragment imp
                     }
                     LatLngBounds bounds = builder1.build();
 
-                    int padding = 0; // offset from edges of the map in pixels
+                    int padding = 150; // offset from edges of the map in pixels
                     CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
                     googleMap.animateCamera(cu);
 
@@ -294,7 +306,7 @@ public class CurrentShipmentFragment extends android.support.v4.app.Fragment imp
 
         for (int i = 0; i < latitude.length; i++) {
 
-            LatLng location = new LatLng(latitude[i],longitude[i]);
+            LatLng location = new LatLng(latitude[i], longitude[i]);
 
             Marker marker = googleMap.addMarker(new MarkerOptions().position(location)
                             .title(name[i])
@@ -307,11 +319,37 @@ public class CurrentShipmentFragment extends android.support.v4.app.Fragment imp
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.callShipperButton:
-                CommonUtils.phoneCall(getActivity(),shipperNumber);
+                CommonUtils.phoneCall(getActivity(), shipperNumber);
+                break;
+
+            case R.id.bookingDetailsLayout:
+                Intent intent = new Intent(getActivity(), BookingDetails.class);
+                intent.putExtra("bookingId",bookingId);
+                startActivity(intent);
+                getActivity().overridePendingTransition(R.anim.anim_slide_in_left, R.anim.anim_slide_out_left);
                 break;
         }
+    }
+
+    private void showRetryPopup(String msg) {
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity());
+        alertDialog.setMessage(msg);
+        alertDialog.setPositiveButton("Retry", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+                getCurrentBookings();
+            }
+        });
+
+        alertDialog.setNegativeButton("Exit", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+
+                dialog.cancel();
+            }
+        });
+        alertDialog.show();
     }
 
     //    @Override

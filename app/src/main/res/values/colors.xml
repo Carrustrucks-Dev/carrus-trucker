@@ -13,4 +13,5 @@
     <color name="white_translucent">#ffffff</color>
     <color name="red">#f00</color>
     <color name="dark_blue">#2058AB</color>
+    <color name="translucent_black">#70000000</color>
 </resources>
