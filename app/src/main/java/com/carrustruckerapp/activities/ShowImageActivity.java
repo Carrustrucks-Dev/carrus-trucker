@@ -157,7 +157,7 @@ public class ShowImageActivity extends BaseActivity  implements View.OnClickList
     }
 
     private void filenameAndUpload() {
-        switch (documentName.toUpperCase()) {
+        switch (documentName) {
             case "POD":
                 images.put("pod", new TypedFile("*/*", new File(imagePath)));
                 break;

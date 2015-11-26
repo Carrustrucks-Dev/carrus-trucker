@@ -192,7 +192,7 @@ public class CommonUtils {
                             .getBody()).getBytes());
                     JSONObject jsonObject = new JSONObject(json);
                     int statusCode = retrofitError.getResponse().getStatus();
-                    if (statusCode == 401) {
+                    if (statusCode == ApiResponseFlags.Unauthorized.getOrdinal()) {
                         Intent intent = new Intent(activity, LoginActivity.class);
                         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |
                                 Intent.FLAG_ACTIVITY_CLEAR_TASK |

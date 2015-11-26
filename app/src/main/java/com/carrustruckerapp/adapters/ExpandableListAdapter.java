@@ -393,18 +393,21 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter implements 
     }
 
     private void filenameAndUpload() {
-        switch (documentName.toUpperCase()) {
+        switch (documentName) {
             case "POD":
                 images.put("pod", new TypedFile("*/*", new File(imagePath)));
+                uploadDocumentApi();
                 break;
             case "Invoice":
                 images.put("invoice", new TypedFile("*/*", new File(imagePath)));
+                uploadDocumentApi();
                 break;
             case "Consignment Notes":
                 images.put("consigmentNote", new TypedFile("*/*", new File(imagePath)));
+                uploadDocumentApi();
                 break;
         }
-        uploadDocumentApi();
+
 
     }
 
