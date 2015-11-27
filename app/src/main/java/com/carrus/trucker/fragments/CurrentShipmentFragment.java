@@ -164,6 +164,7 @@ public class CurrentShipmentFragment extends android.support.v4.app.Fragment imp
                     JSONObject data = serverResponse.getJSONObject("data");
                     if (data.isNull("bookingData")) {
                         noBookingLayout.setVisibility(View.VISIBLE);
+                        googleMap.getUiSettings().setZoomControlsEnabled(false);
                     } else {
                         bookingDetailsLayout.setVisibility(View.VISIBLE);
                         JSONObject bookingData = data.getJSONObject("bookingData");

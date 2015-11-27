@@ -150,8 +150,6 @@ public class BookingDetails extends BaseActivity implements View.OnClickListener
         listDataHeader.add(getResources().getString(R.string.notes));
         listDataHeader.add(getResources().getString(R.string.my_notes));
         getOrderDetails();
-
-
     }
 
     @Override
@@ -332,7 +330,7 @@ public class BookingDetails extends BaseActivity implements View.OnClickListener
                         } else {
                             int statusCode = retrofitError.getResponse().getStatus();
                             if (ApiResponseFlags.Not_Found.getOrdinal() == statusCode) {
-                                    finish();
+                                finish();
                             } else {
                                 commonUtils.dismissLoadingDialog();
                                 commonUtils.showRetrofitError(BookingDetails.this, retrofitError);
@@ -416,7 +414,7 @@ public class BookingDetails extends BaseActivity implements View.OnClickListener
                             commonUtils.dismissLoadingDialog();
                             Intent intent = new Intent(BookingDetails.this, RatingDialogActivity.class);
                             intent.putExtra("bookingId", bookingId);
-                            startActivity(intent);
+                            startActivityForResult(intent, FIVE_REQUEST_CODE);
                         }
 
                         @Override
@@ -540,11 +538,24 @@ public class BookingDetails extends BaseActivity implements View.OnClickListener
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode==TEN_RESULT_CODE){
-            Log.e("callback","");
+        if (requestCode == TEN_RESULT_CODE) {
+            Log.e("callback", "");
+            if (data != null) {
+                if (data.getBooleanExtra("uploadFlag", true)) {
+                    getOrderDetails();
+                    expListView.setOnChildClickListener(this);
+                }
+            }
+        } else if (requestCode == FIVE_REQUEST_CODE) {
             getOrderDetails();
             expListView.setOnChildClickListener(this);
-        }else {
+            if (data != null) {
+                if (data.getBooleanExtra("ratingDone", false)) {
+                    MaterialDesignAnimations.fadeIn(this, findViewById(R.id.errorLayout), data.getStringExtra("message"), 1);
+                }
+            }
+
+        } else {
             if (listAdapter != null)
                 listAdapter.onActivityResult(requestCode, resultCode, data);
         }
@@ -593,10 +604,12 @@ public class BookingDetails extends BaseActivity implements View.OnClickListener
 
             case "ON_THE_WAY":
             case "REACHED_PICKUP_LOCATION":
+                paymentCollectedLayout.setVisibility(View.VISIBLE);
                 orderStatusButton.setVisibility(View.VISIBLE);
                 return "START TRIP";
 
             case "CONFIRMED":
+                paymentCollectedLayout.setVisibility(View.VISIBLE);
                 orderStatusButton.setVisibility(View.VISIBLE);
                 return "ON THE WAY";
 

@@ -4,7 +4,7 @@
     android:layout_height="wrap_content"
     android:background="@drawable/rounded_bg"
     android:orientation="vertical"
-    android:padding="10dp">
+    android:layout_margin="10dp">
 
     <ImageView
         android:id="@+id/crossIV"
@@ -55,7 +55,7 @@
         android:padding="@dimen/ten"
         android:textSize="@dimen/mid_fond"
         android:layout_marginTop="@dimen/fifteen"
-        android:background="@drawable/button_background_selector"/>
+        android:background="@drawable/bottom_rounded_button_selector"/>
 
 
 </LinearLayout>

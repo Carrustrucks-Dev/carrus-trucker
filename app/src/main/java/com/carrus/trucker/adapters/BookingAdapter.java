@@ -94,6 +94,7 @@ public class BookingAdapter extends BaseAdapter {
                     break;
 
                 case "CANCELED":
+                case "ON_THE_WAY":
                     mViewHolder.status.setTextColor(context.getResources().getColor(R.color.red));
                     break;
             }

@@ -26,5 +26,6 @@ public interface AppConstants {
     String DRIVER_NO="driver_no";
     String IS_FIRST = "is_first";
     int TEN_RESULT_CODE=10;
+    int FIVE_REQUEST_CODE=5;
     String USER_TYPE="TRUCKER";
 }

@@ -126,10 +126,11 @@ public class ShowImageActivity extends BaseActivity  implements View.OnClickList
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
+//        super.onBackPressed();
         Intent intent=new Intent();
         intent.putExtra("uploadFlag", uploadFlag);
         setResult(RESULT_OK, intent);
+        finish();
         overridePendingTransition(0, 0);
     }
 
@@ -204,6 +205,7 @@ public class ShowImageActivity extends BaseActivity  implements View.OnClickList
 
             @Override
             public void failure(RetrofitError error) {
+                uploadFlag=false;
                 CommonUtils.showRetrofitError(ShowImageActivity.this, error);
                 CommonUtils.showSingleButtonPopup(ShowImageActivity.this, "Oops!! Some error occurred. Please try again. ");
                 CommonUtils.dismissLoadingDialog();

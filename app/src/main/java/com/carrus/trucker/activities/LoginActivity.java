@@ -64,7 +64,7 @@ public class LoginActivity extends BaseActivity  {
                         driverId = etDriverId.getText().toString();
                         if (driverId.length() == 0) {
                             commonUtils.showSingleButtonPopup(LoginActivity.this, "Please enter driver ID.");
-                        } else if (driverId.length() < 6) {
+                        } else if (driverId.length() < 5) {
                             commonUtils.showSingleButtonPopup(LoginActivity.this, "Invalid driver ID.");
                         } else {
                             if (connectivity.isConnectingToInternet()) {

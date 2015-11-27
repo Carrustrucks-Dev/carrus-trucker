@@ -163,6 +163,7 @@
                     android:drawableLeft="@mipmap/icon_shipment_detail3"
                     android:drawablePadding="10dp"
                     android:singleLine="false"
+                    android:lineSpacingMultiplier="1.2"
                     android:textAppearance="@style/CustomTextAppearance"
                     android:textColor="@color/booking_details_tv_color"
                     android:textSize="16sp" />
@@ -254,6 +255,7 @@
                     android:drawableLeft="@mipmap/icon_shipment_detail3"
                     android:drawablePadding="10dp"
                     android:singleLine="false"
+                    android:lineSpacingMultiplier="1.2"
                     android:textAppearance="@style/CustomTextAppearance"
                     android:textColor="@color/booking_details_tv_color"
                     android:textSize="16sp" />
