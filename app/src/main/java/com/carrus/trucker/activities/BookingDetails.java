@@ -354,6 +354,7 @@ public class BookingDetails extends BaseActivity implements View.OnClickListener
                         try {
                             JSONObject jsonObject = new JSONObject(serverResponse);
                             CommonUtils.showSingleButtonPopup(BookingDetails.this, jsonObject.getString("message"));
+                            getOrderDetails();
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
