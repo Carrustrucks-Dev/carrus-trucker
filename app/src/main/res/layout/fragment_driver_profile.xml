@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.carrustruckerapp.fragments.DriverProfile">
+    tools:context="com.carrus.trucker.fragments.DriverProfile">
 
     <ScrollView
         android:layout_width="match_parent"

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.carrustruckerapp">
+    package="com.carrus.trucker">
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.CAMERA" />
@@ -20,13 +20,13 @@
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <uses-permission android:name="com.carrustruckerapp.permission.C2D_MESSAGE" />
+    <uses-permission android:name="com.carrus.trucker.permission.C2D_MESSAGE" />
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
     <uses-permission android:name="android.permission.VIBRATE" />
-    <uses-permission android:name="com.carrustruckerapp.permission.MAPS_RECEIVE" />
+    <uses-permission android:name="com.carrus.trucker.permission.MAPS_RECEIVE" />
 
     <permission
-        android:name="com.carrustruckerapp.permission.C2D_MESSAGE"
+        android:name="com.carrus.trucker.permission.C2D_MESSAGE"
         android:protectionLevel="signature" />
 
     <uses-feature
@@ -34,7 +34,7 @@
         android:required="false" />
 
     <permission
-        android:name="com.carrustruckerapp.supportmapfragment.permission.MAPS_RECEIVE"
+        android:name="com.carrus.trucker.supportmapfragment.permission.MAPS_RECEIVE"
         android:protectionLevel="signature" />
 
     <uses-feature
@@ -70,7 +70,7 @@
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyBCaphzVCkJ1JlE8Z3zJCy2lDY0xnfseFE" />
+            android:value="AIzaSyA-KOCI0olKYzAgUDAgp_57VxGIyDbgF-4" />
 
         <receiver android:name=".receivers.LocationStateReceiver">
             <intent-filter>
@@ -107,7 +107,7 @@
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
 
-                <category android:name="com.magicgeniehscp" />
+                <category android:name="com.carrus.trucker" />
             </intent-filter>
         </receiver>
 

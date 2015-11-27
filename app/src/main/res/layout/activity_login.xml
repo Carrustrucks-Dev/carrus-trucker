@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@mipmap/bg"
-    tools:context="com.carrustruckerapp.activities.LoginActivity">
+    tools:context="com.carrus.trucker.activities.LoginActivity">
 
     <ScrollView
         android:layout_width="match_parent"
