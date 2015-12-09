@@ -50,7 +50,6 @@ public class BaseActivity extends FragmentActivity implements GPSDailogCallBack,
 
     @Override
     protected void attachBaseContext(Context newBase) {
-        // to apply uniform customised typeface
         super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
     }
 

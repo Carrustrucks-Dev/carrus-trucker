@@ -144,7 +144,7 @@ public class ShowImageActivity extends BaseActivity  implements View.OnClickList
 //            startWebView("https://docs.google.com/gview?embedded=true&url=" + url);
 //            CommonUtils.showLoadingDialog(ShowImageActivity.this, "Loading...");
             webView.setWebChromeClient(new WebChromeClient());
-            webView.loadUrl("https://docs.google.com/gview?embedded=true&url=" + url);
+            webView.loadUrl("http://drive.google.com/viewerng/viewer?embedded=true&url=" + url);
 
 
         } else {

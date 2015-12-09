@@ -152,10 +152,6 @@ public class HomeScreen extends BaseActivity implements HomeCallback {
         bundle=getIntent().getExtras();
     }
 
-//    @Override
-//    public GlobalClass getGlobalClass() {
-//        return globalClass;
-//    }
 
     @Override
     public WebServices getWebServices() {

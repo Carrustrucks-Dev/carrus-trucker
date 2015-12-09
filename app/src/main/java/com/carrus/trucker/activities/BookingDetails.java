@@ -384,24 +384,10 @@ public class BookingDetails extends BaseActivity implements View.OnClickListener
 
             case R.id.pickup_call:
                 CommonUtils.phoneCall(BookingDetails.this, pickUpPhoneNumber);
-//                try {
-//                    Intent call = new Intent(Intent.ACTION_DIAL);
-//                    call.setData(Uri.parse("tel:" + "+91" + pickUpPhoneNumber));
-//                    startActivity(call);
-//                } catch (Exception e) {
-//                    commonUtils.showSingleButtonPopup(BookingDetails.this, "Unable to perform action.");
-//                }
                 break;
 
             case R.id.dropoff_call:
                 CommonUtils.phoneCall(BookingDetails.this, dropOffPhoneNumber);
-//                try {
-//                    Intent call = new Intent(Intent.ACTION_DIAL);
-//                    call.setData(Uri.parse("tel:" + "+91" + dropOffPhoneNumber));
-//                    startActivity(call);
-//                } catch (Exception e) {
-//                    commonUtils.showSingleButtonPopup(BookingDetails.this, "Unable to perform action.");
-//                }
                 break;
 
             case R.id.status_button:

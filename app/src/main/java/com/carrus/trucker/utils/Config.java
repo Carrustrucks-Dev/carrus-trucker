@@ -38,7 +38,7 @@ public class Config {
 
         switch (appMode) {
             case DEV:
-                BASE_URL = "http://52.25.204.93:8080/";
+                BASE_URL = "http://52.25.204.93:3006/";
                 GCM_PROJECT_NUMBER = "1082788264801";
                 GOOGLE_URL = "http://maps.googleapis.com";
                 break;
