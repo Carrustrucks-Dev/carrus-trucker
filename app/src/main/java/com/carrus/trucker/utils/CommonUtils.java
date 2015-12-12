@@ -245,7 +245,7 @@ public class CommonUtils {
         }
     }
 
-    public String getDateSuffix(int i) {
+    public static String getDateSuffix(int i) {
         switch (i) {
             case 1:
             case 21:

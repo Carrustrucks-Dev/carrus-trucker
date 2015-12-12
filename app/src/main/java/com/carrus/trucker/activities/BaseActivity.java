@@ -17,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 
+import com.carrus.trucker.R;
 import com.carrus.trucker.interfaces.AppConstants;
 import com.carrus.trucker.interfaces.GPSDailogCallBack;
 import com.carrus.trucker.utils.CommonUtils;
@@ -31,6 +32,7 @@ public class BaseActivity extends FragmentActivity implements GPSDailogCallBack,
     private Activity activity;
     private Dialog dialog;
     public String accessToken;
+    private BroadcastReceiver mMessageReceiver;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -58,13 +60,11 @@ public class BaseActivity extends FragmentActivity implements GPSDailogCallBack,
         super.onResume();
         LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver,
                 new IntentFilter("gpstracker"));
-        if (!(activity instanceof SplashScreen)) {
+        if (!(activity instanceof SplashScreenActivity)) {
             Intent i = new Intent("gpstracker");
             LocalBroadcastManager.getInstance(activity).sendBroadcast(i);
         }
     }
-
-    private BroadcastReceiver mMessageReceiver;
 
     @Override
     protected void onPause() {
@@ -74,6 +74,9 @@ public class BaseActivity extends FragmentActivity implements GPSDailogCallBack,
             dialog.dismiss();
     }
 
+    /**
+     * Method to Hide keyboard On Outside Touch
+     * */
     public void setupUI(View view) {
         //Set up touch listener for non-text box views to hide keyboard.
 
@@ -111,14 +114,15 @@ public class BaseActivity extends FragmentActivity implements GPSDailogCallBack,
         super.onDestroy();
     }
 
-
+    /**
+    * Method to show GPS setting dialog
+    * */
     @Override
     public void showGSP() {
-        Log.e("showGSP", "showGSP");
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(activity);
-        alertDialog.setTitle("GPS is settings");
-        alertDialog.setMessage("GPS is not enabled. Do you want to go to settings menu?");
-        alertDialog.setPositiveButton("Settings", new DialogInterface.OnClickListener() {
+        alertDialog.setTitle(getString(R.string.gps_dialog_title));
+        alertDialog.setMessage(getString(R.string.gps_msg));
+        alertDialog.setPositiveButton(getString(R.string.settings), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
                 Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
@@ -126,14 +130,6 @@ public class BaseActivity extends FragmentActivity implements GPSDailogCallBack,
             }
         });
         alertDialog.setCancelable(false);
-//         on pressing cancel button
-//       alertDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-//            public void onClick(DialogInterface dialog, int which) {
-//                dialog.cancel();
-//            }
-//        });
-
-        // Showing Alert Message
         dialog = alertDialog.create();
         dialog.show();
     }

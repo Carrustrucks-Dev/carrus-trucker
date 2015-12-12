@@ -8,39 +8,57 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_above="@+id/btnUploadNew"
         android:layout_centerInParent="true"
-        android:layout_above="@+id/upload_new_document"
         android:background="#000">
 
-        <com.magicgeniehscp.util.TouchImageView
-            android:id="@+id/image"
+        <RelativeLayout
+            android:id="@+id/documentLayout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_margin="5dp" />
+            android:layout_height="match_parent">
+
+            <com.magicgeniehscp.util.TouchImageView
+                android:id="@+id/ivDocument"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="5dp" />
+
+            <WebView
+                android:id="@+id/webView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </RelativeLayout>
 
         <ImageView
-            android:id="@+id/imageView_close"
+            android:id="@+id/ivCloseButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignRight="@+id/image"
-            android:layout_alignTop="@+id/image"
+            android:layout_alignRight="@+id/documentLayout"
+            android:layout_alignTop="@+id/documentLayout"
             android:clickable="true"
             android:src="@mipmap/icon_cross" />
 
-        <WebView
-            android:id="@+id/webView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+
     </RelativeLayout>
 
     <Button
-        android:id="@+id/upload_new_document"
+        android:id="@+id/btnUploadNew"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="@dimen/fifty"
         android:layout_alignParentBottom="true"
-        android:text="@string/upload_new_document"
         android:background="@drawable/button_background_selector"
-        android:textColor="@color/white"/>
+        android:text="@string/upload_new_document"
+        android:textColor="@color/white" />
 
+    <LinearLayout
+        android:id="@+id/errorLayout"
+        android:layout_width="fill_parent"
+        android:layout_height="50dp"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="50dp"
+        android:visibility="gone">
+
+        <include layout="@layout/error_bar_top" />
+    </LinearLayout>
 
 </RelativeLayout>

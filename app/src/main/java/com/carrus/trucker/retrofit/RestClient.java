@@ -1,6 +1,5 @@
 package com.carrus.trucker.retrofit;
 
-import com.carrus.trucker.interfaces.WebServices;
 import com.carrus.trucker.utils.Config;
 import com.carrus.trucker.utils.StringConverter;
 

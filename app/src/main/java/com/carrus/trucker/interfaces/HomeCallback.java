@@ -2,6 +2,7 @@ package com.carrus.trucker.interfaces;
 
 import android.content.SharedPreferences;
 
+import com.carrus.trucker.retrofit.WebServices;
 import com.carrus.trucker.utils.CommonUtils;
 
 /**

@@ -1,4 +1,4 @@
-package com.carrus.trucker.interfaces;
+package com.carrus.trucker.retrofit;
 
 import java.util.Map;
 

@@ -12,7 +12,7 @@ import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import com.carrus.trucker.R;
-import com.carrus.trucker.activities.BookingDetails;
+import com.carrus.trucker.activities.BookingDetailsActivity;
 import com.carrus.trucker.interfaces.AppConstants;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
@@ -56,7 +56,7 @@ public class GcmMessageHandler extends IntentService implements AppConstants {
         final Intent notificationIntent;
 
 
-        notificationIntent = new Intent(this, BookingDetails.class);
+        notificationIntent = new Intent(this, BookingDetailsActivity.class);
         notificationIntent.setAction(Intent.ACTION_MAIN);
         notificationIntent.addCategory(Intent.CATEGORY_LAUNCHER);
         notificationIntent.putExtra("bookingId", bookingId);

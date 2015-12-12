@@ -28,7 +28,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class DriverProfile extends Fragment implements AppConstants {
+public class DriverProfileFragment extends Fragment implements AppConstants {
 
     private SharedPreferences sharedPreferences;
     private CircleImageView driverImage;
@@ -37,7 +37,7 @@ public class DriverProfile extends Fragment implements AppConstants {
     private TextView driverId, drivingLicense, licenseState, expiresOn, mobileNumber;
 
 
-    public DriverProfile() {
+    public DriverProfileFragment() {
         // Required empty public constructor
     }
 

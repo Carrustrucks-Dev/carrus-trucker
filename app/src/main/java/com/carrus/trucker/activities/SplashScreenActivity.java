@@ -1,5 +1,6 @@
 package com.carrus.trucker.activities;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
@@ -31,7 +32,7 @@ import retrofit.client.Response;
 import retrofit.mime.TypedByteArray;
 
 
-public class SplashScreen extends BaseActivity implements View.OnClickListener {
+public class SplashScreenActivity extends BaseActivity implements View.OnClickListener {
 
     private ProgressBar progressBar;
     private AlertDialog.Builder alertDialog;
@@ -41,8 +42,10 @@ public class SplashScreen extends BaseActivity implements View.OnClickListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash_screen);
         init();
-//        if (Prefs.with(this).getBoolean(IS_FIRST, true))
-//            createShortCut();
+
+        //create shortcut on home screen
+        if (getSharedPreferences(this.getPackageName(), Context.MODE_PRIVATE).getBoolean(IS_FIRST, false))
+            createShortCut();
     }
 
     @Override
@@ -51,11 +54,23 @@ public class SplashScreen extends BaseActivity implements View.OnClickListener {
         performAction();
     }
 
+    /**
+     * Method to initialize all the {@link View}s inside the Layout of this
+     * {@link Activity}
+     */
     private void init() {
+        //Get Resource ID from XML
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
+
+        //set progress bar color
         progressBar.getIndeterminateDrawable().setColorFilter(0xFFFFFFFF, android.graphics.PorterDuff.Mode.MULTIPLY);
-        new MyApiCalls(SplashScreen.this).getRegistrationId();
+
+        //Google Api call to get GCM Key
+        new MyApiCalls(SplashScreenActivity.this).getRegistrationId();
+
+        //Set Listener
         findViewById(R.id.retry_button).setOnClickListener(this);
+
         createDialog();
     }
 
@@ -70,7 +85,18 @@ public class SplashScreen extends BaseActivity implements View.OnClickListener {
         }
     }
 
+    private void afterConfigTrue(){
+        if (InternetConnectionStatus.getInstance(SplashScreenActivity.this).isOnline()) {
+            verfiySession();
+        } else {
+            progressBar.setVisibility(View.GONE);
+            findViewById(R.id.retry_button).setVisibility(View.VISIBLE);
+        }
+    }
 
+    /**
+    * API call for app versioning
+    * */
     private void getAppVersion() {
         try {
             PackageManager manager = this.getPackageManager();
@@ -89,59 +115,32 @@ public class SplashScreen extends BaseActivity implements View.OnClickListener {
                                         alertDialog.setMessage(getString(R.string.critical_update_message));
                                         alertDialog.setPositiveButton(getString(R.string.yes), new DialogInterface.OnClickListener() {
                                             public void onClick(DialogInterface dialog, int which) {
-                                                Intent intent = new Intent(Intent.ACTION_VIEW);
-                                                intent.setData(Uri.parse("market://details?id=com.carrus.trucker"));
-                                                try {
-                                                    startActivity(intent);
-                                                } catch (Exception e) {
-                                                    intent.setData(Uri.parse("https://play.google.com/store/apps/details?id=com.carrus.trucker"));
-                                                }
+                                                goToAppStore();
                                                 dialog.dismiss();
                                             }
                                         });
                                         alertDialog.show();
                                     } else {
-                                        if (InternetConnectionStatus.getInstance(SplashScreen.this).isOnline()) {
-                                            afterConfigTrue();
-                                        } else {
-                                            progressBar.setVisibility(View.GONE);
-                                            findViewById(R.id.retry_button).setVisibility(View.VISIBLE);
-                                        }
+                                        afterConfigTrue();
                                     }
 
                                 } else if (Integer.parseInt(mAndroidVersion.getString("version")) > info.versionCode) {
                                     alertDialog.setMessage(getString(R.string.update_message));
                                     alertDialog.setPositiveButton(getString(R.string.yes), new DialogInterface.OnClickListener() {
                                         public void onClick(DialogInterface dialog, int which) {
-                                            Intent intent = new Intent(Intent.ACTION_VIEW);
-                                            intent.setData(Uri.parse("market://details?id=com.carrus.trucker"));
-                                            try {
-                                                startActivity(intent);
-                                            } catch (Exception e) {
-                                                intent.setData(Uri.parse("https://play.google.com/store/apps/details?id=com.carrus.trucker"));
-                                            }
+                                            goToAppStore();
                                             dialog.dismiss();
                                         }
                                     });
                                     alertDialog.setNegativeButton(getString(R.string.no), new DialogInterface.OnClickListener() {
                                         public void onClick(DialogInterface dialog, int which) {
                                             dialog.dismiss();
-                                            if (InternetConnectionStatus.getInstance(SplashScreen.this).isOnline()) {
-                                                afterConfigTrue();
-                                            } else {
-                                                progressBar.setVisibility(View.GONE);
-                                                findViewById(R.id.retry_button).setVisibility(View.VISIBLE);
-                                            }
+                                            afterConfigTrue();
                                         }
                                     });
                                     alertDialog.show();
                                 } else {
-                                    if (InternetConnectionStatus.getInstance(SplashScreen.this).isOnline()) {
-                                        afterConfigTrue();
-                                    } else {
-                                        progressBar.setVisibility(View.GONE);
-                                        findViewById(R.id.retry_button).setVisibility(View.VISIBLE);
-                                    }
+                                    afterConfigTrue();
                                 }
                             } catch (JSONException e) {
                                 e.printStackTrace();
@@ -181,7 +180,7 @@ public class SplashScreen extends BaseActivity implements View.OnClickListener {
         }
     }
 
-    public void afterConfigTrue() {
+    public void verfiySession() {
 
         RestClient.getWebServices().verifyUser(accessToken,
                 new Callback<String>() {
@@ -191,50 +190,24 @@ public class SplashScreen extends BaseActivity implements View.OnClickListener {
                             JSONObject data = new JSONObject(new JSONObject(serverResponse).getString("data"));
                             Gson gson = new Gson();
                             ProfileData profileData = gson.fromJson(data.getString("profileData"), ProfileData.class);
-                            Prefs.with(SplashScreen.this).save(ACCESS_TOKEN, data.getString("accessToken"));
-                            Prefs.with(SplashScreen.this).save(DRIVER_ID, profileData.driverId);
-                            Prefs.with(SplashScreen.this).save(DRIVER_NO, profileData._id);
-                            Prefs.with(SplashScreen.this).save(DRIVAR_NAME, CommonUtils.toCamelCase(profileData.driverName));
-                            Prefs.with(SplashScreen.this).save(DRIVING_LICENSE, profileData.drivingLicense.drivingLicenseNo);
-                            Prefs.with(SplashScreen.this).save(VALIDITY, profileData.drivingLicense.validity);
-                            Prefs.with(SplashScreen.this).save(DRIVER_PHONENO, profileData.phoneNumber);
-                            Prefs.with(SplashScreen.this).save(DL_STATE, profileData.stateDl);
-                            Prefs.with(SplashScreen.this).save(RATING, profileData.rating);
-                            Prefs.with(SplashScreen.this).save(FLEET_OWNER_NO, profileData.fleetOwner.get(0).phoneNumber);
+                            Prefs.with(SplashScreenActivity.this).save(ACCESS_TOKEN, data.getString("accessToken"));
+                            Prefs.with(SplashScreenActivity.this).save(DRIVER_ID, profileData.driverId);
+                            Prefs.with(SplashScreenActivity.this).save(DRIVER_NO, profileData._id);
+                            Prefs.with(SplashScreenActivity.this).save(DRIVAR_NAME, CommonUtils.toCamelCase(profileData.driverName));
+                            Prefs.with(SplashScreenActivity.this).save(DRIVING_LICENSE, profileData.drivingLicense.drivingLicenseNo);
+                            Prefs.with(SplashScreenActivity.this).save(VALIDITY, profileData.drivingLicense.validity);
+                            Prefs.with(SplashScreenActivity.this).save(DRIVER_PHONENO, profileData.phoneNumber);
+                            Prefs.with(SplashScreenActivity.this).save(DL_STATE, profileData.stateDl);
+                            Prefs.with(SplashScreenActivity.this).save(RATING, profileData.rating);
+                            Prefs.with(SplashScreenActivity.this).save(FLEET_OWNER_NO, profileData.fleetOwner.get(0).phoneNumber);
                             if (profileData.profilePicture != null) {
-                                Prefs.with(SplashScreen.this).save(DRIVER_IMAGE, profileData.profilePicture.thumb);
+                                Prefs.with(SplashScreenActivity.this).save(DRIVER_IMAGE, profileData.profilePicture.thumb);
                             }
-//                            if (!data.getJSONObject("profileData").isNull("profilePicture")) {
-//                                JSONObject profilePicture = data.getJSONObject("profileData").getJSONObject("profilePicture");
-//                                Prefs.with(SplashScreen.this).save(DRIVER_IMAGE, profilePicture.getString("thumb"));
-//                            } else {
-//                                Prefs.with(SplashScreen.this).save(DRIVER_IMAGE, "null");
-//                            }
-                            Intent intent = new Intent(getApplicationContext(), HomeScreen.class);
+                            Intent intent = new Intent(getApplicationContext(), HomeScreenActivity.class);
                             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |
                                     Intent.FLAG_ACTIVITY_CLEAR_TASK |
                                     Intent.FLAG_ACTIVITY_NEW_TASK);
                             Bundle mBundle = new Bundle();
-//                            if (data.has("bookingData")) {
-//                                mBundle.putBoolean("isBooking", true);
-//                                mBundle.putString("bookingId", data.getJSONObject("bookingData").getString("_id"));
-//                                mBundle.putString("tracking", data.getJSONObject("bookingData").getString("tracking"));
-//                                mBundle.putString("dropOffLong", data.getJSONObject("bookingData").getJSONObject("dropOff").getJSONObject("coordinates").getString("dropOffLong"));
-//                                mBundle.putString("dropOffLat", data.getJSONObject("bookingData").getJSONObject("dropOff").getJSONObject("coordinates").getString("dropOffLat"));
-//                                mBundle.putString("pickUpLong", data.getJSONObject("bookingData").getJSONObject("pickUp").getJSONObject("coordinates").getString("pickUpLong"));
-//                                mBundle.putString("pickUpLat", data.getJSONObject("bookingData").getJSONObject("pickUp").getJSONObject("coordinates").getString("pickUpLat"));
-//                                mBundle.putString("shipperName", data.getJSONObject("bookingData").getJSONObject("shipper").getString("firstName") + " " +
-//                                        data.getJSONObject("bookingData").getJSONObject("shipper").getString("lastName"));
-//                                mBundle.putString("bookingCreatedAt", data.getJSONObject("bookingData").getJSONObject("pickUp").getString("date"));
-//                                mBundle.putString("bookingStatus", data.getJSONObject("bookingData").getString("bookingStatus"));
-//                                mBundle.putString("shipperPhoneNumber", data.getJSONObject("bookingData").getJSONObject("shipper").getString("phoneNumber"));
-//                                mBundle.putString("shippingJourney", CommonUtils.toCamelCase(data.getJSONObject("bookingData").getJSONObject("pickUp").getString("city")) + " to " +
-//                                        CommonUtils.toCamelCase(data.getJSONObject("bookingData").getJSONObject("dropOff").getString("city")));
-//                                mBundle.putString("timeSlot", data.getJSONObject("bookingData").getJSONObject("pickUp").getString("time"));
-//                                mBundle.putString("truckNameNumber", data.getJSONObject("bookingData").getJSONObject("truck").getJSONObject("truckType").getString("typeTruckName"));
-//                            } else {
-//                                mBundle.putBoolean("isBooking", false);
-//                            }
                             intent.putExtras(mBundle);
                             startActivity(intent);
                             overridePendingTransition(R.anim.anim_slide_in_left, R.anim.anim_slide_out_left);
@@ -252,29 +225,45 @@ public class SplashScreen extends BaseActivity implements View.OnClickListener {
                         } else {
                             int statusCode = retrofitError.getResponse().getStatus();
                             if (statusCode == ApiResponseFlags.Unauthorized.getOrdinal()) {
-                                Intent intent = new Intent(SplashScreen.this, LoginActivity.class);
+                                Intent intent = new Intent(SplashScreenActivity.this, LoginActivity.class);
                                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |
                                         Intent.FLAG_ACTIVITY_CLEAR_TASK |
                                         Intent.FLAG_ACTIVITY_NEW_TASK);
                                 startActivity(intent);
                                 overridePendingTransition(R.anim.anim_slide_in_left, R.anim.anim_slide_out_left);
                             } else {
-                                CommonUtils.showRetrofitError(SplashScreen.this, retrofitError);
+                                CommonUtils.showRetrofitError(SplashScreenActivity.this, retrofitError);
                             }
                         }
                     }
                 });
     }
 
+    /**
+    * Redirect to App Store for Update
+    * */
+    private void goToAppStore(){
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setData(Uri.parse("market://details?id=com.carrus.trucker"));
+        try {
+            startActivity(intent);
+        } catch (Exception e) {
+            intent.setData(Uri.parse("https://play.google.com/store/apps/details?id=com.carrus.trucker"));
+        }
+    }
+
+    /**
+    * Method to create app shortcut on home screen
+    * */
     public void createShortCut() {
         Intent shortcutintent = new Intent("com.android.launcher.action.INSTALL_SHORTCUT");
         shortcutintent.putExtra("duplicate", false);
         shortcutintent.putExtra(Intent.EXTRA_SHORTCUT_NAME, getString(R.string.app_name));
         Parcelable icon = Intent.ShortcutIconResource.fromContext(getApplicationContext(), R.mipmap.ic_launcher);
         shortcutintent.putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE, icon);
-        shortcutintent.putExtra(Intent.EXTRA_SHORTCUT_INTENT, new Intent(getApplicationContext(), SplashScreen.class));
+        shortcutintent.putExtra(Intent.EXTRA_SHORTCUT_INTENT, new Intent(getApplicationContext(), SplashScreenActivity.class));
         sendBroadcast(shortcutintent);
-        Prefs.with(this).save(IS_FIRST, false);
+        getSharedPreferences(this.getPackageName(), Context.MODE_PRIVATE).edit().putBoolean(IS_FIRST, false).commit();
     }
 
     @Override
@@ -287,7 +276,7 @@ public class SplashScreen extends BaseActivity implements View.OnClickListener {
     }
 
     private void createDialog() {
-        alertDialog = new AlertDialog.Builder(SplashScreen.this);
+        alertDialog = new AlertDialog.Builder(SplashScreenActivity.this);
         alertDialog.setCancelable(false);
         alertDialog.setTitle(getString(R.string.update_app_title));
     }

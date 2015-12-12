@@ -84,4 +84,16 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_booking_details">BookingDetails</string>
     <string name="title_activity_rating_dialog">RatingDialogActivity</string>
+
+
+    <string name="gps_dialog_title">GPS is settings</string>
+    <string name="gps_msg">GPS is not enabled. Do you want to go to settings menu?</string>
+    <string name="settings">Settings</string>
+    <string name="payment_method">Payment Method</string>
+    <string name="total_cost">Total Cost</string>
+    <string name="crn">CRN</string>
+    <string name="type_of_cargo">Type of Cargo</string>
+    <string name="weight">Weight</string>
+    <string name="enter_your_feedback">Enter your feedback</string>
+
 </resources>

@@ -29,9 +29,9 @@ import com.carrus.trucker.adapters.NavDrawerListAdapter;
 import com.carrus.trucker.entities.NavDrawerItem;
 import com.carrus.trucker.fragments.BookingsFragment;
 import com.carrus.trucker.fragments.CurrentShipmentFragment;
-import com.carrus.trucker.fragments.DriverProfile;
+import com.carrus.trucker.fragments.DriverProfileFragment;
 import com.carrus.trucker.interfaces.HomeCallback;
-import com.carrus.trucker.interfaces.WebServices;
+import com.carrus.trucker.retrofit.WebServices;
 import com.carrus.trucker.retrofit.RestClient;
 import com.carrus.trucker.services.MyService;
 import com.carrus.trucker.utils.CommonUtils;
@@ -51,7 +51,7 @@ import retrofit.RetrofitError;
 import retrofit.client.Response;
 import retrofit.mime.TypedByteArray;
 
-public class HomeScreen extends BaseActivity implements HomeCallback {
+public class HomeScreenActivity extends BaseActivity implements HomeCallback {
 
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
@@ -89,7 +89,7 @@ public class HomeScreen extends BaseActivity implements HomeCallback {
                         if(lastSelectedScreen!=5) {
                             lastSelectedScreen=5;
                             headerTitle.setText(getResources().getString(R.string.my_profile));
-                            Fragment fragment = new DriverProfile();
+                            Fragment fragment = new DriverProfileFragment();
                             getSupportFragmentManager().beginTransaction()
                                     .replace(R.id.frame_container, fragment).commit();
                             mDrawerLayout.closeDrawer(GravityCompat.START);
@@ -138,7 +138,7 @@ public class HomeScreen extends BaseActivity implements HomeCallback {
         navDrawerItems.add(new NavDrawerItem(navMenuTitles[2], navMenuIcons.getResourceId(2, -1)));
         navDrawerItems.add(new NavDrawerItem(navMenuTitles[3], navMenuIcons.getResourceId(3, -1)));
         navMenuIcons.recycle();
-        adapter = new NavDrawerListAdapter(HomeScreen.this, navDrawerItems);
+        adapter = new NavDrawerListAdapter(HomeScreenActivity.this, navDrawerItems);
         mDrawerList.setAdapter(adapter);
         mDrawerList.setOnItemClickListener(new SlideMenuClickListener());
         profileImage = (CircleImageView) findViewById(R.id.profile_picture);
@@ -146,7 +146,7 @@ public class HomeScreen extends BaseActivity implements HomeCallback {
         sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, Context.MODE_PRIVATE);
         accessToken = sharedPreferences.getString(ACCESS_TOKEN, "");
         headerTitle=(TextView) findViewById(R.id.headerTitle);
-        connectivity=new Connectivity(HomeScreen.this);
+        connectivity=new Connectivity(HomeScreenActivity.this);
         commonUtils = new CommonUtils();
         errorLayout = (LinearLayout) findViewById(R.id.errorLayout);
         bundle=getIntent().getExtras();
@@ -196,14 +196,7 @@ public class HomeScreen extends BaseActivity implements HomeCallback {
                 break;
             case 2:
                 lastSelectedScreen=6;
-                CommonUtils.phoneCall(HomeScreen.this,sharedPreferences.getString(FLEET_OWNER_NO,""));
-//                try {
-//                    Intent call = new Intent(Intent.ACTION_DIAL);
-//                    call.setData(Uri.parse("tel:" + "+91"+sharedPreferences.getString(FLEET_OWNER_NO,"")));
-//                    startActivity(call);
-//                } catch (Exception e) {
-//                    commonUtils.showSingleButtonPopup(HomeScreen.this,"Unable to perform action.");
-//                }
+                CommonUtils.phoneCall(HomeScreenActivity.this,sharedPreferences.getString(FLEET_OWNER_NO,""));
                 break;
             case 3:
                 logoutPopup();
@@ -224,7 +217,7 @@ public class HomeScreen extends BaseActivity implements HomeCallback {
     public void logout() {
 
         if (connectivity.isConnectingToInternet()) {
-            commonUtils.showLoadingDialog(HomeScreen.this, "Please wait...");
+            commonUtils.showLoadingDialog(HomeScreenActivity.this, "Please wait...");
             RestClient.getWebServices().logoutDriver(accessToken,/*accessToken,*/
                     new Callback<String>() {
                         @Override
@@ -275,7 +268,7 @@ public class HomeScreen extends BaseActivity implements HomeCallback {
                                             startActivity(intent);
                                             overridePendingTransition(R.anim.anim_slide_in_right, R.anim.anim_slide_out_right);
                                         } else {
-                                            Toast.makeText(HomeScreen.this, jsonObject.get("message").toString(), Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(HomeScreenActivity.this, jsonObject.get("message").toString(), Toast.LENGTH_SHORT).show();
                                         }
 
                                     } catch (JSONException e) {
@@ -298,7 +291,7 @@ public class HomeScreen extends BaseActivity implements HomeCallback {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            commonUtils.showLoadingDialog(HomeScreen.this, "Please wait...");
+            commonUtils.showLoadingDialog(HomeScreenActivity.this, "Please wait...");
             logout();
 
         }
@@ -347,7 +340,7 @@ public class HomeScreen extends BaseActivity implements HomeCallback {
     }
 
     public void showExitPopup(){
-        final Dialog dialog = new Dialog(HomeScreen.this,android.R.style.Theme_Translucent_NoTitleBar);
+        final Dialog dialog = new Dialog(HomeScreenActivity.this,android.R.style.Theme_Translucent_NoTitleBar);
 
         //setting custom layout to dialog
         dialog.setContentView(R.layout.two_button_custom_layout);
@@ -386,7 +379,7 @@ public class HomeScreen extends BaseActivity implements HomeCallback {
 
     public void logoutPopup(){
 
-        final Dialog dialog = new Dialog(HomeScreen.this,android.R.style.Theme_Translucent_NoTitleBar);
+        final Dialog dialog = new Dialog(HomeScreenActivity.this,android.R.style.Theme_Translucent_NoTitleBar);
 
         //setting custom layout to dialog
         dialog.setContentView(R.layout.two_button_custom_layout);
@@ -433,6 +426,6 @@ public class HomeScreen extends BaseActivity implements HomeCallback {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        stopService(new Intent(HomeScreen.this, MyService.class));
+        stopService(new Intent(HomeScreenActivity.this, MyService.class));
     }
 }

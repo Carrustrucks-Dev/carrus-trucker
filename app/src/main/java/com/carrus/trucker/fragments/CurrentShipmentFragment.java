@@ -18,7 +18,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.carrus.trucker.R;
-import com.carrus.trucker.activities.BookingDetails;
+import com.carrus.trucker.activities.BookingDetailsActivity;
 import com.carrus.trucker.interfaces.AppConstants;
 import com.carrus.trucker.retrofit.RestClient;
 import com.carrus.trucker.services.MyService;
@@ -326,7 +326,7 @@ public class CurrentShipmentFragment extends android.support.v4.app.Fragment imp
                 break;
 
             case R.id.bookingDetailsLayout:
-                Intent intent = new Intent(getActivity(), BookingDetails.class);
+                Intent intent = new Intent(getActivity(), BookingDetailsActivity.class);
                 intent.putExtra("bookingId",bookingId);
                 startActivity(intent);
                 getActivity().overridePendingTransition(R.anim.anim_slide_in_left, R.anim.anim_slide_out_left);

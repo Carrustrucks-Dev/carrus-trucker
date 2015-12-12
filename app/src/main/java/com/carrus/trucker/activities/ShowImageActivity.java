@@ -38,12 +38,10 @@ import retrofit.mime.TypedString;
  */
 public class ShowImageActivity extends BaseActivity  implements View.OnClickListener{
 
-    public ImageView closeButton;
-    private Button uploadNewButton;
-    String orderId, documentName, imagePath;
-    public Map<String, TypedFile> images;
-    private String url;
-    private ImageView imageView;
+    private ImageView ivCloseButton, ivDocument;
+    private Button btnUploadNew;
+    private String orderId, documentName, imagePath, url;
+    private Map<String, TypedFile> images;
     private WebView webView;
     private boolean uploadFlag=false;
 
@@ -53,20 +51,39 @@ public class ShowImageActivity extends BaseActivity  implements View.OnClickList
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_show_image);
         setupUI(getWindow().getDecorView().getRootView());
-        images = new HashMap<String, TypedFile>();
-        closeButton = (ImageView) findViewById(R.id.imageView_close);
-        uploadNewButton = (Button) findViewById(R.id.upload_new_document);
-        url = getIntent().getStringExtra("url");
-        orderId = getIntent().getStringExtra("orderId");
-        documentName = getIntent().getStringExtra("documentName");
-        imageView = (ImageView) findViewById(R.id.image);
-        webView = (WebView) findViewById(R.id.webView);
+
+        init();
         showDocument(url);
-        findViewById(R.id.imageView_close).setOnClickListener(this);
-        uploadNewButton.setOnClickListener(this);
 
     }
 
+    /**
+     * Method to initialize all the {@link View}s inside the Layout of this
+     * {@link Activity}
+     */
+    private void init(){
+        //Get values from intent
+        url = getIntent().getStringExtra("url");
+        orderId = getIntent().getStringExtra("orderId");
+        documentName = getIntent().getStringExtra("documentName");
+
+        //Get Resource ID from XML
+        ivCloseButton = (ImageView) findViewById(R.id.ivCloseButton);
+        btnUploadNew = (Button) findViewById(R.id.btnUploadNew);
+        ivDocument = (ImageView) findViewById(R.id.ivDocument);
+        webView = (WebView) findViewById(R.id.webView);
+
+        //Set Listener
+        ivCloseButton.setOnClickListener(this);
+        btnUploadNew.setOnClickListener(this);
+
+        //Initialize variables
+        images = new HashMap<String, TypedFile>();
+    }
+
+    /**
+     * Method to show dialog fof document upload
+     * */
     void selectImage() {
         AlertDialog.Builder dialog = new AlertDialog.Builder(this);
         dialog.setTitle(getResources().getString(R.string.upload_documents));
@@ -74,8 +91,9 @@ public class ShowImageActivity extends BaseActivity  implements View.OnClickList
             @Override
             public void onClick(DialogInterface dialog, int item) {
 
-                if (item == 0) {
-                    try {
+                switch (item){
+                    case 0:
+                        try {
                         Intent intent = new Intent();
                         intent.setType("image/*");
                         intent.setAction(Intent.ACTION_GET_CONTENT);
@@ -83,21 +101,21 @@ public class ShowImageActivity extends BaseActivity  implements View.OnClickList
                     } catch (Exception ex) {
                         Toast.makeText(ShowImageActivity.this, getResources().getString(R.string.unable_to_perform_action), Toast.LENGTH_LONG).show();
                     }
-
-                } else if (item == 1) {
-                    Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                    intent.setType("application/pdf");
-                    intent.addCategory(Intent.CATEGORY_OPENABLE);
-                    startActivityForResult(intent, LOAD_PDF_FILE);
-
-                } else {
-                    dialog.dismiss();
+                        break;
+                    case 1:
+                        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                        intent.setType("application/pdf");
+                        intent.addCategory(Intent.CATEGORY_OPENABLE);
+                        startActivityForResult(intent, LOAD_PDF_FILE);
+                        break;
+                    default:
+                        dialog.dismiss();
+                        break;
                 }
             }
         });
         dialog.show();
     }
-
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         Matrix mat = new Matrix();
@@ -126,7 +144,6 @@ public class ShowImageActivity extends BaseActivity  implements View.OnClickList
 
     @Override
     public void onBackPressed() {
-//        super.onBackPressed();
         Intent intent=new Intent();
         intent.putExtra("uploadFlag", uploadFlag);
         setResult(RESULT_OK, intent);
@@ -137,23 +154,21 @@ public class ShowImageActivity extends BaseActivity  implements View.OnClickList
     private void showDocument(String url) {
         String extension = url.substring(url.lastIndexOf("."));
         if (extension.equalsIgnoreCase(".pdf")) {
-            imageView.setVisibility(View.GONE);
+            ivDocument.setVisibility(View.GONE);
             webView.setVisibility(View.VISIBLE);
             webView.getSettings().setJavaScriptEnabled(true);
             webView.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
-//            startWebView("https://docs.google.com/gview?embedded=true&url=" + url);
-//            CommonUtils.showLoadingDialog(ShowImageActivity.this, "Loading...");
             webView.setWebChromeClient(new WebChromeClient());
             webView.loadUrl("http://drive.google.com/viewerng/viewer?embedded=true&url=" + url);
 
 
         } else {
-            imageView.setVisibility(View.VISIBLE);
+            ivDocument.setVisibility(View.VISIBLE);
             webView.setVisibility(View.GONE);
             Picasso.with(this).
                     load(url).
                     placeholder(R.drawable.loading_placeholder)
-                    .into(imageView);
+                    .into(ivDocument);
         }
     }
 
@@ -169,7 +184,6 @@ public class ShowImageActivity extends BaseActivity  implements View.OnClickList
                 images.put("consigmentNote", new TypedFile("*/*", new File(imagePath)));
                 break;
         }
-
         uploadDocumentApi();
 
     }
@@ -195,7 +209,7 @@ public class ShowImageActivity extends BaseActivity  implements View.OnClickList
                             break;
                     }
                     showDocument(url);
-                    uploadFlag=true;
+                    uploadFlag = true;
                 } catch (JSONException e) {
                     e.printStackTrace();
                     CommonUtils.dismissLoadingDialog();
@@ -205,48 +219,24 @@ public class ShowImageActivity extends BaseActivity  implements View.OnClickList
 
             @Override
             public void failure(RetrofitError error) {
-                uploadFlag=false;
+                uploadFlag = false;
+                CommonUtils.dismissLoadingDialog();
                 CommonUtils.showRetrofitError(ShowImageActivity.this, error);
-                CommonUtils.showSingleButtonPopup(ShowImageActivity.this, "Oops!! Some error occurred. Please try again. ");
-                CommonUtils.dismissLoadingDialog();
             }
         });
-    }
-
-
-    private void startWebView(String url) {
-
-
-        webView.setWebViewClient(new WebViewClient() {
-
-            public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                view.loadUrl(url);
-                return true;
-            }
-
-            public void onLoadResource(WebView view, String url) {
-//                CommonUtils.showLoadingDialog(ShowImageActivity.this, "Loading...");
-            }
-
-            public void onPageFinished(WebView view, String url) {
-                CommonUtils.dismissLoadingDialog();
-            }
-        });
-        webView.getSettings().setJavaScriptEnabled(true);
-        webView.loadUrl(url);
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.imageView_close:
+            case R.id.ivCloseButton:
                 Intent intent=new Intent();
                 intent.putExtra("uploadFlag",uploadFlag);
                 setResult(RESULT_OK, intent);
                 finish();
                 overridePendingTransition(0, 0);
                 break;
-            case R.id.upload_new_document:
+            case R.id.btnUploadNew:
                 selectImage();
                 break;
         }

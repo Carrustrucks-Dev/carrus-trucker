@@ -2,27 +2,27 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.carrus.trucker.activities.BookingDetails">
+    tools:context=".activities.BookingDetailsActivity">
 
     <RelativeLayout
         android:id="@+id/headerView"
         android:layout_width="match_parent"
-        android:layout_height="56dp"
+        android:layout_height="@dimen/headerheight"
         android:background="@color/blue"
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
         <ImageView
-            android:id="@+id/back_button"
+            android:id="@+id/ivBackButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:clickable="true"
-            android:padding="16dp"
+            android:padding="@dimen/sixteen"
             android:src="@drawable/back_button_selector" />
 
         <TextView
-            android:id="@+id/headerTitle"
+            android:id="@+id/tvHeader"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
@@ -35,29 +35,29 @@
     <RelativeLayout
         android:id="@+id/order_status_layout"
         android:layout_width="match_parent"
-        android:layout_height="40dp"
+        android:layout_height="@dimen/fourty"
         android:layout_below="@+id/headerView"
         android:gravity="center_vertical">
 
         <TextView
-            android:id="@+id/crn_number"
+            android:id="@+id/tvCrnNumber"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
-            android:layout_marginLeft="16sp"
+            android:layout_marginLeft="@dimen/sixteen"
             android:textAppearance="@style/CustomTextAppearance"
             android:textColor="@color/white"
-            android:textSize="16sp" />
+            android:textSize="@dimen/big_font" />
 
         <TextView
-            android:id="@+id/order_status"
+            android:id="@+id/tvOrderStatus"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
-            android:layout_marginRight="16sp"
+            android:layout_marginRight="@dimen/sixteen"
             android:textAppearance="@style/CustomTextAppearance"
             android:textColor="@color/white"
-            android:textSize="16sp" />
+            android:textSize="@dimen/big_font" />
     </RelativeLayout>
 
     <ScrollView
@@ -74,26 +74,24 @@
             <LinearLayout
                 android:id="@+id/truck_details_layout"
                 android:layout_width="match_parent"
-                android:layout_height="60dp"
+                android:layout_height="@dimen/sixty"
                 android:gravity="center_vertical"
                 android:orientation="vertical"
-                android:paddingLeft="16dp">
+                android:paddingLeft="@dimen/sixteen">
 
                 <TextView
-                    android:id="@+id/truckName"
+                    android:id="@+id/tvTruckName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:fontFamily="sans-serif"
                     android:textColor="@color/blue"
-                    android:textSize="18sp" />
+                    android:textSize="@dimen/big_font" />
 
                 <TextView
-                    android:id="@+id/truckNumber"
+                    android:id="@+id/tvTruckNumber"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:fontFamily="sans-serif"
                     android:textColor="@color/dark_gery"
-                    android:textSize="14sp" />
+                    android:textSize="@dimen/mid_fond" />
             </LinearLayout>
 
             <LinearLayout
@@ -103,31 +101,31 @@
                 android:layout_below="@+id/truck_details_layout"
                 android:background="@color/white"
                 android:orientation="vertical"
-                android:paddingLeft="18dp"
-                android:paddingRight="16dp">
+                android:paddingLeft="@dimen/sixteen"
+                android:paddingRight="@dimen/sixteen">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
+                    android:layout_marginTop="@dimen/ten"
                     android:singleLine="true"
                     android:text="@string/pickup"
                     android:textAllCaps="true"
                     android:textAppearance="@style/CustomTextAppearance"
                     android:textColor="@color/blue"
-                    android:textSize="18sp" />
+                    android:textSize="@dimen/large_font" />
 
                 <TextView
-                    android:id="@+id/pickup_trucker_name"
+                    android:id="@+id/tvPickupTruckerName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
+                    android:layout_marginTop="@dimen/five"
                     android:drawableLeft="@mipmap/icon_shipment_detail1"
-                    android:drawablePadding="10dp"
+                    android:drawablePadding="@dimen/ten"
                     android:singleLine="true"
                     android:textAppearance="@style/CustomTextAppearance"
                     android:textColor="@color/booking_details_tv_color"
-                    android:textSize="16sp" />
+                    android:textSize="@dimen/large_font" />
 
                 <RelativeLayout
                     android:layout_width="match_parent"
@@ -135,19 +133,19 @@
                     android:gravity="center_vertical">
 
                     <TextView
-                        android:id="@+id/pickup_name"
+                        android:id="@+id/tvPickupName"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="5dp"
+                        android:layout_marginTop="@dimen/five"
                         android:drawableLeft="@mipmap/icon_shipment_detail2"
-                        android:drawablePadding="10dp"
+                        android:drawablePadding="@dimen/ten"
                         android:singleLine="true"
                         android:textAppearance="@style/CustomTextAppearance"
                         android:textColor="@color/booking_details_tv_color"
-                        android:textSize="16sp" />
+                        android:textSize="@dimen/big_font" />
 
                     <ImageView
-                        android:id="@+id/pickup_call"
+                        android:id="@+id/ivPickupCall"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentRight="true"
@@ -156,70 +154,70 @@
                 </RelativeLayout>
 
                 <TextView
-                    android:id="@+id/pickup_location"
+                    android:id="@+id/tvPickupLocation"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
+                    android:layout_marginTop="@dimen/five"
                     android:drawableLeft="@mipmap/icon_shipment_detail3"
-                    android:drawablePadding="10dp"
-                    android:singleLine="false"
+                    android:drawablePadding="@dimen/ten"
                     android:lineSpacingMultiplier="1.2"
+                    android:singleLine="false"
                     android:textAppearance="@style/CustomTextAppearance"
                     android:textColor="@color/booking_details_tv_color"
-                    android:textSize="16sp" />
+                    android:textSize="@dimen/big_font" />
 
                 <TextView
-                    android:id="@+id/pickup_day"
+                    android:id="@+id/tvPickupDay"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
+                    android:layout_marginTop="@dimen/five"
                     android:drawableLeft="@mipmap/icon_shipment_detail4"
-                    android:drawablePadding="10dp"
+                    android:drawablePadding="@dimen/ten"
                     android:singleLine="true"
                     android:textAppearance="@style/CustomTextAppearance"
                     android:textColor="@color/booking_details_tv_color"
-                    android:textSize="16sp" />
+                    android:textSize="@dimen/big_font" />
 
                 <TextView
-                    android:id="@+id/pickup_time"
+                    android:id="@+id/tvPickupTime"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
+                    android:layout_marginTop="@dimen/five"
                     android:drawableLeft="@mipmap/icon_shipment_detail5"
-                    android:drawablePadding="10dp"
+                    android:drawablePadding="@dimen/ten"
                     android:singleLine="true"
                     android:textAppearance="@style/CustomTextAppearance"
                     android:textColor="@color/booking_details_tv_color"
-                    android:textSize="16sp" />
+                    android:textSize="@dimen/big_font" />
 
                 <View
                     android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_marginTop="10dp"
+                    android:layout_height="@dimen/one"
+                    android:layout_marginTop="@dimen/ten"
                     android:background="@color/booking_details_tv_color" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
+                    android:layout_marginTop="@dimen/ten"
                     android:singleLine="true"
                     android:text="@string/drop_off"
                     android:textAllCaps="true"
                     android:textAppearance="@style/CustomTextAppearance"
                     android:textColor="@color/blue"
-                    android:textSize="18sp" />
+                    android:textSize="@dimen/large_font" />
 
                 <TextView
-                    android:id="@+id/dropup_trucker_name"
+                    android:id="@+id/tvDropoffTruckerName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
+                    android:layout_marginTop="@dimen/five"
                     android:drawableLeft="@mipmap/icon_shipment_detail1"
-                    android:drawablePadding="10dp"
+                    android:drawablePadding="@dimen/ten"
                     android:singleLine="true"
                     android:textAppearance="@style/CustomTextAppearance"
                     android:textColor="@color/booking_details_tv_color"
-                    android:textSize="16sp" />
+                    android:textSize="@dimen/big_font" />
 
                 <RelativeLayout
                     android:layout_width="match_parent"
@@ -227,19 +225,19 @@
                     android:gravity="center_vertical">
 
                     <TextView
-                        android:id="@+id/dropup_name"
+                        android:id="@+id/tvDropoffName"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="5dp"
+                        android:layout_marginTop="@dimen/five"
                         android:drawableLeft="@mipmap/icon_shipment_detail2"
-                        android:drawablePadding="10dp"
+                        android:drawablePadding="@dimen/ten"
                         android:singleLine="true"
                         android:textAppearance="@style/CustomTextAppearance"
                         android:textColor="@color/booking_details_tv_color"
-                        android:textSize="16sp" />
+                        android:textSize="@dimen/big_font" />
 
                     <ImageView
-                        android:id="@+id/dropoff_call"
+                        android:id="@+id/ivDropoffCall"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentRight="true"
@@ -248,41 +246,41 @@
                 </RelativeLayout>
 
                 <TextView
-                    android:id="@+id/dropup_location"
+                    android:id="@+id/tvDropoffLocation"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
+                    android:layout_marginTop="@dimen/five"
                     android:drawableLeft="@mipmap/icon_shipment_detail3"
-                    android:drawablePadding="10dp"
-                    android:singleLine="false"
+                    android:drawablePadding="@dimen/ten"
                     android:lineSpacingMultiplier="1.2"
+                    android:singleLine="false"
                     android:textAppearance="@style/CustomTextAppearance"
                     android:textColor="@color/booking_details_tv_color"
-                    android:textSize="16sp" />
+                    android:textSize="@dimen/big_font" />
 
                 <TextView
-                    android:id="@+id/dropup_day"
+                    android:id="@+id/tvDropoffDay"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
+                    android:layout_marginTop="@dimen/five"
                     android:drawableLeft="@mipmap/icon_shipment_detail4"
-                    android:drawablePadding="10dp"
+                    android:drawablePadding="@dimen/ten"
                     android:singleLine="true"
                     android:textAppearance="@style/CustomTextAppearance"
                     android:textColor="@color/booking_details_tv_color"
-                    android:textSize="16sp" />
+                    android:textSize="@dimen/big_font" />
 
                 <TextView
-                    android:id="@+id/dropup_time"
+                    android:id="@+id/tvDropoffTime"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
+                    android:layout_marginTop="@dimen/five"
                     android:drawableLeft="@mipmap/icon_shipment_detail5"
-                    android:drawablePadding="10dp"
+                    android:drawablePadding="@dimen/ten"
                     android:singleLine="true"
                     android:textAppearance="@style/CustomTextAppearance"
                     android:textColor="@color/booking_details_tv_color"
-                    android:textSize="16sp" />
+                    android:textSize="@dimen/big_font" />
             </LinearLayout>
 
             <ExpandableListView
@@ -294,7 +292,7 @@
 
             <View
                 android:layout_width="match_parent"
-                android:layout_height="1dp"
+                android:layout_height="@dimen/one"
                 android:layout_below="@+id/exListView"
                 android:background="@color/grey" />
 
@@ -304,18 +302,18 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/exListView"
-                android:padding="10dp">
+                android:padding="@dimen/ten">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Payment Method"
+                    android:text="@string/payment_method"
                     android:textAllCaps="true"
                     android:textAppearance="@style/CustomTextAppearance"
                     android:textColor="@color/blue" />
 
                 <TextView
-                    android:id="@+id/payment_method"
+                    android:id="@+id/tvPaymentMethod"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
@@ -325,11 +323,11 @@
             </RelativeLayout>
 
             <Button
-                android:id="@+id/collect_cash_button"
+                android:id="@+id/btnCollectCash"
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
+                android:layout_height="@dimen/fifty"
                 android:layout_below="@+id/payment_mode_layout"
-                android:layout_margin="10dp"
+                android:layout_margin="@dimen/ten"
                 android:background="@drawable/button_background_selector"
                 android:text="@string/collect_cash"
                 android:textColor="@color/white"
@@ -337,27 +335,27 @@
 
             <View
                 android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_below="@+id/collect_cash_button"
+                android:layout_height="@dimen/one"
+                android:layout_below="@+id/btnCollectCash"
                 android:background="@color/grey" />
 
             <RelativeLayout
                 android:id="@+id/total_amount_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/collect_cash_button"
-                android:padding="10dp">
+                android:layout_below="@+id/btnCollectCash"
+                android:padding="@dimen/ten">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Total Cost"
+                    android:text="@string/total_cost"
                     android:textAllCaps="true"
                     android:textAppearance="@style/CustomTextAppearance"
                     android:textColor="@color/blue" />
 
                 <TextView
-                    android:id="@+id/total_amount"
+                    android:id="@+id/tvTotalAmount"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
@@ -368,7 +366,7 @@
 
             <View
                 android:layout_width="match_parent"
-                android:layout_height="1dp"
+                android:layout_height="@dimen/one"
                 android:layout_below="@+id/total_amount_layout"
                 android:background="@color/grey" />
 
@@ -377,7 +375,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/total_amount_layout"
-                android:padding="10dp"
+                android:padding="@dimen/ten"
                 android:visibility="gone">
 
                 <TextView
@@ -389,7 +387,7 @@
                     android:textColor="@color/blue" />
 
                 <TextView
-                    android:id="@+id/payment_status"
+                    android:id="@+id/tvPaymentStatus"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
@@ -399,14 +397,14 @@
             </RelativeLayout>
 
             <Button
-                android:id="@+id/status_button"
+                android:id="@+id/btnStatus"
                 android:layout_width="fill_parent"
-                android:layout_height="40dp"
+                android:layout_height="@dimen/fourty"
                 android:layout_below="@+id/payment_collected_layout"
                 android:background="@drawable/button_background_selector"
                 android:textAppearance="@style/CustomTextAppearance"
                 android:textColor="@color/white"
-                android:textSize="14sp"
+                android:textSize="@dimen/mid_fond"
                 android:visibility="gone" />
 
         </RelativeLayout>
@@ -435,9 +433,9 @@
     <LinearLayout
         android:id="@+id/errorLayout"
         android:layout_width="fill_parent"
-        android:layout_height="50dp"
+        android:layout_height="@dimen/fifty"
         android:layout_alignParentTop="true"
-        android:layout_marginTop="50dp"
+        android:layout_marginTop="@dimen/fifty"
         android:visibility="gone">
 
         <include layout="@layout/error_bar_top" />

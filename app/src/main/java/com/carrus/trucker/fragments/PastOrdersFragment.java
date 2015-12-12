@@ -12,7 +12,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.carrus.trucker.R;
-import com.carrus.trucker.activities.BookingDetails;
+import com.carrus.trucker.activities.BookingDetailsActivity;
 import com.carrus.trucker.adapters.BookingAdapter;
 import com.carrus.trucker.entities.Booking;
 import com.carrus.trucker.interfaces.AppConstants;
@@ -76,7 +76,7 @@ public class PastOrdersFragment extends Fragment implements AppConstants, SwipeR
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Log.i("I m clicked", "");
-                Intent intent = new Intent(getActivity(), BookingDetails.class);
+                Intent intent = new Intent(getActivity(), BookingDetailsActivity.class);
                 intent.putExtra("bookingId", pastBookingArrayList.get(position).getBooking_id());
                 startActivity(intent);
                 getActivity().overridePendingTransition(R.anim.anim_slide_in_left, R.anim.anim_slide_out_left);
