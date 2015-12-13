@@ -22,9 +22,9 @@ import java.util.TimeZone;
  * Created by Saurbhv on 10/29/15.
  */
 public class BookingAdapter extends BaseAdapter {
-    ArrayList<Booking> data = new ArrayList<Booking>();
-    LayoutInflater inflater;
-    Context context;
+    private ArrayList<Booking> data = new ArrayList<Booking>();
+    private LayoutInflater inflater;
+    private Context context;
 
     public BookingAdapter(Context context, ArrayList<Booking> myList) {
         this.data = myList;
@@ -58,46 +58,38 @@ public class BookingAdapter extends BaseAdapter {
             mViewHolder = (MyViewHolder) convertView.getTag();
         }
 
-        try {
-            Calendar cal = Calendar.getInstance();
-            TimeZone tz = cal.getTimeZone();
-            DateFormat f = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-            f.setTimeZone(TimeZone.getTimeZone("ISO"));
-            Date d = f.parse(String.valueOf(data.get(position).getBookingTime()));
-            DateFormat date = new SimpleDateFormat("dd");
-            DateFormat month = new SimpleDateFormat("MMM");
-            DateFormat dayName = new SimpleDateFormat("EEE");
-            mViewHolder.date.setText(date.format(d));
-            mViewHolder.month.setText(month.format(d));
+            mViewHolder.date.setText(CommonUtils.getDateFromUTC(data.get(position).getBookingTime()));
+            mViewHolder.month.setText(CommonUtils.getShortMonthNameFromUTC(data.get(position).getBookingTime()));
             mViewHolder.name.setText(CommonUtils.toCamelCase(data.get(position).getName()));
             mViewHolder.truckName.setText(data.get(position).getTruckName());
             mViewHolder.shipingJourney.setText(data.get(position).getShipingJourney());
-            mViewHolder.timeSlot.setText(dayName.format(d) + ", " + data.get(position).getTimeSlot());
-            switch (data.get(position).getStatus().toUpperCase()) {
-                case "REACHED_DESTINATION":
-                case "REACHED_PICKUP_LOCATION":
-                    mViewHolder.status.setTextColor(context.getResources().getColor(R.color.orange));
-                    break;
-
-                case "ON_GOING":
-                case "UP_GOING":
-                    mViewHolder.status.setTextColor(context.getResources().getColor(R.color.blue));
-                    break;
-
-                case "CONFIRMED":
-                    mViewHolder.status.setTextColor(context.getResources().getColor(R.color.green));
-                    break;
-
-                case "HALT":
-                case "COMPLETED":
-                    mViewHolder.status.setTextColor(context.getResources().getColor(R.color.dark_gery));
-                    break;
-
-                case "CANCELED":
-                case "ON_THE_WAY":
-                    mViewHolder.status.setTextColor(context.getResources().getColor(R.color.red));
-                    break;
-            }
+            mViewHolder.timeSlot.setText(CommonUtils.getShortDayNameFromUTC(data.get(position).getBookingTime()) + ", " + data.get(position).getTimeSlot());
+            setTextColorOfStatus(data.get(position).getStatus().toUpperCase(),mViewHolder);
+//            switch (data.get(position).getStatus().toUpperCase()) {
+//                case "REACHED_DESTINATION":
+//                case "REACHED_PICKUP_LOCATION":
+//                    mViewHolder.status.setTextColor(context.getResources().getColor(R.color.orange));
+//                    break;
+//
+//                case "ON_GOING":
+//                case "UP_GOING":
+//                    mViewHolder.status.setTextColor(context.getResources().getColor(R.color.blue));
+//                    break;
+//
+//                case "CONFIRMED":
+//                    mViewHolder.status.setTextColor(context.getResources().getColor(R.color.green));
+//                    break;
+//
+//                case "HALT":
+//                case "COMPLETED":
+//                    mViewHolder.status.setTextColor(context.getResources().getColor(R.color.dark_gery));
+//                    break;
+//
+//                case "CANCELED":
+//                case "ON_THE_WAY":
+//                    mViewHolder.status.setTextColor(context.getResources().getColor(R.color.red));
+//                    break;
+//            }
 //            if(data.get(position).getStatus().equals("REACHED_DESTINATION")||data.get(position).getStatus().equals("REACHED_PICKUP_LOCATION"))
 //                mViewHolder.status.setTextColor(context.getResources().getColor(R.color.orange));
 //            if(data.get(position).getStatus().equals("ON_GOING")||data.get(position).getStatus().equals("UP_GOING"))
@@ -109,10 +101,6 @@ public class BookingAdapter extends BaseAdapter {
 //            if(data.get(position).getStatus().equals("CANCELED"))
 //                mViewHolder.status.setTextColor(context.getResources().getColor(R.color.red));
             mViewHolder.status.setText(data.get(position).getStatus().replace("_", " "));
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
         return convertView;
     }
 
@@ -128,6 +116,39 @@ public class BookingAdapter extends BaseAdapter {
             shipingJourney = (TextView) item.findViewById(R.id.shipingJourney);
             timeSlot = (TextView) item.findViewById(R.id.timeSlot);
             status = (TextView) item.findViewById(R.id.status);
+        }
+    }
+
+    /**
+     * @param String
+     * @param ViewHolder
+     * Method to set text color of status textView
+     * */
+    private void setTextColorOfStatus(String status, MyViewHolder mViewHolder){
+        switch (status) {
+            case "REACHED_DESTINATION":
+            case "REACHED_PICKUP_LOCATION":
+                mViewHolder.status.setTextColor(context.getResources().getColor(R.color.orange));
+                break;
+
+            case "ON_GOING":
+            case "UP_GOING":
+                mViewHolder.status.setTextColor(context.getResources().getColor(R.color.blue));
+                break;
+
+            case "CONFIRMED":
+                mViewHolder.status.setTextColor(context.getResources().getColor(R.color.green));
+                break;
+
+            case "HALT":
+            case "COMPLETED":
+                mViewHolder.status.setTextColor(context.getResources().getColor(R.color.dark_gery));
+                break;
+
+            case "CANCELED":
+            case "ON_THE_WAY":
+                mViewHolder.status.setTextColor(context.getResources().getColor(R.color.red));
+                break;
         }
     }
 }

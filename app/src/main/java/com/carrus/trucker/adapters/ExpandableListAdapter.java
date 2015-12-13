@@ -51,13 +51,13 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter implements 
     private List<String> _listDataHeader; // header titles
     // child data in format of header title, child title
     private HashMap<String, List<ExpandableChildItem>> _listDataChild;
-    public String orderId;
-    public SharedPreferences sharedPreferences;
-    public String imagePath;
+    private String orderId;
+    private SharedPreferences sharedPreferences;
+    private String imagePath;
     ActivityResultCallback resultCallback;
-    public String documentName;
-    public Map<String, TypedFile> images;
-    ExpandableChildItem expandableChildItem;
+    private String documentName;
+    private Map<String, TypedFile> images;
+    private ExpandableChildItem expandableChildItem;
 
     public ExpandableListAdapter(Context context, String orderId, List<String> listDataHeader,
                                  HashMap<String, List<ExpandableChildItem>> listChildData) {

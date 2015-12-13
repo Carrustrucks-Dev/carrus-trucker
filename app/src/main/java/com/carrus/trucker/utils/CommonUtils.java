@@ -558,6 +558,20 @@ public class CommonUtils {
         }
     }
 
+    public static String getShortDayNameFromUTC(String date) {
+        Calendar cal = Calendar.getInstance();
+        TimeZone tz = cal.getTimeZone();
+        DateFormat f = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+        f.setTimeZone(TimeZone.getTimeZone("ISO"));
+        try {
+            Date d = f.parse(date);
+            DateFormat day = new SimpleDateFormat("EEE");
+            return day.format(d);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return "";
+        }
+    }
 
     public static String getShortMonthNameFromUTC(String date) {
         Calendar cal = Calendar.getInstance();
