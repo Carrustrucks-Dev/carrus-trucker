@@ -22,6 +22,7 @@ import com.carrus.trucker.utils.ApiResponseFlags;
 import com.carrus.trucker.utils.CommonUtils;
 import com.carrus.trucker.utils.Log;
 import com.carrus.trucker.utils.MaterialDesignAnimations;
+import com.carrus.trucker.utils.Transactions;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -101,7 +102,6 @@ public class BookingDetailsActivity extends BaseActivity implements View.OnClick
         getOrderDetails();
     }
 
-
     /**
      * Method to initialize all the {@link View}s inside the Layout of this
      * {@link Activity}
@@ -153,7 +153,9 @@ public class BookingDetailsActivity extends BaseActivity implements View.OnClick
         listDataHeader.add(getString(R.string.my_notes));
     }
 
-
+    /**
+     * Method for API call of get details for particular order
+     * */
     public void getOrderDetails() {
         CommonUtils.showLoadingDialog(BookingDetailsActivity.this, getResources().getString(R.string.loading));
         RestClient.getWebServices().getBookingDetails(accessToken, bookingId,
@@ -163,8 +165,8 @@ public class BookingDetailsActivity extends BaseActivity implements View.OnClick
                         findViewById(R.id.scrollView).setVisibility(View.VISIBLE);
                         try {
                             JSONObject jsonObject = new JSONObject(serverResponse);
-                            JSONObject data=jsonObject.getJSONObject("data");
-                            tvCrnNumber.setText(getString(R.string.crn)+" - " + data.getString("crn").toUpperCase());
+                            JSONObject data = jsonObject.getJSONObject("data");
+                            tvCrnNumber.setText(getString(R.string.crn) + " - " + data.getString("crn").toUpperCase());
                             orderStatusLayout.setBackgroundColor(statusBarColor(data.getString("bookingStatus").toUpperCase()));
                             btnStatus.setText(textOnButton(data.getString("bookingStatus").toUpperCase()));
                             if (data.getString("paymentStatus").equalsIgnoreCase("PENDING")) {
@@ -216,7 +218,7 @@ public class BookingDetailsActivity extends BaseActivity implements View.OnClick
 
                             ArrayList<ExpandableChildItem> documents = new ArrayList<ExpandableChildItem>();
                             if (jsonObject.getJSONObject("data").has("doc")) {
-                                JSONObject docJson=data.getJSONObject("doc");
+                                JSONObject docJson = data.getJSONObject("doc");
                                 documents.add(new ExpandableChildItem(getString(R.string.pod), docJson.has("pod") ? docJson.getString("pod") : null));
                                 documents.add(new ExpandableChildItem(getString(R.string.invoice), docJson.has("invoice") ? docJson.getString("invoice") : null));
                                 documents.add(new ExpandableChildItem(getString(R.string.consignment), docJson.has("consigmentNote") ? docJson.getString("consigmentNote") : null));
@@ -250,7 +252,7 @@ public class BookingDetailsActivity extends BaseActivity implements View.OnClick
                             listDataChild.put(listDataHeader.get(4), myNotes);
                             listAdapter = new ExpandableListAdapter(BookingDetailsActivity.this, bookingId, listDataHeader, listDataChild);
                             expListView.setAdapter(listAdapter);
-                            setListViewHeight(expListView);
+                            CommonUtils.setListViewHeightBasedOnChildren(expListView);//setListViewHeight(expListView);
                             final ScrollView scrollview = (ScrollView) findViewById(R.id.scrollView);
                             expListView.setOnChildClickListener(BookingDetailsActivity.this);
                             scrollview.post(new Runnable() {
@@ -289,7 +291,6 @@ public class BookingDetailsActivity extends BaseActivity implements View.OnClick
                 });
     }
 
-
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -298,7 +299,6 @@ public class BookingDetailsActivity extends BaseActivity implements View.OnClick
                 RestClient.getWebServices().collectCash(accessToken, bookingId, "PAID", new Callback<String>() {
                     @Override
                     public void success(String serverResponse, Response response) {
-                        Log.i("Success", "" + serverResponse);
                         findViewById(R.id.btnCollectCash).setVisibility(View.GONE);
                         try {
                             JSONObject jsonObject = new JSONObject(serverResponse);
@@ -307,15 +307,13 @@ public class BookingDetailsActivity extends BaseActivity implements View.OnClick
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
-
                         CommonUtils.dismissLoadingDialog();
-
                     }
 
                     @Override
                     public void failure(RetrofitError error) {
-                        Log.i("Failure", "" + error);
                         CommonUtils.dismissLoadingDialog();
+                        CommonUtils.showRetrofitError(BookingDetailsActivity.this,error);
                     }
                 });
                 break;
@@ -339,94 +337,109 @@ public class BookingDetailsActivity extends BaseActivity implements View.OnClick
                 break;
 
             case R.id.btnStatus:
-                if (btnStatus.getText().equals("END TRIP")) {
-                    CommonUtils.showLoadingDialog(BookingDetailsActivity.this, getResources().getString(R.string.loading));
-                    RestClient.getWebServices().completeOrder(accessToken, bookingId, "COMPLETED", new Callback<String>() {
-                        @Override
-                        public void success(String s, Response response) {
-                            Log.i("Success", "" + s);
-                            btnStatus.setVisibility(View.GONE);
-                            CommonUtils.dismissLoadingDialog();
-                            Intent intent = new Intent(BookingDetailsActivity.this, RatingDialogActivity.class);
-                            intent.putExtra("bookingId", bookingId);
-                            startActivityForResult(intent, FIVE_REQUEST_CODE);
-                        }
+                switch (btnStatus.getText().toString()) {
+                    case "END TRIP":
+                        CommonUtils.showLoadingDialog(BookingDetailsActivity.this, getResources().getString(R.string.loading));
+                        RestClient.getWebServices().completeOrder(accessToken, bookingId, "COMPLETED", new Callback<String>() {
+                            @Override
+                            public void success(String s, Response response) {
+                                Log.i("Success", "" + s);
+                                btnStatus.setVisibility(View.GONE);
+                                CommonUtils.dismissLoadingDialog();
+                                Intent intent = new Intent(BookingDetailsActivity.this, RatingDialogActivity.class);
+                                intent.putExtra("bookingId", bookingId);
+                                startActivityForResult(intent, FIVE_REQUEST_CODE);
+                            }
 
-                        @Override
-                        public void failure(RetrofitError error) {
-                            Log.i("Failure", "" + error);
-                            CommonUtils.showRetrofitError(BookingDetailsActivity.this, error);
-                            CommonUtils.dismissLoadingDialog();
-                        }
-                    });
-                } else if (btnStatus.getText().equals("ON THE WAY")) {
-                    CommonUtils.showLoadingDialog(BookingDetailsActivity.this, getResources().getString(R.string.loading));
-                    RestClient.getWebServices().changeOrderStatus(accessToken, bookingId, "ON_THE_WAY", new Callback<String>() {
-                        @Override
-                        public void success(String s, Response response) {
-                            Log.i("Success", "" + s);
-                            btnStatus.setVisibility(View.GONE);
-                            CommonUtils.dismissLoadingDialog();
-                            getOrderDetails();
-                        }
+                            @Override
+                            public void failure(RetrofitError error) {
+                                Log.i("Failure", "" + error);
+                                CommonUtils.showRetrofitError(BookingDetailsActivity.this, error);
+                                CommonUtils.dismissLoadingDialog();
+                            }
+                        });
+                        break;
+                    case "ON THE WAY":
+                        changeStatus("ON_THE_WAY");
+                        break;
 
-                        @Override
-                        public void failure(RetrofitError error) {
-                            Log.i("Failure", "" + error);
-                            CommonUtils.showRetrofitError(BookingDetailsActivity.this, error);
-                            CommonUtils.dismissLoadingDialog();
-                        }
-                    });
-                } else if (btnStatus.getText().equals("START TRIP")) {
-                    CommonUtils.showLoadingDialog(BookingDetailsActivity.this, getResources().getString(R.string.loading));
-                    RestClient.getWebServices().changeOrderStatus(accessToken, bookingId, "ON_GOING", new Callback<String>() {
-                        @Override
-                        public void success(String s, Response response) {
-                            Log.i("Success", "" + s);
-                            btnStatus.setVisibility(View.GONE);
-                            CommonUtils.dismissLoadingDialog();
-                            getOrderDetails();
-                        }
-
-                        @Override
-                        public void failure(RetrofitError error) {
-                            Log.i("Failure", "" + error);
-                            CommonUtils.showRetrofitError(BookingDetailsActivity.this, error);
-                            CommonUtils.dismissLoadingDialog();
-                        }
-                    });
+                    case "START TRIP":
+                        changeStatus("ON_GOING");
+                        break;
                 }
+
+//                if (btnStatus.getText().equals("END TRIP")) {
+//                    CommonUtils.showLoadingDialog(BookingDetailsActivity.this, getResources().getString(R.string.loading));
+//                    RestClient.getWebServices().completeOrder(accessToken, bookingId, "COMPLETED", new Callback<String>() {
+//                        @Override
+//                        public void success(String s, Response response) {
+//                            Log.i("Success", "" + s);
+//                            btnStatus.setVisibility(View.GONE);
+//                            CommonUtils.dismissLoadingDialog();
+//                            Intent intent = new Intent(BookingDetailsActivity.this, RatingDialogActivity.class);
+//                            intent.putExtra("bookingId", bookingId);
+//                            startActivityForResult(intent, FIVE_REQUEST_CODE);
+//                        }
+//
+//                        @Override
+//                        public void failure(RetrofitError error) {
+//                            Log.i("Failure", "" + error);
+//                            CommonUtils.showRetrofitError(BookingDetailsActivity.this, error);
+//                            CommonUtils.dismissLoadingDialog();
+//                        }
+//                    });
+//                } else if (btnStatus.getText().equals("ON THE WAY")) {
+//                    CommonUtils.showLoadingDialog(BookingDetailsActivity.this, getResources().getString(R.string.loading));
+//                    RestClient.getWebServices().changeOrderStatus(accessToken, bookingId, "ON_THE_WAY", new Callback<String>() {
+//                        @Override
+//                        public void success(String s, Response response) {
+//                            Log.i("Success", "" + s);
+//                            btnStatus.setVisibility(View.GONE);
+//                            CommonUtils.dismissLoadingDialog();
+//                            getOrderDetails();
+//                        }
+//
+//                        @Override
+//                        public void failure(RetrofitError error) {
+//                            Log.i("Failure", "" + error);
+//                            CommonUtils.showRetrofitError(BookingDetailsActivity.this, error);
+//                            CommonUtils.dismissLoadingDialog();
+//                        }
+//                    });
+//                } else if (btnStatus.getText().equals("START TRIP")) {
+//                    CommonUtils.showLoadingDialog(BookingDetailsActivity.this, getResources().getString(R.string.loading));
+//                    RestClient.getWebServices().changeOrderStatus(accessToken, bookingId, "ON_GOING", new Callback<String>() {
+//                        @Override
+//                        public void success(String s, Response response) {
+//                            Log.i("Success", "" + s);
+//                            btnStatus.setVisibility(View.GONE);
+//                            CommonUtils.dismissLoadingDialog();
+//                            getOrderDetails();
+//                        }
+//
+//                        @Override
+//                        public void failure(RetrofitError error) {
+//                            Log.i("Failure", "" + error);
+//                            CommonUtils.showRetrofitError(BookingDetailsActivity.this, error);
+//                            CommonUtils.dismissLoadingDialog();
+//                        }
+//                    });
+//                }
                 break;
 
 
         }
     }
 
-
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
         finish();
-        overridePendingTransition(R.anim.anim_slide_in_right, R.anim.anim_slide_out_right);
+        Transactions.showPreviousAnimation(BookingDetailsActivity.this);
     }
 
-    private void setListViewHeight(ListView listView) {
-        ListAdapter listAdapter = listView.getAdapter();
-        int totalHeight = 0;
-        for (int i = 0; i < listAdapter.getCount(); i++) {
-            View listItem = listAdapter.getView(i, null, listView);
-            listItem.measure(0, 0);
-            totalHeight += listItem.getMeasuredHeight();
-        }
-
-        ViewGroup.LayoutParams params = listView.getLayoutParams();
-        params.height = totalHeight
-                + (listView.getDividerHeight() * (listAdapter.getCount() - 1));
-        listView.setLayoutParams(params);
-        listView.requestLayout();
-    }
-
-
+    /**
+     * Method to set height expandable listview
+     */
     private void setListViewHeight(ExpandableListView listView,
                                    int group) {
         ExpandableListAdapter listAdapter = (ExpandableListAdapter) listView.getExpandableListAdapter();
@@ -463,11 +476,9 @@ public class BookingDetailsActivity extends BaseActivity implements View.OnClick
 
     }
 
-
     @Override
     public void startActivityResult(Intent intent, int requestCode, int resultCode) {
         startActivityForResult(intent, requestCode);
-
     }
 
     @Override
@@ -503,6 +514,9 @@ public class BookingDetailsActivity extends BaseActivity implements View.OnClick
         return false;
     }
 
+    /**
+     * Method to set color of status bar
+     */
     private int statusBarColor(String status) {
         switch (status) {
             case "REACHED_PICKUP_LOCATION":
@@ -528,6 +542,9 @@ public class BookingDetailsActivity extends BaseActivity implements View.OnClick
         }
     }
 
+    /**
+     * Method for set text on button of status
+     */
     private String textOnButton(String status) {
         switch (status) {
             case "ON_GOING":
@@ -555,6 +572,27 @@ public class BookingDetailsActivity extends BaseActivity implements View.OnClick
                 return "";
         }
 
+    }
+
+    /**
+     * @param String Method for API call to change status of order
+     */
+    private void changeStatus(String orderStatus) {
+        CommonUtils.showLoadingDialog(BookingDetailsActivity.this, getString(R.string.loading));
+        RestClient.getWebServices().changeOrderStatus(accessToken, bookingId, orderStatus, new Callback<String>() {
+            @Override
+            public void success(String s, Response response) {
+                btnStatus.setVisibility(View.GONE);
+                CommonUtils.dismissLoadingDialog();
+                getOrderDetails();
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                CommonUtils.showRetrofitError(BookingDetailsActivity.this, error);
+                CommonUtils.dismissLoadingDialog();
+            }
+        });
     }
 }
 

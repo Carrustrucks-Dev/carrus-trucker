@@ -19,7 +19,6 @@ import com.carrus.trucker.R;
 import com.carrus.trucker.entities.ProfileData;
 import com.carrus.trucker.retrofit.RestClient;
 import com.carrus.trucker.utils.CommonUtils;
-import com.carrus.trucker.utils.Connectivity;
 import com.carrus.trucker.utils.InternetConnectionStatus;
 import com.carrus.trucker.utils.MaterialDesignAnimations;
 import com.carrus.trucker.utils.Prefs;

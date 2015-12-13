@@ -4,6 +4,8 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="header_text_size">16sp</dimen>
     <dimen name="headerheight">56dp</dimen>
+    <dimen name="pic_size">80dp</dimen>
+    <dimen name="sliding_menu_width">180dp</dimen>
 
 
     <!--Dimensions-->
