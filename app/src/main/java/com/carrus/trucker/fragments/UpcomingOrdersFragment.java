@@ -16,9 +16,9 @@ import com.carrus.trucker.activities.BookingDetailsActivity;
 import com.carrus.trucker.adapters.BookingAdapter;
 import com.carrus.trucker.entities.Booking;
 import com.carrus.trucker.interfaces.AppConstants;
-import com.carrus.trucker.interfaces.HomeCallback;
+import com.carrus.trucker.retrofit.RestClient;
 import com.carrus.trucker.utils.CommonUtils;
-import com.carrus.trucker.utils.Log;
+import com.carrus.trucker.utils.Prefs;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -34,12 +34,11 @@ import retrofit.client.Response;
  */
 public class UpcomingOrdersFragment extends Fragment implements AppConstants, SwipeRefreshLayout.OnRefreshListener {
 
-    ListView listView;
-    ArrayList<Booking> bookingsArrayList, pastBookingArrayList;
-    BookingAdapter bookingAdapter, pastBookinAdapter;
-    HomeCallback homeCallback;
-    boolean isRefreshView=false;
-    TextView noOrderPlaceholder;
+    private ListView listView;
+    private ArrayList<Booking> bookingsArrayList;
+    private BookingAdapter bookingAdapter;
+    private boolean isRefreshView=false;
+    private TextView noOrderPlaceholder;
     private SwipeRefreshLayout swipeRefreshLayout;
     public UpcomingOrdersFragment() {
         // Required empty public constructor
@@ -53,16 +52,11 @@ public class UpcomingOrdersFragment extends Fragment implements AppConstants, Sw
         View v = inflater.inflate(R.layout.fragment_bookingview, container, false);
         init(v);
         getData();
-
         return v;
     }
 
     private void init(View v){
-        homeCallback = (HomeCallback) getActivity();
-        if (homeCallback == null)
-            throw new IllegalArgumentException(" implement home callback in Activity");
         listView = (ListView) v.findViewById(R.id.orders_listview);
-        pastBookingArrayList = new ArrayList<Booking>();
         bookingsArrayList = new ArrayList<Booking>();
         noOrderPlaceholder = (TextView) v.findViewById(R.id.no_bookings_placeholder);
         swipeRefreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.swipe_refresh_layout);
@@ -72,11 +66,10 @@ public class UpcomingOrdersFragment extends Fragment implements AppConstants, Sw
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        swipeRefreshLayout.setOnRefreshListener((SwipeRefreshLayout.OnRefreshListener) this);
+        swipeRefreshLayout.setOnRefreshListener(this);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Log.i("I m clicked", "");
                 Intent intent = new Intent(getActivity(), BookingDetailsActivity.class);
                 intent.putExtra("bookingId", bookingsArrayList.get(position).getBooking_id());
                 startActivity(intent);
@@ -100,12 +93,9 @@ public class UpcomingOrdersFragment extends Fragment implements AppConstants, Sw
 
     private void getData() {
             if (!isRefreshView) {
-                homeCallback.getCommonUtils().showLoadingDialog(getActivity(), getResources().getString(R.string.loading));
+                CommonUtils.showLoadingDialog(getActivity(), getResources().getString(R.string.loading));
             }
-
-
-            Log.i("bookingsArrayList", bookingsArrayList.size() + "");
-            homeCallback.getWebServices().getUpComingOrders(homeCallback.getSharedPreference().getString(ACCESS_TOKEN, ""),"ASC",
+            RestClient.getWebServices().getUpComingOrders(Prefs.with(getActivity()).getString(ACCESS_TOKEN, ""),"ASC",
                     new Callback<String>() {
                         @Override
                         public void success(String serverResponse, Response response) {
@@ -130,12 +120,9 @@ public class UpcomingOrdersFragment extends Fragment implements AppConstants, Sw
                                 }
 
                                 if (bookingsArrayList.size() == 0) {
-                                    Log.i("bookingsArrayList1", bookingsArrayList.size() + "");
-                                    noOrderPlaceholder.setText("No Upcoming Orders");
+                                    noOrderPlaceholder.setText(getString(R.string.no_upcoming_orders));
                                     noOrderPlaceholder.setVisibility(View.VISIBLE);
-                                    //  listView.setVisibility(View.GONE);
                                 } else {
-                                    Log.i("bookingsArrayList2", bookingsArrayList.size() + "");
                                     noOrderPlaceholder.setVisibility(View.GONE);
                                     listView.setVisibility(View.VISIBLE);
                                     bookingAdapter = new BookingAdapter(getActivity(), bookingsArrayList);
@@ -144,75 +131,19 @@ public class UpcomingOrdersFragment extends Fragment implements AppConstants, Sw
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
-                            homeCallback.getCommonUtils().dismissLoadingDialog();
+                            CommonUtils.dismissLoadingDialog();
                             swipeRefreshLayout.setRefreshing(false);
                             isRefreshView = false;
                         }
 
                         @Override
                         public void failure(RetrofitError retrofitError) {
-                            homeCallback.getCommonUtils().showRetrofitError(getActivity(), retrofitError);
-                            homeCallback.getCommonUtils().dismissLoadingDialog();
+                            CommonUtils.showRetrofitError(getActivity(), retrofitError);
+                            CommonUtils.dismissLoadingDialog();
                             swipeRefreshLayout.setRefreshing(false);
                             isRefreshView = false;
                         }
                     });
-//        } else {
-//            if (bookingsArrayList.isEmpty() && pastBookingArrayList.isEmpty()&& !isRefreshView) {
-//                homeCallback.getCommonUtils().showLoadingDialog(getActivity(), getResources().getString(R.string.loading));
-//            }
-//
-//            pastBookingArrayList.clear();
-//            homeCallback.getWebServices().getPastOrders(homeCallback.getSharedPreference().getString(ACCESS_TOKEN, ""),
-//                    new Callback<String>() {
-//                        @Override
-//                        public void success(String serverResponse, Response response) {
-//                            try {
-//                                JSONObject jsonObjectServerResponse = new JSONObject(serverResponse);
-//                                if (!jsonObjectServerResponse.isNull("data")) {
-//                                    JSONArray jsonDataArray = new JSONArray(jsonObjectServerResponse.getString("data"));
-//                                    for (int i = 0; i < jsonDataArray.length(); i++) {
-//                                        Booking booking = new Booking();
-//                                        JSONObject jsonObject = jsonDataArray.getJSONObject(i);
-//                                        booking.setBooking_id(jsonObject.getString("_id"));
-//                                        booking.setBookingTime(jsonObject.getString("bookingCreatedAt"));
-//                                        booking.setName(jsonObject.getJSONObject("shipper").getString("firstName") + " " + jsonObject.getJSONObject("shipper").getString("lastName"));
-//                                        booking.setShipingJourney(jsonObject.getJSONObject("pickUp").getString("city") + " to " + jsonObject.getJSONObject("pickUp").getString("city"));
-//                                        booking.setStatus(jsonObject.getString("bookingStatus"));
-//                                        booking.setTimeSlot(jsonObject.getJSONObject("dropOff").getString("time"));
-//                                        booking.setTruckName(jsonObject.getJSONObject("truck").getJSONObject("truckType").getString("typeTruckName"));
-//                                        pastBookingArrayList.add(booking);
-//                                    }
-//                                }
-//
-//                                if (pastBookingArrayList.size() == 0) {
-//                                    noOrderPlaceholder.setText("No Past Orders");
-//                                    noOrderPlaceholder.setVisibility(View.VISIBLE);
-//                                    // listView.setVisibility(View.GONE);
-//                                } else {
-//                                    noOrderPlaceholder.setVisibility(View.GONE);
-//                                    listView.setVisibility(View.VISIBLE);
-//                                    bookingAdapter = new BookingAdapter(getActivity(), pastBookingArrayList);
-//                                    listView.setAdapter(bookingAdapter);
-//                                }
-//
-//                            } catch (Exception e) {
-//                                e.printStackTrace();
-//                            }
-//                            homeCallback.getCommonUtils().dismissLoadingDialog();
-//                            swipeRefreshLayout.setRefreshing(false);
-//                            isRefreshView=false;
-//                        }
-//
-//                        @Override
-//                        public void failure(RetrofitError retrofitError) {
-//                            homeCallback.getCommonUtils().showRetrofitError(getActivity(), retrofitError);
-//                            homeCallback.getCommonUtils().dismissLoadingDialog();
-//                            swipeRefreshLayout.setRefreshing(false);
-//                            isRefreshView=false;
-//                        }
-//                    });
-//        }
 
         }
 

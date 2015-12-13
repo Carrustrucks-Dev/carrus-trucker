@@ -18,7 +18,7 @@
             >
 
             <ImageView
-                android:id="@+id/appLogo"
+                android:id="@+id/ivAppLogo"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
@@ -28,38 +28,38 @@
                 android:id="@+id/flipper"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/appLogo">
+                android:layout_below="@+id/ivAppLogo">
 
                 <LinearLayout
-                    android:id="@+id/driverIdLayout"
+                    android:id="@+id/llDriverIdLayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
                     <EditText
-                        android:id="@+id/driverId"
+                        android:id="@+id/etDriverId"
                         style="@android:style/Widget.EditText"
                         android:layout_width="match_parent"
-                        android:layout_height="56dp"
-                        android:layout_marginTop="40dp"
+                        android:layout_height="@dimen/headerheight"
+                        android:layout_marginTop="@dimen/fourty"
                         android:animateLayoutChanges="true"
                         android:background="@color/white"
                         android:digits="0123456789"
                         android:drawableLeft="@mipmap/icon_driver"
-                        android:drawablePadding="10dp"
+                        android:drawablePadding="@dimen/ten"
                         android:hint="@string/driverId"
                         android:inputType="number"
                         android:maxLength="6"
-                        android:padding="10dp"
+                        android:padding="@dimen/ten"
                         android:imeOptions="actionDone"
                         android:textAppearance="@style/CustomTextAppearance"
-                        android:textColor="#969696"
-                        android:textColorHint="#969696" />
+                        android:textColor="@color/dark_gery"
+                        android:textColorHint="@color/dark_gery" />
 
                     <Button
-                        android:id="@+id/submitButton"
+                        android:id="@+id/btnSubmit"
                         android:layout_width="match_parent"
-                        android:layout_height="56dp"
+                        android:layout_height="@dimen/headerheight"
                         android:animateLayoutChanges="true"
                         android:background="@drawable/login_button_background_selector"
                         android:text="@string/submit"
@@ -69,35 +69,35 @@
                 </LinearLayout>
 
                 <LinearLayout
-                    android:id="@+id/otpLayout"
+                    android:id="@+id/llOtpLayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
                     <EditText
-                        android:id="@+id/otp"
+                        android:id="@+id/etOTP"
                         style="@android:style/Widget.EditText"
                         android:layout_width="match_parent"
-                        android:layout_height="56dp"
-                        android:layout_marginTop="40dp"
+                        android:layout_height="@dimen/headerheight"
+                        android:layout_marginTop="@dimen/fourty"
                         android:animateLayoutChanges="true"
                         android:background="@color/white"
                         android:digits="0123456789"
                         android:drawableLeft="@mipmap/icon_otp"
-                        android:drawablePadding="10dp"
+                        android:drawablePadding="@dimen/ten"
                         android:hint="@string/enterOTP"
                         android:inputType="numberPassword"
-                        android:padding="10dp"
+                        android:padding="@dimen/ten"
                         android:maxLength="6"
                         android:imeOptions="actionDone"
                         android:textAppearance="@style/CustomTextAppearance"
-                        android:textColor="#969696"
-                        android:textColorHint="#969696" />
+                        android:textColor="@color/dark_gery"
+                        android:textColorHint="@color/dark_gery" />
 
                     <Button
-                        android:id="@+id/loginButton"
+                        android:id="@+id/btnLogin"
                         android:layout_width="match_parent"
-                        android:layout_height="56dp"
+                        android:layout_height="@dimen/headerheight"
                         android:animateLayoutChanges="true"
                         android:background="@drawable/login_button_background_selector"
                         android:clickable="true"
@@ -107,16 +107,16 @@
                         android:textColor="@color/white" />
 
                     <TextView
-                        android:id="@+id/resendOtp"
+                        android:id="@+id/tvResendOtp"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="@string/resend_otp"
                         android:textColor="@drawable/change_text_color"
-                        android:textSize="14sp"
+                        android:textSize="@dimen/mid_fond"
                         android:textAppearance="@style/CustomTextAppearance.Bold"
                         android:gravity="center_horizontal"
                         android:background="#70000000"
-                        android:padding="5dp"/>
+                        android:padding="@dimen/five"/>
                 </LinearLayout>
             </ViewFlipper>
         </RelativeLayout>
@@ -125,9 +125,9 @@
     <LinearLayout
         android:id="@+id/errorLayout"
         android:layout_width="fill_parent"
-        android:layout_height="50dp"
+        android:layout_height="@dimen/fifty"
         android:layout_alignParentTop="true"
-        android:layout_marginTop="50dp"
+        android:layout_marginTop="@dimen/fifty"
         android:visibility="gone">
 
         <include layout="@layout/error_bar_top" />

@@ -141,11 +141,6 @@ public class CurrentShipmentFragment extends android.support.v4.app.Fragment imp
         sharedPreferences = getActivity().getSharedPreferences(SHARED_PREFERENCES, Context.MODE_PRIVATE);
         getCurrentBookings();
         v2GetRouteDirection = new GMapV2GetRouteDirection();
-        bundle = getArguments();
-//        shipperNumber=bundle.getString("shipperPhoneNumber");
-        Log.e("isbooking", "" + bundle.getBoolean("isBooking"));
-
-
     }
 
     @Override

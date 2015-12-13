@@ -189,7 +189,7 @@ public class ShowImageActivity extends BaseActivity  implements View.OnClickList
     }
 
     private void uploadDocumentApi() {
-        CommonUtils.showLoadingDialog(ShowImageActivity.this, "Uploading...");
+        CommonUtils.showLoadingDialog(ShowImageActivity.this, getString(R.string.uploading_msg));
         RestClient.getWebServices().uploadDocument(accessToken, new TypedString(orderId), images, new Callback<String>() {
             @Override
             public void success(String s, Response response) {

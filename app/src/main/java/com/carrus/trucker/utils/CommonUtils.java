@@ -15,11 +15,14 @@ import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.util.Patterns;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.ListAdapter;
+import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -579,6 +582,25 @@ public class CommonUtils {
         } catch (Exception e) {
             CommonUtils.showSingleButtonPopup(context, "Unable to perform action.");
         }
+    }
+
+    public static void setListViewHeightBasedOnChildren(ListView listView) {
+        ListAdapter listAdapter = listView.getAdapter();
+        if (listAdapter == null) {
+            return;
+        }
+
+        int totalHeight = 0;
+        for (int i = 0, len = listAdapter.getCount(); i < len; i++) {
+            View listItem = listAdapter.getView(i, null, listView);
+            listItem.measure(0, 0);
+            totalHeight += listItem.getMeasuredHeight();
+        }
+
+        ViewGroup.LayoutParams params = listView.getLayoutParams();
+        params.height = totalHeight
+                + (listView.getDividerHeight() * (listAdapter.getCount() - 1));
+        listView.setLayoutParams(params);
     }
 
 }

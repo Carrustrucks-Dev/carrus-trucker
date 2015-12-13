@@ -20,8 +20,10 @@ import com.carrus.trucker.entities.ProfileData;
 import com.carrus.trucker.retrofit.RestClient;
 import com.carrus.trucker.utils.CommonUtils;
 import com.carrus.trucker.utils.Connectivity;
+import com.carrus.trucker.utils.InternetConnectionStatus;
 import com.carrus.trucker.utils.MaterialDesignAnimations;
 import com.carrus.trucker.utils.Prefs;
+import com.carrus.trucker.utils.Transactions;
 import com.google.gson.Gson;
 
 import org.json.JSONException;
@@ -32,17 +34,16 @@ import retrofit.RetrofitError;
 import retrofit.client.Response;
 import retrofit.mime.TypedByteArray;
 
-public class LoginActivity extends BaseActivity  {
+public class LoginActivity extends BaseActivity implements View.OnClickListener {
 
     private EditText etDriverId, etOtp;
-    private Button submitButton, loginButton;
+    private Button btnSubmit, btnLogin;
     private String driverId, otp;
     private ViewFlipper flipper;
     private Animation slideLeftOut, slideLeftIn, slideRightIn, slideRightOut;
     private boolean flag = false;
-    private Connectivity connectivity;
-    private TextView resendOtp;
-    private boolean isResendOtp=false;
+    private TextView tvResendOtp;
+    private boolean isResendOtp = false;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -50,52 +51,7 @@ public class LoginActivity extends BaseActivity  {
         setContentView(R.layout.activity_login);
         setupUI(getWindow().getDecorView().getRootView());
         init();
-        View.OnClickListener handler = new View.OnClickListener() {
-            public void onClick(View v) {
-                Intent intent;
-                switch (v.getId()) {
-                    case R.id.submitButton:
-                        hideKeyboard(v);
-                        driverId = etDriverId.getText().toString();
-                        if (driverId.length() == 0) {
-                            CommonUtils.showSingleButtonPopup(LoginActivity.this, "Please enter driver ID.");
-                        } else if (driverId.length() < 5) {
-                            CommonUtils.showSingleButtonPopup(LoginActivity.this, "Invalid driver ID.");
-                        } else {
-                            if (connectivity.isConnectingToInternet()) {
-                                sendDriverId();
-                            }
-                        }
-                        break;
-                    case R.id.loginButton:
-                        hideKeyboard(v);
-                        otp = etOtp.getText().toString();
-                        if (otp.length() == 0) {
-                            CommonUtils.showSingleButtonPopup(LoginActivity.this, "Please enter OTP.");
-                        } else if (otp.length() < 6) {
-                            CommonUtils.showSingleButtonPopup(LoginActivity.this, "Invalid OTP.");
-                        } else {
-                            if (connectivity.isConnectingToInternet()) {
-                               sendOtp();
-                            }
-                        }
-                        break;
-
-                    case R.id.resendOtp:
-                        isResendOtp=true;
-                        etOtp.setText("");
-                        sendDriverId();
-                        break;
-                }
-            }
-        };
-        submitButton.setOnClickListener(handler);
-        loginButton.setOnClickListener(handler);
-        resendOtp.setOnClickListener(handler);
-
-
         etDriverId.addTextChangedListener(new TextWatcher() {
-
 
             @Override
             public void afterTextChanged(Editable arg0) {
@@ -137,22 +93,29 @@ public class LoginActivity extends BaseActivity  {
 
     }
 
+    /**
+     * Method to initialize all the {@link View}s inside the Layout of this
+     * {@link Activity}
+     */
     private void init() {
-        resendOtp=(TextView) findViewById(R.id.resendOtp);
-        connectivity = new Connectivity(this);
-        etDriverId = (EditText) findViewById(R.id.driverId);
-        etOtp = (EditText) findViewById(R.id.otp);
-        submitButton = (Button) findViewById(R.id.submitButton);
-        loginButton = (Button) findViewById(R.id.loginButton);
+        //Get Resource ID from XML
+        tvResendOtp = (TextView) findViewById(R.id.tvResendOtp);
+        etDriverId = (EditText) findViewById(R.id.etDriverId);
+        etOtp = (EditText) findViewById(R.id.etOTP);
+        btnSubmit = (Button) findViewById(R.id.btnSubmit);
+        btnLogin = (Button) findViewById(R.id.btnLogin);
         flipper = (ViewFlipper) findViewById(R.id.flipper);
-        slideLeftOut = AnimationUtils.loadAnimation(getApplicationContext(),
-                R.anim.anim_slide_out_left);
-        slideLeftIn = AnimationUtils.loadAnimation(getApplicationContext(),
-                R.anim.anim_slide_in_left);
-        slideRightIn = AnimationUtils.loadAnimation(getApplicationContext(),
-                R.anim.anim_slide_in_right);
-        slideRightOut = AnimationUtils.loadAnimation(getApplicationContext(),
-                R.anim.anim_slide_out_right);
+
+        //Set animation variables
+        slideLeftOut = AnimationUtils.loadAnimation(this, R.anim.anim_slide_out_left);
+        slideLeftIn = AnimationUtils.loadAnimation(this, R.anim.anim_slide_in_left);
+        slideRightIn = AnimationUtils.loadAnimation(this, R.anim.anim_slide_in_right);
+        slideRightOut = AnimationUtils.loadAnimation(this, R.anim.anim_slide_out_right);
+
+        //Set Listener
+        btnSubmit.setOnClickListener(this);
+        btnLogin.setOnClickListener(this);
+        tvResendOtp.setOnClickListener(this);
     }
 
     public void onBackPressed() {
@@ -162,7 +125,7 @@ public class LoginActivity extends BaseActivity  {
             flipper.showPrevious();
             flag = false;
             etOtp.setText("");
-            isResendOtp=false;
+            isResendOtp = false;
         } else {
             super.onBackPressed();
             finish();
@@ -170,13 +133,13 @@ public class LoginActivity extends BaseActivity  {
         }
     }
 
-
+    /**
+     * Method for hide virtual keyboard
+     * */
     public void hideKeyboard(View view) {
         // hide virtual keyboard
-        InputMethodManager imm = (InputMethodManager)
-                getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(view.getWindowToken(),
-                InputMethodManager.RESULT_UNCHANGED_SHOWN);
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.RESULT_UNCHANGED_SHOWN);
     }
 
     public void sendDriverId() {
@@ -186,10 +149,10 @@ public class LoginActivity extends BaseActivity  {
                     @Override
                     public void success(String serverResponse, Response response) {
                         if (!isResendOtp) {
-                                flipper.setInAnimation(slideLeftIn);
-                                flipper.setOutAnimation(slideLeftOut);
-                                flipper.showNext();
-                                flag = true;
+                            flipper.setInAnimation(slideLeftIn);
+                            flipper.setOutAnimation(slideLeftOut);
+                            flipper.showNext();
+                            flag = true;
                         }
                         CommonUtils.dismissLoadingDialog();
                     }
@@ -236,11 +199,11 @@ public class LoginActivity extends BaseActivity  {
                             Prefs.with(LoginActivity.this).save(DL_STATE, profileData.stateDl);
                             Prefs.with(LoginActivity.this).save(RATING, profileData.rating);
                             Prefs.with(LoginActivity.this).save(FLEET_OWNER_NO, profileData.fleetOwner.get(0).phoneNumber);
-                            if(profileData.profilePicture!=null){
+                            if (profileData.profilePicture != null) {
                                 Prefs.with(LoginActivity.this).save(DRIVER_IMAGE, profileData.profilePicture.thumb);
                             }
                             startActivity(new Intent(LoginActivity.this, HomeScreenActivity.class));
-                            overridePendingTransition(R.anim.anim_slide_in_left, R.anim.anim_slide_out_left);
+                            Transactions.showNextAnimation(LoginActivity.this);
                             finish();
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -256,5 +219,43 @@ public class LoginActivity extends BaseActivity  {
                         CommonUtils.dismissLoadingDialog();
                     }
                 });
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.btnSubmit:
+                hideKeyboard(v);
+                driverId = etDriverId.getText().toString();
+                if (driverId.isEmpty()) {
+                    CommonUtils.showSingleButtonPopup(this, getString(R.string.enter_driver_id_msg));
+                } else if (driverId.length() < 5) {
+                    CommonUtils.showSingleButtonPopup(this, getString(R.string.invalid_driver_id));
+                } else {
+                    if (InternetConnectionStatus.getInstance(this).isOnline()) {
+                        sendDriverId();
+                    }
+                }
+                break;
+            case R.id.btnLogin:
+                hideKeyboard(v);
+                otp = etOtp.getText().toString();
+                if (otp.isEmpty()) {
+                    CommonUtils.showSingleButtonPopup(this,getString(R.string.enter_otp_msg));
+                } else if (otp.length() < 6) {
+                    CommonUtils.showSingleButtonPopup(this, getString(R.string.invalid_otp));
+                } else {
+                    if (InternetConnectionStatus.getInstance(this).isOnline()) {
+                        sendOtp();
+                    }
+                }
+                break;
+
+            case R.id.tvResendOtp:
+                isResendOtp = true;
+                etOtp.setText("");
+                sendDriverId();
+                break;
+        }
     }
 }

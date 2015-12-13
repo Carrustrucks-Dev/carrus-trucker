@@ -2,11 +2,9 @@ package com.carrus.trucker.activities;
 
 
 import android.app.Dialog;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.TypedArray;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -14,12 +12,9 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.view.Gravity;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -30,17 +25,16 @@ import com.carrus.trucker.entities.NavDrawerItem;
 import com.carrus.trucker.fragments.BookingsFragment;
 import com.carrus.trucker.fragments.CurrentShipmentFragment;
 import com.carrus.trucker.fragments.DriverProfileFragment;
-import com.carrus.trucker.interfaces.HomeCallback;
-import com.carrus.trucker.retrofit.WebServices;
 import com.carrus.trucker.retrofit.RestClient;
 import com.carrus.trucker.services.MyService;
 import com.carrus.trucker.utils.CommonUtils;
-import com.carrus.trucker.utils.Connectivity;
+import com.carrus.trucker.utils.InternetConnectionStatus;
 import com.carrus.trucker.utils.Log;
+import com.carrus.trucker.utils.Prefs;
+import com.carrus.trucker.utils.Transactions;
 import com.squareup.picasso.MemoryPolicy;
 import com.squareup.picasso.Picasso;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -49,9 +43,8 @@ import de.hdodenhof.circleimageview.CircleImageView;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
-import retrofit.mime.TypedByteArray;
 
-public class HomeScreenActivity extends BaseActivity implements HomeCallback {
+public class HomeScreenActivity extends BaseActivity implements View.OnClickListener {
 
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
@@ -63,12 +56,7 @@ public class HomeScreenActivity extends BaseActivity implements HomeCallback {
     private SharedPreferences sharedPreferences;
     private TextView driverName;
     private TextView headerTitle;
-    public Connectivity connectivity;
-    public CommonUtils commonUtils;
-    public String accessToken;
-    public LinearLayout errorLayout;
-    private int lastSelectedScreen=0;
-    private Bundle bundle;
+    private int lastSelectedScreen = 0;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -76,53 +64,25 @@ public class HomeScreenActivity extends BaseActivity implements HomeCallback {
         setContentView(R.layout.activity_home_screen);
         setupUI(getWindow().getDecorView().getRootView());
         init();
-        View.OnClickListener handler = new View.OnClickListener() {
-            public void onClick(View v) {
-                Intent intent;
-                switch (v.getId()) {
-
-                    case R.id.navigation_drawer_button:
-                        mDrawerLayout.openDrawer(Gravity.LEFT);
-                        break;
-
-                    case R.id.driverProfile:
-                        if(lastSelectedScreen!=5) {
-                            lastSelectedScreen=5;
-                            headerTitle.setText(getResources().getString(R.string.my_profile));
-                            Fragment fragment = new DriverProfileFragment();
-                            getSupportFragmentManager().beginTransaction()
-                                    .replace(R.id.frame_container, fragment).commit();
-                            mDrawerLayout.closeDrawer(GravityCompat.START);
-                        }
-                        else{
-                            mDrawerLayout.closeDrawer(GravityCompat.START);
-                        }
-
-                }
-            }
-        };
-        driverName.setText(sharedPreferences.getString(DRIVAR_NAME, "Test"));
-        try{
-            String path=sharedPreferences.getString(DRIVER_IMAGE, null);
-            if(path.equals(null)){
-
-            }else{
-                Picasso.with(this)
-                        .load(sharedPreferences.getString(DRIVER_IMAGE, "")).fit()
-                        .centerCrop().memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE).skipMemoryCache()
-                        .placeholder(R.mipmap.icon_placeholder)// optional
-                        .into(profileImage);
-            }
-        }catch(Exception e){
-
-        }
+        setDriverData();
 
         if (savedInstanceState == null) {
             displayView(0);
         }
-        findViewById(R.id.navigation_drawer_button).setOnClickListener(handler);
-        findViewById(R.id.driverProfile).setOnClickListener(handler);
-        setListViewHeightBasedOnChildren(mDrawerList);
+    }
+
+    private void setDriverData(){
+        driverName.setText(Prefs.with(this).getString(DRIVAR_NAME, "Test"));
+        String path = Prefs.with(this).getString(DRIVER_IMAGE, null);
+        if (path.equals(null)) {
+
+        } else {
+            Picasso.with(this)
+                    .load(Prefs.with(this).getString(DRIVER_IMAGE, "")).fit()
+                    .centerCrop().memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE).skipMemoryCache()
+                    .placeholder(R.mipmap.icon_placeholder)// optional
+                    .into(profileImage);
+        }
     }
 
     private void init() {
@@ -143,29 +103,31 @@ public class HomeScreenActivity extends BaseActivity implements HomeCallback {
         mDrawerList.setOnItemClickListener(new SlideMenuClickListener());
         profileImage = (CircleImageView) findViewById(R.id.profile_picture);
         driverName = (TextView) findViewById(R.id.driverName);
-        sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, Context.MODE_PRIVATE);
-        accessToken = sharedPreferences.getString(ACCESS_TOKEN, "");
-        headerTitle=(TextView) findViewById(R.id.headerTitle);
-        connectivity=new Connectivity(HomeScreenActivity.this);
-        commonUtils = new CommonUtils();
-        errorLayout = (LinearLayout) findViewById(R.id.errorLayout);
-        bundle=getIntent().getExtras();
-    }
-
-
-    @Override
-    public WebServices getWebServices() {
-        return RestClient.getWebServices();
+        headerTitle = (TextView) findViewById(R.id.headerTitle);
+        findViewById(R.id.navigation_drawer_button).setOnClickListener(this);
+        findViewById(R.id.driverProfile).setOnClickListener(this);
+        CommonUtils.setListViewHeightBasedOnChildren(mDrawerList);
     }
 
     @Override
-    public CommonUtils getCommonUtils() {
-        return commonUtils;
-    }
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.navigation_drawer_button:
+                mDrawerLayout.openDrawer(Gravity.LEFT);
+                break;
 
-    @Override
-    public SharedPreferences getSharedPreference() {
-        return sharedPreferences;
+            case R.id.driverProfile:
+                if (lastSelectedScreen != 5) {
+                    lastSelectedScreen = 5;
+                    headerTitle.setText(getString(R.string.my_profile));
+                    Fragment fragment = new DriverProfileFragment();
+                    getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.frame_container, fragment).commit();
+                }
+                mDrawerLayout.closeDrawer(GravityCompat.START);
+
+
+        }
     }
 
     private class SlideMenuClickListener implements
@@ -173,30 +135,29 @@ public class HomeScreenActivity extends BaseActivity implements HomeCallback {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position,
                                 long id) {
-            if(lastSelectedScreen!=position)
-            displayView(position);
+            if (lastSelectedScreen != position)
+                displayView(position);
             else
                 mDrawerLayout.closeDrawer(GravityCompat.START);
         }
     }
 
     private void displayView(int position) {
-        lastSelectedScreen=position;
+        lastSelectedScreen = position;
         mDrawerLayout.closeDrawer(GravityCompat.START);
         Fragment fragment = null;
         switch (position) {
             case 0:
                 headerTitle.setText(getResources().getString(R.string.current_shipment));
                 fragment = new CurrentShipmentFragment();
-                fragment.setArguments(bundle);
                 break;
             case 1:
                 headerTitle.setText(getResources().getString(R.string.my_schedule));
                 fragment = new BookingsFragment();
                 break;
             case 2:
-                lastSelectedScreen=6;
-                CommonUtils.phoneCall(HomeScreenActivity.this,sharedPreferences.getString(FLEET_OWNER_NO,""));
+                lastSelectedScreen = 6;
+                CommonUtils.phoneCall(HomeScreenActivity.this, sharedPreferences.getString(FLEET_OWNER_NO, ""));
                 break;
             case 3:
                 logoutPopup();
@@ -216,8 +177,8 @@ public class HomeScreenActivity extends BaseActivity implements HomeCallback {
 
     public void logout() {
 
-        if (connectivity.isConnectingToInternet()) {
-            commonUtils.showLoadingDialog(HomeScreenActivity.this, "Please wait...");
+        if (InternetConnectionStatus.getInstance(this).isOnline()) {
+            CommonUtils.showLoadingDialog(HomeScreenActivity.this, getString(R.string.please_wait));
             RestClient.getWebServices().logoutDriver(accessToken,/*accessToken,*/
                     new Callback<String>() {
                         @Override
@@ -229,106 +190,27 @@ public class HomeScreenActivity extends BaseActivity implements HomeCallback {
                                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |
                                         Intent.FLAG_ACTIVITY_CLEAR_TASK |
                                         Intent.FLAG_ACTIVITY_NEW_TASK);
-                                SharedPreferences.Editor editor = sharedPreferences.edit();
-                                editor.clear();
-                                editor.commit();
-                                commonUtils.dismissLoadingDialog();
+                                Prefs.with(HomeScreenActivity.this).removeAll();
+                                CommonUtils.dismissLoadingDialog();
                                 startActivity(intent);
-                                overridePendingTransition(R.anim.anim_slide_in_right, R.anim.anim_slide_out_right);
-
+                                Transactions.showPreviousAnimation(HomeScreenActivity.this);
                                 finish();
                             } catch (Exception e) {
                                 e.printStackTrace();
-                                commonUtils.dismissLoadingDialog();
+                                CommonUtils.dismissLoadingDialog();
                             }
                         }
 
                         @Override
                         public void failure(RetrofitError retrofitError) {
-                            if (retrofitError.getResponse() != null) {
-                                String json = new String(((TypedByteArray) retrofitError.getResponse()
-                                        .getBody()).getBytes());
-                                int statusCode = retrofitError.getResponse().getStatus();
-                                if (statusCode == 401) {
-                                    Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
-                                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |
-                                            Intent.FLAG_ACTIVITY_CLEAR_TASK |
-                                            Intent.FLAG_ACTIVITY_NEW_TASK);
-                                    startActivity(intent);
-                                    overridePendingTransition(R.anim.anim_slide_in_right, R.anim.anim_slide_out_right);
-                                } else {
-                                    try {
-                                        JSONObject jsonObject = new JSONObject(json);
-                                        if (jsonObject.getString("message").equalsIgnoreCase("access denied")) {
-                                            Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
-                                            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |
-                                                    Intent.FLAG_ACTIVITY_CLEAR_TASK |
-                                                    Intent.FLAG_ACTIVITY_NEW_TASK);
-                                            commonUtils.dismissLoadingDialog();
-                                            startActivity(intent);
-                                            overridePendingTransition(R.anim.anim_slide_in_right, R.anim.anim_slide_out_right);
-                                        } else {
-                                            Toast.makeText(HomeScreenActivity.this, jsonObject.get("message").toString(), Toast.LENGTH_SHORT).show();
-                                        }
-
-                                    } catch (JSONException e) {
-                                        e.printStackTrace();
-                                        commonUtils.dismissLoadingDialog();
-                                    }
-                                }
-                            }
-                            commonUtils.dismissLoadingDialog();
+                            CommonUtils.dismissLoadingDialog();
+                            CommonUtils.showRetrofitError(HomeScreenActivity.this, retrofitError);
                         }
                     });
         }
 
     }
 
-
-    public class Logout extends AsyncTask<Void, Void, Void> {
-
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            commonUtils.showLoadingDialog(HomeScreenActivity.this, "Please wait...");
-            logout();
-
-        }
-
-        @Override
-        protected Void doInBackground(Void... params) {
-            try {
-                Thread.sleep(500);
-            } catch (Exception ae) {
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-        }
-    }
-
-    public void setListViewHeightBasedOnChildren(ListView listView) {
-        ListAdapter listAdapter = listView.getAdapter();
-        if (listAdapter == null) {
-            return;
-        }
-
-        int totalHeight = 0;
-        for (int i = 0, len = listAdapter.getCount(); i < len; i++) {
-            View listItem = listAdapter.getView(i, null, listView);
-            listItem.measure(0, 0);
-            totalHeight += listItem.getMeasuredHeight();
-        }
-
-        ViewGroup.LayoutParams params = listView.getLayoutParams();
-        params.height = totalHeight
-                + (listView.getDividerHeight() * (listAdapter.getCount() - 1));
-        listView.setLayoutParams(params);
-    }
 
     @Override
     public void onBackPressed() {
@@ -339,8 +221,8 @@ public class HomeScreenActivity extends BaseActivity implements HomeCallback {
         }
     }
 
-    public void showExitPopup(){
-        final Dialog dialog = new Dialog(HomeScreenActivity.this,android.R.style.Theme_Translucent_NoTitleBar);
+    public void showExitPopup() {
+        final Dialog dialog = new Dialog(HomeScreenActivity.this, android.R.style.Theme_Translucent_NoTitleBar);
 
         //setting custom layout to dialog
         dialog.setContentView(R.layout.two_button_custom_layout);
@@ -365,7 +247,7 @@ public class HomeScreenActivity extends BaseActivity implements HomeCallback {
                 overridePendingTransition(R.anim.anim_slide_in_right, R.anim.anim_slide_out_right);
             }
         });
-        Button noButton =(Button) dialog.findViewById(R.id.no_button);
+        Button noButton = (Button) dialog.findViewById(R.id.no_button);
         noButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -377,9 +259,9 @@ public class HomeScreenActivity extends BaseActivity implements HomeCallback {
     }
 
 
-    public void logoutPopup(){
+    public void logoutPopup() {
 
-        final Dialog dialog = new Dialog(HomeScreenActivity.this,android.R.style.Theme_Translucent_NoTitleBar);
+        final Dialog dialog = new Dialog(HomeScreenActivity.this, android.R.style.Theme_Translucent_NoTitleBar);
 
         //setting custom layout to dialog
         dialog.setContentView(R.layout.two_button_custom_layout);
@@ -399,19 +281,19 @@ public class HomeScreenActivity extends BaseActivity implements HomeCallback {
         yesButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                lastSelectedScreen=0;
+                lastSelectedScreen = 0;
                 dialog.dismiss();
                 logout();
 //                finish();
 //                overridePendingTransition(R.anim.anim_slide_in_right, R.anim.anim_slide_out_right);
             }
         });
-        Button noButton =(Button) dialog.findViewById(R.id.no_button);
+        Button noButton = (Button) dialog.findViewById(R.id.no_button);
         noButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 dialog.dismiss();
-                lastSelectedScreen=0;
+                lastSelectedScreen = 0;
             }
         });
         dialog.show();
