@@ -71,7 +71,8 @@ public class CurrentShipmentFragment extends android.support.v4.app.Fragment imp
     public SharedPreferences sharedPreferences;
     private double[] latitude = new double[2];
     private double[] longitude = new double[2];
-    public String name[] = new String[2];
+    private String name[] = new String[2];
+    private String address[] = new String[2];
     private ArrayList<Marker> mMarkerArray = new ArrayList<Marker>();
     private Marker currentMarker = null;
     private String bookingId;
@@ -102,7 +103,7 @@ public class CurrentShipmentFragment extends android.support.v4.app.Fragment imp
         tvDate = (TextView) v.findViewById(R.id.date);
         tvMonth = (TextView) v.findViewById(R.id.month);
         tvShipingJourney = (TextView) v.findViewById(R.id.shipingJourney);
-        tvBookingStatus = (TextView) v.findViewById(R.id.status);
+        tvBookingStatus = (TextView) v.findViewById(R.id.tvStatus);
         callShipper = (ImageView) v.findViewById(R.id.callShipperButton);
         tvTimeSlot = (TextView) v.findViewById(R.id.timeSlot);
         tvTruckName = (TextView) v.findViewById(R.id.truckName);
@@ -110,12 +111,7 @@ public class CurrentShipmentFragment extends android.support.v4.app.Fragment imp
         v.findViewById(R.id.bookingDetailsLayout).setOnClickListener(this);
         if (gpsTracker.canGetLocation()) {
             googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(gpsTracker.getLatitude(), gpsTracker.getLongitude()), 14));
-//            getDriectionToDestination(new LatLng(gpsTracker.getLatitude(), gpsTracker.getLongitude()), gpsTracker.getLatitude() + ", " + gpsTracker.getLongitude(), "11.723512, 78.466287", GMapV2GetRouteDirection.MODE_DRIVING);
-        } else {
-//            gpsTracker.showSettingsAlert();
         }
-
-
         return v;
     }
 
@@ -123,7 +119,7 @@ public class CurrentShipmentFragment extends android.support.v4.app.Fragment imp
         @Override
         public void onReceive(Context context, Intent intent) {
             // Get extra data included in the Intent
-            tvBookingStatus.setText(intent.getStringExtra("bookingStatus").replace("_", " "));
+            tvBookingStatus.setText(CommonUtils.toCamelCase(intent.getStringExtra("bookingStatus").replace("_", " ")));
             MarkerOptions markerOptions = new MarkerOptions();
             markerOptions.position(new LatLng(intent.getDoubleExtra("latitude", 0.0), intent.getDoubleExtra("longitude", 0.0)));
             markerOptions.icon(BitmapDescriptorFactory.fromResource(R.mipmap.icon_van));
@@ -163,7 +159,7 @@ public class CurrentShipmentFragment extends android.support.v4.app.Fragment imp
                     } else {
                         bookingDetailsLayout.setVisibility(View.VISIBLE);
                         JSONObject bookingData = data.getJSONObject("bookingData");
-                        bookingId=bookingData.getString("_id");
+                        bookingId = bookingData.getString("_id");
 
                         tvDate.setText(CommonUtils.getDateFromUTC(bookingData.getJSONObject("pickUp").getString("date")));
                         tvMonth.setText(CommonUtils.getShortMonthNameFromUTC(bookingData.getJSONObject("pickUp").getString("date")));
@@ -175,9 +171,18 @@ public class CurrentShipmentFragment extends android.support.v4.app.Fragment imp
                                 CommonUtils.toCamelCase(bookingData.getJSONObject("dropOff").getString("city")));
                         tvName.setText(CommonUtils.toCamelCase(bookingData.getJSONObject("shipper").getString("firstName") + " " +
                                 bookingData.getJSONObject("shipper").getString("lastName")));
-                        tvBookingStatus.setText(bookingData.getString("bookingStatus").replace("_", " "));
+                        tvBookingStatus.setText(CommonUtils.toCamelCase(bookingData.getString("bookingStatus").replace("_", " ")));
 
                         shipperNumber = bookingData.getJSONObject("shipper").getString("phoneNumber");
+                        name[0]=bookingData.getJSONObject("pickUp").getString("companyName");
+                        name[1]=bookingData.getJSONObject("dropOff").getString("companyName");
+                        address[0]=bookingData.getJSONObject("pickUp").getString("address")+", "+
+                                bookingData.getJSONObject("pickUp").getString("city")+", "+
+                                bookingData.getJSONObject("pickUp").getString("state");
+
+                        address[1]=bookingData.getJSONObject("dropOff").getString("address")+", "+
+                                bookingData.getJSONObject("dropOff").getString("city")+", "+
+                                bookingData.getJSONObject("dropOff").getString("state");
 
                         getDriectionToDestination(new LatLng(gpsTracker.getLatitude(), gpsTracker.getLongitude()),
                                 bookingData.getJSONObject("pickUp").getJSONObject("coordinates").getString("pickUpLat") + ", " + bookingData.getJSONObject("pickUp").getJSONObject("coordinates").getString("pickUpLong"),
@@ -238,6 +243,7 @@ public class CurrentShipmentFragment extends android.support.v4.app.Fragment imp
                     MarkerOptions markerOptions = new MarkerOptions();
                     markerOptions.position(currentposition);
                     markerOptions.icon(BitmapDescriptorFactory.fromResource(R.mipmap.icon_van));
+                    markerOptions.title(getActivity().getString(R.string.current_position));
                     currentMarker = googleMap.addMarker(markerOptions);
                     String source[] = start.split(",");
                     try {
@@ -246,12 +252,6 @@ public class CurrentShipmentFragment extends android.support.v4.app.Fragment imp
                     } catch (NumberFormatException e) {
                         e.printStackTrace();
                     }
-
-
-//                    MarkerOptions sourceMarker = new MarkerOptions();
-//                    sourceMarker.position(new LatLng(Double.valueOf(source[0]), Double.valueOf(source[1])));
-//                    sourceMarker.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
-//                    googleMap.addMarker(sourceMarker);
 
                     String destination[] = end.split(",");
                     try {
@@ -262,11 +262,6 @@ public class CurrentShipmentFragment extends android.support.v4.app.Fragment imp
                         longitude[1] = 0;
                         latitude[1] = 0;
                     }
-
-//                    MarkerOptions destinationMarker = new MarkerOptions();
-//                    destinationMarker.position(new LatLng(Double.valueOf(destination[0]), Double.valueOf(destination[1])));
-//                    destinationMarker.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
-//                    googleMap.addMarker(destinationMarker);
 
                     addmarkers();
                     LatLngBounds.Builder builder1 = new LatLngBounds.Builder();
@@ -305,9 +300,11 @@ public class CurrentShipmentFragment extends android.support.v4.app.Fragment imp
             LatLng location = new LatLng(latitude[i], longitude[i]);
 
             Marker marker = googleMap.addMarker(new MarkerOptions().position(location)
-                            .title(name[i])
+                            .title(CommonUtils.toCamelCase(name[i]))
                             .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
-            );
+                    .snippet(CommonUtils.toCamelCase(address[i]))
+
+                    );
 
             mMarkerArray.add(marker);
         }
@@ -322,7 +319,7 @@ public class CurrentShipmentFragment extends android.support.v4.app.Fragment imp
 
             case R.id.bookingDetailsLayout:
                 Intent intent = new Intent(getActivity(), BookingDetailsActivity.class);
-                intent.putExtra("bookingId",bookingId);
+                intent.putExtra("bookingId", bookingId);
                 startActivity(intent);
                 getActivity().overridePendingTransition(R.anim.anim_slide_in_left, R.anim.anim_slide_out_left);
                 break;

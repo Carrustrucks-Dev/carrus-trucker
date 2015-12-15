@@ -8,15 +8,10 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.carrus.trucker.R;
-import com.carrus.trucker.entities.Booking;
+import com.carrus.trucker.models.Booking;
 import com.carrus.trucker.utils.CommonUtils;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.TimeZone;
 
 /**
  * Created by Saurbhv on 10/29/15.
@@ -100,7 +95,7 @@ public class BookingAdapter extends BaseAdapter {
 //                mViewHolder.status.setTextColor(context.getResources().getColor(R.color.dark_gery));
 //            if(data.get(position).getStatus().equals("CANCELED"))
 //                mViewHolder.status.setTextColor(context.getResources().getColor(R.color.red));
-            mViewHolder.status.setText(data.get(position).getStatus().replace("_", " "));
+            mViewHolder.status.setText(CommonUtils.toCamelCase(data.get(position).getStatus().replace("_", " ")));
         return convertView;
     }
 

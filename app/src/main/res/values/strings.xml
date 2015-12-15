@@ -95,10 +95,14 @@
     <string name="type_of_cargo">Type of Cargo</string>
     <string name="weight">Weight</string>
     <string name="enter_your_feedback">Enter your feedback</string>
+    <string name="give_rating_msg">Please give rating.</string>
     <string name="enter_driver_id_msg">Please enter driver ID.</string>
     <string name="invalid_driver_id">Invalid driver ID.</string>
     <string name="enter_otp_msg">Please enter OTP.</string>
     <string name="invalid_otp">Invalid OTP.</string>
     <string name="uploading_msg">Uploading...</string>
+    <string name="please_enter_notes">Please enter notes</string>
+    <string name="saved_successfully">Saved Successfully</string>
+    <string name="current_position">Current Position</string>
 
 </resources>

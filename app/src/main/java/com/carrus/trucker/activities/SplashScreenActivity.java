@@ -13,7 +13,7 @@ import android.view.View;
 import android.widget.ProgressBar;
 
 import com.carrus.trucker.R;
-import com.carrus.trucker.entities.ProfileData;
+import com.carrus.trucker.models.ProfileData;
 import com.carrus.trucker.retrofit.RestClient;
 import com.carrus.trucker.utils.ApiResponseFlags;
 import com.carrus.trucker.utils.CommonUtils;

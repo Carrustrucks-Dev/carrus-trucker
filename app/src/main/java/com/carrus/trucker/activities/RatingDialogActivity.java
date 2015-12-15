@@ -60,9 +60,7 @@ public class RatingDialogActivity extends BaseActivity implements View.OnClickLi
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btnSubmit:
-                if (etComment.getText().toString().trim().isEmpty()) {
-                    MaterialDesignAnimations.fadeIn(this, findViewById(R.id.errorLayout), getString(R.string.enter_your_feedback), 0);
-                } else {
+                if (validate(etComment.getText().toString().trim(),ratingBar.getRating())) {
                     sendRating();
                 }
                 break;
@@ -105,5 +103,17 @@ public class RatingDialogActivity extends BaseActivity implements View.OnClickLi
         intent.putExtra("message", message);
         setResult(RESULT_OK, intent);
         finish();
+    }
+
+    private boolean validate(String comment, float rating){
+        if(comment.isEmpty()){
+            MaterialDesignAnimations.fadeIn(this, findViewById(R.id.errorLayout), getString(R.string.enter_your_feedback), 0);
+            return false;
+        }
+        if(rating==0.0){
+            MaterialDesignAnimations.fadeIn(this, findViewById(R.id.errorLayout), getString(R.string.give_rating_msg), 0);
+            return false;
+        }
+        return true;
     }
 }

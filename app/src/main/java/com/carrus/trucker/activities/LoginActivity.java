@@ -16,7 +16,7 @@ import android.widget.Toast;
 import android.widget.ViewFlipper;
 
 import com.carrus.trucker.R;
-import com.carrus.trucker.entities.ProfileData;
+import com.carrus.trucker.models.ProfileData;
 import com.carrus.trucker.retrofit.RestClient;
 import com.carrus.trucker.utils.CommonUtils;
 import com.carrus.trucker.utils.InternetConnectionStatus;

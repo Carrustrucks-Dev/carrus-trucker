@@ -1,4 +1,4 @@
-package com.carrus.trucker.entities;
+package com.carrus.trucker.models;
 
 import android.location.Location;
 

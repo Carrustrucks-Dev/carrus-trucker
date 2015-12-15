@@ -19,7 +19,7 @@ import android.widget.Toast;
 
 import com.carrus.trucker.R;
 import com.carrus.trucker.activities.ShowImageActivity;
-import com.carrus.trucker.entities.ExpandableChildItem;
+import com.carrus.trucker.models.ExpandableChildItem;
 import com.carrus.trucker.interfaces.ActivityResultCallback;
 import com.carrus.trucker.interfaces.AppConstants;
 import com.carrus.trucker.retrofit.RestClient;
@@ -48,8 +48,7 @@ import retrofit.mime.TypedString;
 public class ExpandableListAdapter extends BaseExpandableListAdapter implements AppConstants {
 
     private Context _context;
-    private List<String> _listDataHeader; // header titles
-    // child data in format of header title, child title
+    private List<String> _listDataHeader;
     private HashMap<String, List<ExpandableChildItem>> _listDataChild;
     private String orderId;
     private SharedPreferences sharedPreferences;
@@ -104,26 +103,10 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter implements 
                     convertView = infalInflater.inflate(R.layout.upload_documents_layout, null);
                     TextView uploadButtonText = (TextView) convertView.findViewById(R.id.upload_button_text);
                     uploadButtonText.setText(expandableChildItem.getName());
-//                    convertView.findViewById(R.id.upload_document).setOnClickListener(new View.OnClickListener() {
-//                        @Override
-//                        public void onClick(View v) {
-////                            selectImage();
-//                            documentName=expandableChildItem.getName();
-//                            Log.e("Document Name",documentName);
-//                            Toast.makeText(v.getContext(), expandableChildItem.getName(), Toast.LENGTH_LONG).show();
-//                        }
-//                    });
                 } else {
                     convertView = infalInflater.inflate(R.layout.uploaded_document_layout, null);
                     TextView uploadButtonText = (TextView) convertView.findViewById(R.id.upload_button_text);
                     uploadButtonText.setText(expandableChildItem.getName());
-                  /*  convertView.findViewById(R.id.uploaded_document).setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            expandableChildItem.getDetail();
-                        }
-                    });*/
-
                 }
                 break;
             case 2:
@@ -132,7 +115,6 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter implements 
                 details = (TextView) convertView.findViewById(R.id.details);
                 name.setText(expandableChildItem.getName());
                 details.setText(expandableChildItem.getDetail());
-
                 break;
             case 3:
                 convertView = infalInflater.inflate(R.layout.simple_textview_layout, null);
@@ -147,23 +129,21 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter implements 
                     @Override
                     public void onClick(View v) {
                         if (myNotes.getText().toString().trim().isEmpty()) {
-                            CommonUtils.showSingleButtonPopup(_context, "Please enter notes");
+                            MaterialDesignAnimations.fadeIn(_context, ((Activity) _context).findViewById(R.id.errorLayout), _context.getString(R.string.please_enter_notes), 0);
                         } else {
                             final String myNotesData = myNotes.getText().toString().trim();
-                            CommonUtils.showLoadingDialog((Activity) _context, "Sending...");
+                            CommonUtils.showLoadingDialog((Activity) _context, _context.getString(R.string.sending));
                             RestClient.getWebServices().addNotes(sharedPreferences.getString(ACCESS_TOKEN, ""), orderId, myNotes.getText().toString().trim(), new Callback<String>() {
                                 @Override
                                 public void success(String s, Response response) {
                                     expandableChildItem.setName(myNotesData);
                                     CommonUtils.dismissLoadingDialog();
-//                                    CommonUtils.showSingleButtonPopup(_context, "Saved Successfully");
-                                    MaterialDesignAnimations.fadeIn(_context, ((Activity)_context).findViewById(R.id.errorLayout), "Saved Successfully", 1);
+                                    MaterialDesignAnimations.fadeIn(_context, ((Activity) _context).findViewById(R.id.errorLayout), _context.getString(R.string.saved_successfully), 1);
                                 }
 
                                 @Override
                                 public void failure(RetrofitError error) {
                                     CommonUtils.showRetrofitError((Activity) _context, error);
-//                                    CommonUtils.showSingleButtonPopup(_context, "Oops!! Some error occurred. Please try again. ");
                                     CommonUtils.dismissLoadingDialog();
                                 }
                             });
@@ -173,16 +153,6 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter implements 
                 break;
 
         }
-//        if (expandableChildItem.getType() == 1) {
-////            TextView name = (TextView) convertView.findViewById(R.id.name);
-////            TextView details = (TextView) convertView.findViewById(R.id.details);
-////            name.setText(expandableChildItem.getName());
-////            details.setText(expandableChildItem.getDetail());
-//        } else if (expandableChildItem.getType() == 2) {
-//
-//        } else if (expandableChildItem.getType() == 3) {
-//
-//        }
         return convertView;
     }
 
@@ -250,7 +220,6 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter implements 
                         intent.setType("image/*");
                         intent.setAction(Intent.ACTION_GET_CONTENT);
                         resultCallback.startActivityResult(intent, LOAD_IMAGE_RESULTS, 10);
-//                        startActivityForResult(Intent.createChooser(intent, _context.getString(R.string.select_picture)), LOAD_IMAGE_RESULTS);
                     } catch (Exception ex) {
                         Toast.makeText(_context, _context.getString(R.string.unable_to_perform_action), Toast.LENGTH_LONG).show();
                     }
@@ -282,7 +251,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter implements 
                 intent.putExtra("url", childItem.getDetail());
                 intent.putExtra("orderId", orderId);
                 intent.putExtra("documentName", childItem.getName());
-                ((Activity)_context).startActivityForResult(intent, TEN_RESULT_CODE);
+                ((Activity) _context).startActivityForResult(intent, TEN_RESULT_CODE);
 
             }
         }
@@ -394,6 +363,9 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter implements 
         }
     }
 
+    /**
+     * Method to set name of file
+     * */
     private void filenameAndUpload() {
         switch (documentName) {
             case "POD":
@@ -410,11 +382,13 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter implements 
                 break;
         }
 
-
     }
 
+    /**
+     * Method to Call upload document api
+     * */
     private void uploadDocumentApi() {
-        CommonUtils.showLoadingDialog((Activity) _context, "Uploading...");
+        CommonUtils.showLoadingDialog((Activity) _context, _context.getString(R.string.uploading_msg));
         RestClient.getWebServices().uploadDocument(sharedPreferences.getString(ACCESS_TOKEN, ""), new TypedString(orderId), images, new Callback<String>() {
             @Override
             public void success(String s, Response response) {
@@ -422,7 +396,6 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter implements 
                     JSONObject jsonObject = new JSONObject(s);
                     CommonUtils.dismissLoadingDialog();
                     MaterialDesignAnimations.fadeIn(_context, ((Activity) _context).findViewById(R.id.errorLayout), jsonObject.getString("message"), 1);
-//                    CommonUtils.showSingleButtonPopup(_context, jsonObject.getString("message"));
                     resultCallback.getOrderDetails();
                 } catch (JSONException e) {
                     e.printStackTrace();

@@ -9,7 +9,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.carrus.trucker.R;
-import com.carrus.trucker.entities.NavDrawerItem;
+import com.carrus.trucker.models.NavDrawerItem;
 
 import java.util.ArrayList;
 
@@ -47,10 +47,7 @@ public class NavDrawerListAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         if (convertView == null) {
-//            LayoutInflater mInflater = (LayoutInflater)
-//                    context.getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
             convertView = inflater.inflate(R.layout.drawer_list_item, parent, false);
-//            convertView = inflater.inflate(R.layout.drawer_list_item, null);
         }
         ImageView imgIcon = (ImageView) convertView.findViewById(R.id.icon);
         TextView txtTitle = (TextView) convertView.findViewById(R.id.title);
@@ -59,7 +56,6 @@ public class NavDrawerListAdapter extends BaseAdapter {
         View view=(View) convertView.findViewById(R.id.line);
         if(position==navDrawerItems.size()-1)
             view.setVisibility(View.GONE);
-
         return convertView;
     }
 

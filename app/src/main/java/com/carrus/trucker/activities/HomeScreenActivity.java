@@ -20,7 +20,7 @@ import android.widget.Toast;
 
 import com.carrus.trucker.R;
 import com.carrus.trucker.adapters.NavDrawerListAdapter;
-import com.carrus.trucker.entities.NavDrawerItem;
+import com.carrus.trucker.models.NavDrawerItem;
 import com.carrus.trucker.fragments.BookingsFragment;
 import com.carrus.trucker.fragments.CurrentShipmentFragment;
 import com.carrus.trucker.fragments.DriverProfileFragment;

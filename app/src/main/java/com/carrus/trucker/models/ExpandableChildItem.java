@@ -1,4 +1,4 @@
-package com.carrus.trucker.entities;
+package com.carrus.trucker.models;
 
 /**
  * Created by Saurbhv on 10/31/15.

@@ -14,7 +14,7 @@ import android.widget.TextView;
 import com.carrus.trucker.R;
 import com.carrus.trucker.activities.BookingDetailsActivity;
 import com.carrus.trucker.adapters.BookingAdapter;
-import com.carrus.trucker.entities.Booking;
+import com.carrus.trucker.models.Booking;
 import com.carrus.trucker.interfaces.AppConstants;
 import com.carrus.trucker.retrofit.RestClient;
 import com.carrus.trucker.utils.CommonUtils;

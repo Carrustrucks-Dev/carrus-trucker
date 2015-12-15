@@ -7,15 +7,13 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ExpandableListView;
 import android.widget.ImageView;
-import android.widget.ListAdapter;
-import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.carrus.trucker.R;
 import com.carrus.trucker.adapters.ExpandableListAdapter;
-import com.carrus.trucker.entities.ExpandableChildItem;
+import com.carrus.trucker.models.ExpandableChildItem;
 import com.carrus.trucker.interfaces.ActivityResultCallback;
 import com.carrus.trucker.retrofit.RestClient;
 import com.carrus.trucker.utils.ApiResponseFlags;
@@ -176,7 +174,7 @@ public class BookingDetailsActivity extends BaseActivity implements View.OnClick
                             }
 
                             JSONObject pickupJson = data.getJSONObject("pickUp");
-                            tvOrderStatus.setText(data.getString("bookingStatus").toUpperCase().replace("_", " "));
+                            tvOrderStatus.setText(CommonUtils.toCamelCase(data.getString("bookingStatus").toUpperCase().replace("_", " ")));
                             tvTruckName.setText(data.getJSONObject("truck").getJSONObject("truckType").getString("typeTruckName").toUpperCase());
                             tvTruckNumber.setText(data.getJSONObject("assignTruck").getString("truckNumber").toUpperCase());
                             tvPickupTruckerName.setText(pickupJson.getString("companyName"));
