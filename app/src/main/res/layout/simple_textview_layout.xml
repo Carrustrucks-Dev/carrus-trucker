@@ -3,15 +3,15 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
-    android:paddingLeft="10dp"
-    android:paddingRight="10dp">
+    android:paddingLeft="@dimen/ten"
+    android:paddingRight="@dimen/ten">
 
     <TextView
-        android:padding="5dp"
+        android:padding="@dimen/five"
         android:id="@+id/notes"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:textSize="17sp"
+        android:textSize="@dimen/large_font"
         android:textColor="@color/dark_gery"
         android:textAppearance="@style/CustomTextAppearance"/>
 

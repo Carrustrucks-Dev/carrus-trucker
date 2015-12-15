@@ -139,11 +139,15 @@ public class PastOrdersFragment extends Fragment implements AppConstants, SwipeR
 
                         @Override
                         public void failure(RetrofitError retrofitError) {
-
-                            CommonUtils.showRetrofitError(getActivity(), retrofitError);
+                            if(retrofitError.getResponse().getStatus()==405){
+                                noOrderPlaceholder.setText(getString(R.string.no_past_orders));
+                                noOrderPlaceholder.setVisibility(View.VISIBLE);
+                            }else {
+                                CommonUtils.showRetrofitError(getActivity(), retrofitError);
+                            }
                             CommonUtils.dismissLoadingDialog();
                             swipeRefreshLayout.setRefreshing(false);
-                            isRefreshView=false;
+                            isRefreshView = false;
                         }
                     });
         }

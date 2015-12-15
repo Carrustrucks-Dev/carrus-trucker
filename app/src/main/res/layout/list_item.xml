@@ -4,31 +4,28 @@
     android:layout_height="wrap_content"
     android:layout_gravity="center_vertical"
     android:background="@color/white"
-    android:paddingLeft="10dp"
-    android:paddingRight="10dp">
+    android:paddingLeft="@dimen/ten"
+    android:paddingRight="@dimen/ten">
 
     <TextView
         android:id="@+id/name"
-        android:text="Type of Cargo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="17sp"
+        android:textSize="@dimen/large_font"
         android:layout_weight="1"
-        android:paddingTop="5dp"
-        android:paddingBottom="5dp"
+        android:paddingTop="@dimen/five"
+        android:paddingBottom="@dimen/five"
          />
     
     <TextView
         android:id="@+id/details"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:text="Chemical"
-        android:paddingTop="5dp"
+        android:paddingTop="@dimen/five"
         android:gravity="right"
         android:layout_weight="1"
-        android:paddingBottom="5dp"
-        android:textSize="17sp"
+        android:paddingBottom="@dimen/five"
+        android:textSize="@dimen/large_font"
         />
 
 </LinearLayout>
