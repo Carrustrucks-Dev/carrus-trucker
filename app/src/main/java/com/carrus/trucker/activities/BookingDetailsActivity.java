@@ -7,14 +7,16 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ExpandableListView;
 import android.widget.ImageView;
+import android.widget.ListAdapter;
+import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.carrus.trucker.R;
 import com.carrus.trucker.adapters.ExpandableListAdapter;
-import com.carrus.trucker.models.ExpandableChildItem;
 import com.carrus.trucker.interfaces.ActivityResultCallback;
+import com.carrus.trucker.models.ExpandableChildItem;
 import com.carrus.trucker.retrofit.RestClient;
 import com.carrus.trucker.utils.ApiResponseFlags;
 import com.carrus.trucker.utils.CommonUtils;
@@ -153,7 +155,7 @@ public class BookingDetailsActivity extends BaseActivity implements View.OnClick
 
     /**
      * Method for API call of get details for particular order
-     * */
+     */
     public void getOrderDetails() {
         CommonUtils.showLoadingDialog(BookingDetailsActivity.this, getResources().getString(R.string.loading));
         RestClient.getWebServices().getBookingDetails(accessToken, bookingId,
@@ -250,7 +252,7 @@ public class BookingDetailsActivity extends BaseActivity implements View.OnClick
                             listDataChild.put(listDataHeader.get(4), myNotes);
                             listAdapter = new ExpandableListAdapter(BookingDetailsActivity.this, bookingId, listDataHeader, listDataChild);
                             expListView.setAdapter(listAdapter);
-                            CommonUtils.setListViewHeightBasedOnChildren(expListView);//setListViewHeight(expListView);
+                            setListViewHeight(expListView);  //CommonUtils.setListViewHeightBasedOnChildren(expListView);
                             final ScrollView scrollview = (ScrollView) findViewById(R.id.scrollView);
                             expListView.setOnChildClickListener(BookingDetailsActivity.this);
                             scrollview.post(new Runnable() {
@@ -311,7 +313,7 @@ public class BookingDetailsActivity extends BaseActivity implements View.OnClick
                     @Override
                     public void failure(RetrofitError error) {
                         CommonUtils.dismissLoadingDialog();
-                        CommonUtils.showRetrofitError(BookingDetailsActivity.this,error);
+                        CommonUtils.showRetrofitError(BookingDetailsActivity.this, error);
                     }
                 });
                 break;
@@ -434,6 +436,44 @@ public class BookingDetailsActivity extends BaseActivity implements View.OnClick
         finish();
         Transactions.showPreviousAnimation(BookingDetailsActivity.this);
     }
+
+    private void setListViewHeight(ListView listView) {
+        ListAdapter listAdapter = listView.getAdapter();
+        int totalHeight = 0;
+        for (int i = 0; i < listAdapter.getCount(); i++) {
+            View listItem = listAdapter.getView(i, null, listView);
+            listItem.measure(0, 0);
+            totalHeight += listItem.getMeasuredHeight();
+        }
+
+        ViewGroup.LayoutParams params = listView.getLayoutParams();
+        params.height = totalHeight
+                + (listView.getDividerHeight() * (listAdapter.getCount() - 1));
+        listView.setLayoutParams(params);
+        listView.requestLayout();
+    }
+
+
+
+//    private void setListViewHeight(ListView listView) {
+//        ListAdapter listAdapter = listView.getAdapter();
+//        int totalHeight = 0;
+//        for (int i = 0; i < listAdapter.getCount(); i++) {
+//            View listItem = listAdapter.getView(i, null, listView);
+//            try {
+//                listItem.measure(0, 0);
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//            totalHeight += listItem.getMeasuredHeight();
+//        }
+//        ViewGroup.LayoutParams params = listView.getLayoutParams();
+//        params.height = totalHeight
+//                + (listView.getDividerHeight() * (listAdapter.getCount() - 1));
+//        listView.setLayoutParams(params);
+//        listView.requestLayout();
+//
+//    }
 
     /**
      * Method to set height expandable listview
