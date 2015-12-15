@@ -21,6 +21,7 @@ import com.carrus.trucker.utils.InternetConnectionStatus;
 import com.carrus.trucker.utils.MaterialDesignAnimations;
 import com.carrus.trucker.utils.MyApiCalls;
 import com.carrus.trucker.utils.Prefs;
+import com.carrus.trucker.utils.Transactions;
 import com.google.gson.Gson;
 
 import org.json.JSONException;
@@ -182,61 +183,64 @@ public class SplashScreenActivity extends BaseActivity implements View.OnClickLi
 
     public void verfiySession() {
 
-        RestClient.getWebServices().verifyUser(accessToken,
-                new Callback<String>() {
-                    @Override
-                    public void success(String serverResponse, Response response) {
-                        try {
-                            JSONObject data = new JSONObject(new JSONObject(serverResponse).getString("data"));
-                            Gson gson = new Gson();
-                            ProfileData profileData = gson.fromJson(data.getString("profileData"), ProfileData.class);
-                            Prefs.with(SplashScreenActivity.this).save(ACCESS_TOKEN, data.getString("accessToken"));
-                            Prefs.with(SplashScreenActivity.this).save(DRIVER_ID, profileData.driverId);
-                            Prefs.with(SplashScreenActivity.this).save(DRIVER_NO, profileData._id);
-                            Prefs.with(SplashScreenActivity.this).save(DRIVAR_NAME, CommonUtils.toCamelCase(profileData.driverName));
-                            Prefs.with(SplashScreenActivity.this).save(DRIVING_LICENSE, profileData.drivingLicense.drivingLicenseNo);
-                            Prefs.with(SplashScreenActivity.this).save(VALIDITY, profileData.drivingLicense.validity);
-                            Prefs.with(SplashScreenActivity.this).save(DRIVER_PHONENO, profileData.phoneNumber);
-                            Prefs.with(SplashScreenActivity.this).save(DL_STATE, profileData.stateDl);
-                            Prefs.with(SplashScreenActivity.this).save(RATING, profileData.rating);
-                            Prefs.with(SplashScreenActivity.this).save(FLEET_OWNER_NO, profileData.fleetOwner.get(0).phoneNumber);
-                            if (profileData.profilePicture != null) {
-                                Prefs.with(SplashScreenActivity.this).save(DRIVER_IMAGE, profileData.profilePicture.thumb);
-                            }
-                            Intent intent = new Intent(getApplicationContext(), HomeScreenActivity.class);
-                            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |
-                                    Intent.FLAG_ACTIVITY_CLEAR_TASK |
-                                    Intent.FLAG_ACTIVITY_NEW_TASK);
-                            Bundle mBundle = new Bundle();
-                            intent.putExtras(mBundle);
-                            startActivity(intent);
-                            overridePendingTransition(R.anim.anim_slide_in_left, R.anim.anim_slide_out_left);
-                            finish();
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-
-                    @Override
-                    public void failure(RetrofitError retrofitError) {
-                        if (retrofitError.getKind() == RetrofitError.Kind.NETWORK) {
-                            progressBar.setVisibility(View.GONE);
-                            findViewById(R.id.retry_button).setVisibility(View.VISIBLE);
-                        } else {
-                            int statusCode = retrofitError.getResponse().getStatus();
-                            if (statusCode == ApiResponseFlags.Unauthorized.getOrdinal()) {
-                                Intent intent = new Intent(SplashScreenActivity.this, LoginActivity.class);
-                                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |
-                                        Intent.FLAG_ACTIVITY_CLEAR_TASK |
-                                        Intent.FLAG_ACTIVITY_NEW_TASK);
+        if(!accessToken.isEmpty()) {
+            RestClient.getWebServices().verifyUser(accessToken,
+                    new Callback<String>() {
+                        @Override
+                        public void success(String serverResponse, Response response) {
+                            try {
+                                JSONObject data = new JSONObject(new JSONObject(serverResponse).getString("data"));
+                                Gson gson = new Gson();
+                                ProfileData profileData = gson.fromJson(data.getString("profileData"), ProfileData.class);
+                                Prefs.with(SplashScreenActivity.this).save(ACCESS_TOKEN, data.getString("accessToken"));
+                                Prefs.with(SplashScreenActivity.this).save(DRIVER_ID, profileData.driverId);
+                                Prefs.with(SplashScreenActivity.this).save(DRIVER_NO, profileData._id);
+                                Prefs.with(SplashScreenActivity.this).save(DRIVAR_NAME, CommonUtils.toCamelCase(profileData.driverName));
+                                Prefs.with(SplashScreenActivity.this).save(DRIVING_LICENSE, profileData.drivingLicense.drivingLicenseNo);
+                                Prefs.with(SplashScreenActivity.this).save(VALIDITY, profileData.drivingLicense.validity);
+                                Prefs.with(SplashScreenActivity.this).save(DRIVER_PHONENO, profileData.phoneNumber);
+                                Prefs.with(SplashScreenActivity.this).save(DL_STATE, profileData.stateDl);
+                                Prefs.with(SplashScreenActivity.this).save(RATING, profileData.rating);
+                                Prefs.with(SplashScreenActivity.this).save(FLEET_OWNER_NO, profileData.fleetOwner.get(0).phoneNumber);
+                                if (profileData.profilePicture != null) {
+                                    Prefs.with(SplashScreenActivity.this).save(DRIVER_IMAGE, profileData.profilePicture.thumb);
+                                }
+                                Intent intent = new Intent(getApplicationContext(), HomeScreenActivity.class);
+                                Bundle mBundle = new Bundle();
+                                intent.putExtras(mBundle);
                                 startActivity(intent);
+                                finish();
                                 overridePendingTransition(R.anim.anim_slide_in_left, R.anim.anim_slide_out_left);
-                            } else {
-                                CommonUtils.showRetrofitError(SplashScreenActivity.this, retrofitError);
+                                finish();
+                            } catch (Exception e) {
+                                e.printStackTrace();
                             }
                         }
-                    }
-                });
+
+                        @Override
+                        public void failure(RetrofitError retrofitError) {
+                            if (retrofitError.getKind() == RetrofitError.Kind.NETWORK) {
+                                progressBar.setVisibility(View.GONE);
+                                findViewById(R.id.retry_button).setVisibility(View.VISIBLE);
+                            } else {
+                                int statusCode = retrofitError.getResponse().getStatus();
+                                if (statusCode == ApiResponseFlags.Unauthorized.getOrdinal()) {
+                                    Intent intent = new Intent(SplashScreenActivity.this, LoginActivity.class);
+                                    startActivity(intent);
+                                    finish();
+                                    Transactions.showNextAnimation(SplashScreenActivity.this);
+                                } else {
+                                    CommonUtils.showRetrofitError(SplashScreenActivity.this, retrofitError);
+                                }
+                            }
+                        }
+                    });
+        }else{
+            Intent intent = new Intent(SplashScreenActivity.this, LoginActivity.class);
+            startActivity(intent);
+            finish();
+            Transactions.showNextAnimation(SplashScreenActivity.this);
+        }
     }
 
     /**
