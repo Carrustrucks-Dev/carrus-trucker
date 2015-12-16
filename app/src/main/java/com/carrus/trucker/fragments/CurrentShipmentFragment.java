@@ -26,6 +26,7 @@ import com.carrus.trucker.utils.CommonUtils;
 import com.carrus.trucker.utils.GMapV2GetRouteDirection;
 import com.carrus.trucker.utils.GPSTracker;
 import com.carrus.trucker.utils.Log;
+import com.carrus.trucker.utils.Transactions;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -135,14 +136,14 @@ public class CurrentShipmentFragment extends android.support.v4.app.Fragment imp
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         sharedPreferences = getActivity().getSharedPreferences(SHARED_PREFERENCES, Context.MODE_PRIVATE);
-        getCurrentBookings();
+
         v2GetRouteDirection = new GMapV2GetRouteDirection();
     }
 
     @Override
     public void onResume() {
         super.onResume();
-
+        getCurrentBookings();
     }
 
     private void getCurrentBookings() {
@@ -329,6 +330,7 @@ public class CurrentShipmentFragment extends android.support.v4.app.Fragment imp
     private void showRetryPopup(String msg) {
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity());
         alertDialog.setMessage(msg);
+        alertDialog.setCancelable(false);
         alertDialog.setPositiveButton("Retry", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
@@ -340,6 +342,8 @@ public class CurrentShipmentFragment extends android.support.v4.app.Fragment imp
             public void onClick(DialogInterface dialog, int which) {
 
                 dialog.cancel();
+                getActivity().finish();
+                Transactions.showPreviousAnimation(getActivity());
             }
         });
         alertDialog.show();

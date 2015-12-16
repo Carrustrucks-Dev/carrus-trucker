@@ -64,16 +64,20 @@ public class MyService extends Service implements AppConstants, LocationListener
     public synchronized void onStart(Intent intent, int startId) {
         super.onStart(intent, startId);
         try {
-            orderId = intent.getStringExtra("bookingId");
+
+            if (intent.hasExtra("bookingId")) {
+                orderId = intent.getStringExtra("bookingId");
+                Log.d(TAG, "onStart");
+                if (!isRunning && orderId != null && !orderId.trim().isEmpty()) {
+                    mythread.start();
+                    isRunning = true;
+                }
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        Log.d(TAG, "onStart");
-        if (!isRunning && !orderId.trim().isEmpty() && orderId!=null) {
-            mythread.start();
-            isRunning = true;
-        }
+
     }
 
     public void readWebPage() {

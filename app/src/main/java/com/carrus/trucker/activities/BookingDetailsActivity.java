@@ -151,6 +151,7 @@ public class BookingDetailsActivity extends BaseActivity implements View.OnClick
         listDataHeader.add(getString(R.string.advisory_checkList));
         listDataHeader.add(getString(R.string.notes));
         listDataHeader.add(getString(R.string.my_notes));
+
     }
 
     /**

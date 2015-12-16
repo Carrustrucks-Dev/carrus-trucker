@@ -14,10 +14,11 @@ import android.widget.TextView;
 import com.carrus.trucker.R;
 import com.carrus.trucker.activities.BookingDetailsActivity;
 import com.carrus.trucker.adapters.BookingAdapter;
-import com.carrus.trucker.models.Booking;
 import com.carrus.trucker.interfaces.AppConstants;
+import com.carrus.trucker.models.Booking;
 import com.carrus.trucker.retrofit.RestClient;
 import com.carrus.trucker.utils.CommonUtils;
+import com.carrus.trucker.utils.MaterialDesignAnimations;
 import com.carrus.trucker.utils.Prefs;
 
 import org.json.JSONArray;
@@ -51,7 +52,7 @@ public class UpcomingOrdersFragment extends Fragment implements AppConstants, Sw
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_bookingview, container, false);
         init(v);
-        getData();
+//        getData();
         return v;
     }
 
@@ -93,7 +94,7 @@ public class UpcomingOrdersFragment extends Fragment implements AppConstants, Sw
     @Override
     public void onResume() {
         super.onResume();
-        onRefresh();
+        getData();
     }
 
     private void getData() {
@@ -143,16 +144,25 @@ public class UpcomingOrdersFragment extends Fragment implements AppConstants, Sw
 
                         @Override
                         public void failure(RetrofitError retrofitError) {
-                            if(retrofitError.getResponse().getStatus()==405){
-                                noOrderPlaceholder.setText(getString(R.string.no_upcoming_orders));
-                                noOrderPlaceholder.setVisibility(View.VISIBLE);
-                            }else {
-                                CommonUtils.showRetrofitError(getActivity(), retrofitError);
-                            }
                             CommonUtils.dismissLoadingDialog();
+                            try {
+                                int statusCode = retrofitError.getResponse().getStatus();
+                                if (statusCode == 405) {
+                                    noOrderPlaceholder.setText(getString(R.string.no_upcoming_orders));
+                                    noOrderPlaceholder.setVisibility(View.VISIBLE);
+                                } else {
+                                    CommonUtils.showRetrofitError(getActivity(), retrofitError);
+                                }
+
+
+                            }catch (Exception e){
+                                e.printStackTrace();
+                                MaterialDesignAnimations.fadeIn(getActivity(), getActivity().findViewById(R.id.errorLayout), getActivity().getString(R.string.internetConnectionError), 0);
+                            }
                             swipeRefreshLayout.setRefreshing(false);
                             isRefreshView = false;
                         }
+
                     });
 
         }

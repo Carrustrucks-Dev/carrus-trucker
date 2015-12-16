@@ -78,7 +78,7 @@ public class RatingDialogActivity extends BaseActivity implements View.OnClickLi
             public void success(String s, Response response) {
                 CommonUtils.dismissLoadingDialog();
                 try {
-                    setMessage(true, new JSONObject().getString("message"));
+                    setMessage(true, new JSONObject(s).getString("message"));
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
