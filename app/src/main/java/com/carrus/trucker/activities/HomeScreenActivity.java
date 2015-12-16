@@ -71,10 +71,8 @@ public class HomeScreenActivity extends BaseActivity implements View.OnClickList
      * */
     private void setDriverData() {
         tvDriverName.setText(Prefs.with(this).getString(DRIVAR_NAME, "Test"));
-        String path = Prefs.with(this).getString(DRIVER_IMAGE, null);
-        if (path.equals(null)) {
-
-        } else {
+        String path = Prefs.with(this).getString(DRIVER_IMAGE, "");
+        if (!path.equals("")) {
             Picasso.with(this)
                     .load(Prefs.with(this).getString(DRIVER_IMAGE, "")).fit()
                     .centerCrop().memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE).skipMemoryCache()

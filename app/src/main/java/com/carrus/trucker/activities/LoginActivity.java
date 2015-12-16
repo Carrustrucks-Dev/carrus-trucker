@@ -21,6 +21,7 @@ import com.carrus.trucker.retrofit.RestClient;
 import com.carrus.trucker.utils.CommonUtils;
 import com.carrus.trucker.utils.InternetConnectionStatus;
 import com.carrus.trucker.utils.MaterialDesignAnimations;
+import com.carrus.trucker.utils.MyApiCalls;
 import com.carrus.trucker.utils.Prefs;
 import com.carrus.trucker.utils.Transactions;
 import com.google.gson.Gson;
@@ -50,6 +51,11 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
         setContentView(R.layout.activity_login);
         setupUI(getWindow().getDecorView().getRootView());
         init();
+
+        if(Prefs.with(this).getString(ACCESS_TOKEN,"").equals(""))
+            //Google Api call to get GCM Key
+            new MyApiCalls(LoginActivity.this).getRegistrationId();
+
         etDriverId.addTextChangedListener(new TextWatcher() {
 
             @Override

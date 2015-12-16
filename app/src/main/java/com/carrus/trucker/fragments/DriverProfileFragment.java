@@ -82,10 +82,8 @@ public class DriverProfileFragment extends Fragment implements AppConstants {
             Date d = f.parse(sharedPreferences.getString(VALIDITY, ""));
             DateFormat date = new SimpleDateFormat("MM/yyyy");
             expiresOn.setText(date.format(d));
-            String path=sharedPreferences.getString(DRIVER_IMAGE, null);
-            if(path.equals(null)){
-
-            }else{
+            String path=sharedPreferences.getString(DRIVER_IMAGE, "");
+            if(!path.equals("")){
                 Picasso.with(getActivity())
                         .load(path).fit()
                         .centerCrop().memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE).skipMemoryCache()
