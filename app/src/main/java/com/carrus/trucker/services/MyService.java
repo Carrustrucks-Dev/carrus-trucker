@@ -63,7 +63,11 @@ public class MyService extends Service implements AppConstants, LocationListener
     @Override
     public synchronized void onStart(Intent intent, int startId) {
         super.onStart(intent, startId);
-        orderId = intent.getStringExtra("bookingId");
+        try {
+            orderId = intent.getStringExtra("bookingId");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         Log.d(TAG, "onStart");
         if (!isRunning && !orderId.trim().isEmpty() && orderId!=null) {

@@ -60,6 +60,11 @@ public class UpcomingOrdersFragment extends Fragment implements AppConstants, Sw
         bookingsArrayList = new ArrayList<Booking>();
         noOrderPlaceholder = (TextView) v.findViewById(R.id.no_bookings_placeholder);
         swipeRefreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.swipe_refresh_layout);
+        swipeRefreshLayout.setColorSchemeResources(
+                R.color.blue,
+                R.color.red,
+                R.color.orange,
+                R.color.green);
 
     }
 
