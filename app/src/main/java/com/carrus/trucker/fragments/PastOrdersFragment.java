@@ -97,6 +97,7 @@ public class PastOrdersFragment extends Fragment implements AppConstants, SwipeR
     }
 
     private void getData() {
+        noOrderPlaceholder.setVisibility(View.GONE);
             if ( !isRefreshView) {
                 CommonUtils.showLoadingDialog(getActivity(), getResources().getString(R.string.loading));
             }
@@ -153,6 +154,7 @@ public class PastOrdersFragment extends Fragment implements AppConstants, SwipeR
                                     noOrderPlaceholder.setVisibility(View.VISIBLE);
                                 } else {
                                     CommonUtils.showRetrofitError(getActivity(), retrofitError);
+                                    noOrderPlaceholder.setVisibility(View.GONE);
                                 }
 
 
