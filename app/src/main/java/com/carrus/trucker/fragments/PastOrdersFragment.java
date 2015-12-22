@@ -150,6 +150,7 @@ public class PastOrdersFragment extends Fragment implements AppConstants, SwipeR
                             try {
                                 int statusCode = retrofitError.getResponse().getStatus();
                                 if (statusCode == 405) {
+                                    listView.setVisibility(View.GONE);
                                     noOrderPlaceholder.setText(getString(R.string.no_past_orders));
                                     noOrderPlaceholder.setVisibility(View.VISIBLE);
                                 } else {

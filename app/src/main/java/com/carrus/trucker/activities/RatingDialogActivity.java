@@ -106,10 +106,10 @@ public class RatingDialogActivity extends BaseActivity implements View.OnClickLi
     }
 
     private boolean validate(String comment, float rating){
-        if(comment.isEmpty()){
-            MaterialDesignAnimations.fadeIn(this, findViewById(R.id.errorLayout), getString(R.string.enter_your_feedback), 0);
-            return false;
-        }
+//        if(comment.isEmpty()){
+//            MaterialDesignAnimations.fadeIn(this, findViewById(R.id.errorLayout), getString(R.string.enter_your_feedback), 0);
+//            return false;
+//        }
         if(rating==0.0){
             MaterialDesignAnimations.fadeIn(this, findViewById(R.id.errorLayout), getString(R.string.give_rating_msg), 0);
             return false;

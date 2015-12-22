@@ -149,8 +149,10 @@ public class UpcomingOrdersFragment extends Fragment implements AppConstants, Sw
                             try {
                                 int statusCode = retrofitError.getResponse().getStatus();
                                 if (statusCode == 405) {
+                                    listView.setVisibility(View.GONE);
                                     noOrderPlaceholder.setText(getString(R.string.no_upcoming_orders));
                                     noOrderPlaceholder.setVisibility(View.VISIBLE);
+
                                 } else {
                                     CommonUtils.showRetrofitError(getActivity(), retrofitError);
                                     noOrderPlaceholder.setVisibility(View.GONE);

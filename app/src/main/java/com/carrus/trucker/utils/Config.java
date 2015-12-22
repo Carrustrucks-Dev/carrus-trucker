@@ -7,7 +7,7 @@ public class Config {
 
     static String GCM_PROJECT_NUMBER = "";
     static String BASE_URL = "";
-    static AppMode appMode = AppMode.TEST;
+    static AppMode appMode = AppMode.LIVE;
     static String GOOGLE_URL = "";
 
     static public String getBaseURL() {
