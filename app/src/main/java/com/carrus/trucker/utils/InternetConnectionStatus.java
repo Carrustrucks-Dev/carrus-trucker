@@ -7,6 +7,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
 import com.carrus.trucker.R;
+import com.carrus.trucker.activities.SplashScreenActivity;
 
 public class InternetConnectionStatus {
 
@@ -30,7 +31,7 @@ public class InternetConnectionStatus {
             connected = networkInfo != null && networkInfo.isAvailable()
                     && networkInfo.isConnected();
 
-            if(!connected)
+            if(!connected&&!((Activity)context instanceof SplashScreenActivity))
                 MaterialDesignAnimations.fadeIn(context, ((Activity)context).findViewById(R.id.errorLayout), context.getResources().getString(R.string.internetConnectionError), 0);
             return connected;
 
