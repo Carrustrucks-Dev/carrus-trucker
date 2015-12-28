@@ -98,7 +98,7 @@ public class UpcomingOrdersFragment extends Fragment implements AppConstants, Sw
     }
 
     private void getData() {
-        noOrderPlaceholder.setVisibility(View.GONE);
+//        noOrderPlaceholder.setVisibility(View.GONE);
             if (!isRefreshView) {
                 CommonUtils.showLoadingDialog(getActivity(), getResources().getString(R.string.loading));
             }

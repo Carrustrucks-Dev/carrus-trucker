@@ -585,6 +585,7 @@ public class BookingDetailsActivity extends BaseActivity implements View.OnClick
      * Method for set text on button of status
      */
     private String textOnButton(String status) {
+        btnStatus.setBackgroundResource(R.drawable.button_background_selector);
         switch (status) {
             case "ON_GOING":
             case "HALT":
@@ -602,6 +603,7 @@ public class BookingDetailsActivity extends BaseActivity implements View.OnClick
             case "CONFIRMED":
                 paymentCollectedLayout.setVisibility(View.VISIBLE);
                 btnStatus.setVisibility(View.VISIBLE);
+                btnStatus.setBackgroundResource(R.drawable.orange_button_background_selector);
                 return "ON THE WAY";
 
             case "COMPLETED":

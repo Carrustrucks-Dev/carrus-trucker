@@ -18,9 +18,9 @@ public class ProfileData {
     public String stateDl;
     public String createdAt;
     public CurrentCoordinates currentCoordinates;
-    public Integer totalRating;
+    public float totalRating;
     public Integer noOfPeopleRating;
-    public String rating;
+    public float rating;
     public Integer loginCount;
     public Integer radius;
     public Location location;

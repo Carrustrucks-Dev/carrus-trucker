@@ -72,7 +72,7 @@ public class DriverProfileFragment extends Fragment implements AppConstants {
         licenseState.setText(sharedPreferences.getString(DL_STATE, ""));
         expiresOn.setText(sharedPreferences.getString(VALIDITY, ""));
         mobileNumber.setText(sharedPreferences.getString(DRIVER_PHONENO, ""));
-        driverRating.setRating(Float.valueOf(sharedPreferences.getString(RATING, "0")));
+        driverRating.setRating(Float.valueOf(sharedPreferences.getFloat(RATING, 0)));
         try {
             Calendar cal = Calendar.getInstance();
             TimeZone tz = cal.getTimeZone();
