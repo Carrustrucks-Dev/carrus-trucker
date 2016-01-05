@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -39,7 +40,8 @@ public class PastOrdersFragment extends Fragment implements AppConstants, SwipeR
     private ArrayList<Booking> pastBookingArrayList;
     private BookingAdapter bookingAdapter;
     private boolean isRefreshView=false;
-    private TextView noOrderPlaceholder;
+    private LinearLayout llNoBookingPlaceholder;
+    private TextView tvNoBookingText;
     private SwipeRefreshLayout swipeRefreshLayout;
     public PastOrdersFragment() {
         // Required empty public constructor
@@ -59,7 +61,8 @@ public class PastOrdersFragment extends Fragment implements AppConstants, SwipeR
     private void init(View v){
         listView = (ListView) v.findViewById(R.id.orders_listview);
         pastBookingArrayList = new ArrayList<Booking>();
-        noOrderPlaceholder = (TextView) v.findViewById(R.id.no_bookings_placeholder);
+        tvNoBookingText = (TextView) v.findViewById(R.id.tvNoBookingText);
+        llNoBookingPlaceholder = (LinearLayout) v.findViewById(R.id.llNoBookingPlaceholder);
         swipeRefreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.swipe_refresh_layout);
         swipeRefreshLayout.setColorSchemeResources(
                 R.color.blue,
@@ -126,11 +129,11 @@ public class PastOrdersFragment extends Fragment implements AppConstants, SwipeR
                                 }
 
                                 if (pastBookingArrayList.size() == 0) {
-                                    noOrderPlaceholder.setText(getString(R.string.no_past_orders));
-                                    noOrderPlaceholder.setVisibility(View.VISIBLE);
+                                    tvNoBookingText.setText(getString(R.string.no_past_orders));
+                                    llNoBookingPlaceholder.setVisibility(View.VISIBLE);
                                     // listView.setVisibility(View.GONE);
                                 } else {
-                                    noOrderPlaceholder.setVisibility(View.GONE);
+                                    llNoBookingPlaceholder.setVisibility(View.GONE);
                                     listView.setVisibility(View.VISIBLE);
                                     bookingAdapter = new BookingAdapter(getActivity(), pastBookingArrayList);
                                     listView.setAdapter(bookingAdapter);
@@ -151,11 +154,11 @@ public class PastOrdersFragment extends Fragment implements AppConstants, SwipeR
                                 int statusCode = retrofitError.getResponse().getStatus();
                                 if (statusCode == 405) {
                                     listView.setVisibility(View.GONE);
-                                    noOrderPlaceholder.setText(getString(R.string.no_past_orders));
-                                    noOrderPlaceholder.setVisibility(View.VISIBLE);
+                                    tvNoBookingText.setText(getString(R.string.no_past_orders));
+                                    llNoBookingPlaceholder.setVisibility(View.VISIBLE);
                                 } else {
                                     CommonUtils.showRetrofitError(getActivity(), retrofitError);
-                                    noOrderPlaceholder.setVisibility(View.GONE);
+                                    llNoBookingPlaceholder.setVisibility(View.GONE);
                                 }
 
 
