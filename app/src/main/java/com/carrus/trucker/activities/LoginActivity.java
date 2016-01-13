@@ -230,7 +230,11 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btnSubmit:
-                hideKeyboard(v);
+                try {
+                    hideKeyboard(v);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
                 driverId = etDriverId.getText().toString();
                 if (driverId.isEmpty()) {
                     CommonUtils.showSingleButtonPopup(this, getString(R.string.enter_driver_id_msg));
@@ -243,7 +247,11 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                 }
                 break;
             case R.id.btnLogin:
-                hideKeyboard(v);
+                try {
+                    hideKeyboard(v);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
                 otp = etOtp.getText().toString();
                 if (otp.isEmpty()) {
                     CommonUtils.showSingleButtonPopup(this,getString(R.string.enter_otp_msg));

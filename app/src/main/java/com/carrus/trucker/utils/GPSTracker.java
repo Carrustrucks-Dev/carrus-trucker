@@ -11,7 +11,7 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.Settings;
-import android.util.Log;
+
 
 import com.carrus.trucker.interfaces.GPSDailogCallBack;
 

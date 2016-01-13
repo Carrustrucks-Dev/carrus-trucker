@@ -44,11 +44,17 @@ public interface WebServices {
                              Callback<String> callback);
 
     @GET("/api/v1/trucker/getPast")
-    public void getPastOrders(@Header("authorization") String accessToken, @Query("sort") String sort,
+    public void getPastOrders(@Header("authorization") String accessToken,
+                              @Query("limit") int limit,
+                              @Query("skip") int skip,
+                              @Query("sort") String sort,
                               Callback<String> callback);
 
     @GET("/api/v1/trucker/getUpComing")
-    public void getUpComingOrders(@Header("authorization") String accessToken, @Query("sort") String sort,
+    public void getUpComingOrders(@Header("authorization") String accessToken,
+                                  @Query("limit") int limit,
+                                  @Query("skip") int skip,
+                                  @Query("sort") String sort,
                                   Callback<String> callback);
 
     @GET("/api/v1/trucker/getBookingDetail/{bookingId}")

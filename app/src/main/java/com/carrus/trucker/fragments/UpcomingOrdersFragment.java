@@ -17,19 +17,8 @@ import com.carrus.trucker.activities.BookingDetailsActivity;
 import com.carrus.trucker.adapters.BookingAdapter;
 import com.carrus.trucker.interfaces.AppConstants;
 import com.carrus.trucker.models.Booking;
-import com.carrus.trucker.retrofit.RestClient;
-import com.carrus.trucker.utils.CommonUtils;
-import com.carrus.trucker.utils.MaterialDesignAnimations;
-import com.carrus.trucker.utils.Prefs;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
-
-import retrofit.Callback;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
 
 /**
  * Created by Saurbhv on 11/16/15.
@@ -102,7 +91,7 @@ public class UpcomingOrdersFragment extends Fragment implements AppConstants, Sw
 
     private void getData() {
 //        noOrderPlaceholder.setVisibility(View.GONE);
-            if (!isRefreshView) {
+            /*if (!isRefreshView) {
                 CommonUtils.showLoadingDialog(getActivity(), getResources().getString(R.string.loading));
             }
             RestClient.getWebServices().getUpComingOrders(Prefs.with(getActivity()).getString(ACCESS_TOKEN, ""),"ASC",
@@ -170,7 +159,7 @@ public class UpcomingOrdersFragment extends Fragment implements AppConstants, Sw
                             isRefreshView = false;
                         }
 
-                    });
+                    });*/
 
         }
 

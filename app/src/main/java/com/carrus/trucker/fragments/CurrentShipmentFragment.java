@@ -120,14 +120,16 @@ public class CurrentShipmentFragment extends android.support.v4.app.Fragment imp
         @Override
         public void onReceive(Context context, Intent intent) {
             // Get extra data included in the Intent
-            tvBookingStatus.setText(CommonUtils.toCamelCase(intent.getStringExtra("bookingStatus").replace("_", " ")));
-            MarkerOptions markerOptions = new MarkerOptions();
-            markerOptions.position(new LatLng(intent.getDoubleExtra("latitude", 0.0), intent.getDoubleExtra("longitude", 0.0)));
-            markerOptions.icon(BitmapDescriptorFactory.fromResource(R.mipmap.icon_van));
-            if (currentMarker != null)
-                currentMarker.remove();
+            if(intent!=null) {
+                tvBookingStatus.setText(CommonUtils.toCamelCase(intent.getStringExtra("bookingStatus").replace("_", " ")));
+                MarkerOptions markerOptions = new MarkerOptions();
+                markerOptions.position(new LatLng(intent.getDoubleExtra("latitude", 0.0), intent.getDoubleExtra("longitude", 0.0)));
+                markerOptions.icon(BitmapDescriptorFactory.fromResource(R.mipmap.icon_van));
+                if (currentMarker != null)
+                    currentMarker.remove();
 
-            currentMarker = googleMap.addMarker(markerOptions);
+                currentMarker = googleMap.addMarker(markerOptions);
+            }
 
         }
     };
@@ -205,12 +207,10 @@ public class CurrentShipmentFragment extends android.support.v4.app.Fragment imp
                 }
 
                 CommonUtils.dismissLoadingDialog();
-                Log.d("Response", s);
             }
 
             @Override
             public void failure(RetrofitError error) {
-                Log.d("failure", "" + error);
                 CommonUtils.dismissLoadingDialog();
                 if (((RetrofitError) error).getKind() == RetrofitError.Kind.NETWORK) {
                     showRetryPopup(getActivity().getString(R.string.no_internet_access));

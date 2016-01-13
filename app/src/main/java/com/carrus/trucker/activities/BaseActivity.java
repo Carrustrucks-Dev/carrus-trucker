@@ -31,7 +31,7 @@ public class BaseActivity extends FragmentActivity implements GPSDailogCallBack,
 
     private Activity activity;
     private Dialog dialog;
-    public String accessToken;
+    protected String accessToken;
     private BroadcastReceiver mMessageReceiver;
 
     @Override

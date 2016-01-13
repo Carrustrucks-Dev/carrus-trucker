@@ -116,7 +116,7 @@ public class MyService extends Service implements AppConstants, LocationListener
 
                 } else {
                     if (isNetworkEnabled) {
-                        android.util.Log.d("Network", "Network");
+                        //Log.d("Network", "Network");
                         if (locationManager != null) {
                             location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
                             if (location != null) {
@@ -125,7 +125,7 @@ public class MyService extends Service implements AppConstants, LocationListener
                     }
                     if (isGPSEnabled) {
                         if (location == null) {
-                            android.util.Log.d("GPS Enabled", "GPS Enabled");
+                            //Log.d("GPS Enabled", "GPS Enabled");
                             if (locationManager != null) {
                                 location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
                             }
@@ -133,32 +133,34 @@ public class MyService extends Service implements AppConstants, LocationListener
                     }
                 }
 
-                RestClient.getWebServices().sendTracking(orderId,
-                        sharedPreferences.getString(DRIVER_NO, ""),
-                        String.valueOf(location.getLongitude()),
-                        String.valueOf(location.getLatitude()), new Callback<String>() {
-                            @Override
-                            public void success(String s, Response response) {
+                if(location!=null) {
+                    RestClient.getWebServices().sendTracking(orderId,
+                            sharedPreferences.getString(DRIVER_NO, ""),
+                            String.valueOf(location.getLongitude()),
+                            String.valueOf(location.getLatitude()), new Callback<String>() {
+                                @Override
+                                public void success(String s, Response response) {
 
-                                try {
-                                    JSONObject jsonObject = new JSONObject(s);
+                                    try {
+                                        JSONObject jsonObject = new JSONObject(s);
 
-                                    Intent i = new Intent("custom-event-name");
-                                    i.putExtra("bookingStatus", jsonObject.getJSONObject("data").getString("bookingStatus"));
-                                    i.putExtra("longitude", location.getLongitude());
-                                    i.putExtra("latitude", location.getLatitude());
-                                    LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(i);
-                                    Log.d("Tracking Success", s);
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
+                                        Intent i = new Intent("custom-event-name");
+                                        i.putExtra("bookingStatus", jsonObject.getJSONObject("data").getString("bookingStatus"));
+                                        i.putExtra("longitude", location.getLongitude());
+                                        i.putExtra("latitude", location.getLatitude());
+                                        LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(i);
+                                        Log.d("Tracking Success", s);
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
                                 }
-                            }
 
-                            @Override
-                            public void failure(RetrofitError error) {
-                                Log.d("Tracking Failed", "" + error);
-                            }
-                        });
+                                @Override
+                                public void failure(RetrofitError error) {
+                                    Log.d("Tracking Failed", "" + error);
+                                }
+                            });
+                }
                 try {
                     readWebPage();
                     Thread.sleep(DELAY);

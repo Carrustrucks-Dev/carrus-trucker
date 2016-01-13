@@ -26,4 +26,5 @@ public interface AppConstants {
     int TEN_RESULT_CODE = 10;
     int FIVE_REQUEST_CODE = 5;
     String USER_TYPE = "TRUCKER";
+    int LIMIT = 15;
 }

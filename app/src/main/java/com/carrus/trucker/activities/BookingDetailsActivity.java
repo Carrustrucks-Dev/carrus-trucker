@@ -152,6 +152,10 @@ public class BookingDetailsActivity extends BaseActivity implements View.OnClick
         listDataHeader.add(getString(R.string.notes));
         listDataHeader.add(getString(R.string.my_notes));
 
+/*        Intent intent = new Intent(BookingDetailsActivity.this, RatingDialogActivity.class);
+        intent.putExtra("bookingId", bookingId);
+        startActivityForResult(intent, FIVE_REQUEST_CODE);*/
+
     }
 
     /**

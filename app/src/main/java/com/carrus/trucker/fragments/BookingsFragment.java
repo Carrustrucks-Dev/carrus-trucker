@@ -43,8 +43,8 @@ public class BookingsFragment extends Fragment implements AppConstants, View.OnC
         pastBookingButton = (Button) v.findViewById(R.id.past_button);
         upcomingBookingButton.setOnClickListener(this);
         pastBookingButton.setOnClickListener(this);
-        upcomingOrderFragment=new UpcomingOrdersFragment();
-        pastOrderFragment=new PastOrdersFragment();
+        upcomingOrderFragment=new UpcomingOrderFragment();
+        pastOrderFragment=new PastOrderFragment();
     }
 
 
@@ -121,16 +121,16 @@ public class BookingsFragment extends Fragment implements AppConstants, View.OnC
         // If fragment doesn't exist yet, create one
         if (fragment.isAdded())
         {
-            if(fragment instanceof UpcomingOrdersFragment) {
+            if(fragment instanceof UpcomingOrderFragment) {
                 fragmentTransaction.hide(pastOrderFragment);
-            }else if(fragment instanceof PastOrdersFragment){
+            }else if(fragment instanceof PastOrderFragment){
                 fragmentTransaction.hide(upcomingOrderFragment);
             }
             fragmentTransaction.show(fragment);
         }
 
         else { // re-use the old fragment
-            if(fragment instanceof PastOrdersFragment){
+            if(fragment instanceof PastOrderFragment){
                 fragmentTransaction.hide(upcomingOrderFragment);
             }
             fragmentTransaction.add(R.id.booking_frame_container, fragment);

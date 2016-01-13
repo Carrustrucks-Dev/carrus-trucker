@@ -133,6 +133,8 @@ public class HomeScreenActivity extends BaseActivity implements View.OnClickList
                 }
                 mDrawerLayout.closeDrawer(GravityCompat.START);
 
+                break;
+
 
         }
     }
