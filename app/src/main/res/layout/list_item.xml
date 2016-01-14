@@ -11,7 +11,7 @@
         android:id="@+id/name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="@dimen/large_font"
+        android:textSize="@dimen/big_font"
         android:layout_weight="1"
         android:paddingTop="@dimen/five"
         android:paddingBottom="@dimen/five"
@@ -25,7 +25,7 @@
         android:gravity="right"
         android:layout_weight="1"
         android:paddingBottom="@dimen/five"
-        android:textSize="@dimen/large_font"
+        android:textSize="@dimen/big_font"
         />
 
 </LinearLayout>

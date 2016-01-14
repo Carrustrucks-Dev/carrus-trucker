@@ -30,7 +30,7 @@
             android:padding="@dimen/ten"
             android:textAppearance="@style/CustomTextAppearance"
             android:textColor="@color/blue"
-            android:textSize="@dimen/large_font" />
+            android:textSize="@dimen/big_font" />
     </LinearLayout>
 
     <!--<LinearLayout-->

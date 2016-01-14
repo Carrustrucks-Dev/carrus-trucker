@@ -5,22 +5,23 @@ import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.ContentUris;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.drawable.ColorDrawable;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
-import android.util.Patterns;
+import android.support.v7.app.AlertDialog;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -39,8 +40,6 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import retrofit.RetrofitError;
 import retrofit.mime.TypedByteArray;
@@ -50,7 +49,7 @@ import retrofit.mime.TypedByteArray;
  */
 public class CommonUtils {
 
-    public static ProgressDialog progressDial;
+    public static Dialog progressDial;
     public static Dialog dialog;
     public static String APP_VERSION = "0";
 
@@ -77,29 +76,24 @@ public class CommonUtils {
     }
 
 
-    public static Boolean validateEmail(final String email) {
-        final String EMAIL_PATTERN = Patterns.EMAIL_ADDRESS.toString();
-//"^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@" + "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
-        Pattern pattern = Pattern.compile(EMAIL_PATTERN);
-        Matcher matcher = pattern.matcher(email);
-        return matcher.matches();
-    }
+    public static void showLoadingDialog(Context context, String msg) {
+        dismissLoadingDialog();
 
-//    public void showLoadingDialog(Context context, String msg) {
-//        dismissLoadingDialog();
-//
-//        progressDial = new ProgressDialog(context);
-//        progressDial.setCancelable(false);
-//        progressDial.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
-//        progressDial.show();
-//        WindowManager.LayoutParams layoutParams = progressDial.getWindow()
-//                .getAttributes();
-//        progressDial.setContentView(R.layout.loading_box);
-//        @SuppressWarnings("unused")
-//                TextView dialogTxt = (TextView) progressDial.findViewById(R.id.tv101);
-//        dialogTxt.setText(msg);
-//
-//    }
+        progressDial = new Dialog(context,
+                R.style.Theme_AppCompat_Translucent);
+        progressDial.setCancelable(false);
+        //progressDial.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+        progressDial.show();
+        WindowManager.LayoutParams layoutParams = progressDial.getWindow()
+                .getAttributes();
+        progressDial.setContentView(R.layout.loading_box);
+        ProgressBar progressBar = (ProgressBar) progressDial.findViewById(R.id.progressBar1);
+        progressBar.getIndeterminateDrawable().setColorFilter(0xFF2362C0, android.graphics.PorterDuff.Mode.MULTIPLY);
+        @SuppressWarnings("unused")
+        TextView dialogTxt = (TextView) progressDial.findViewById(R.id.tv101);
+        //dialogTxt.setText(msg);
+
+    }
 
     /**
      * Show the circular progress bar as loading with the message
@@ -107,7 +101,7 @@ public class CommonUtils {
      * @param activity on which it is to be displayed
      * @param message  that is to be shown
      */
-    public static void showLoadingDialog(final Activity activity, String message) {
+    /*public static void showLoadingDialog(final Activity activity, String message) {
         try {
             dismissLoadingDialog();
             dialog = new Dialog(activity,
@@ -143,47 +137,60 @@ public class CommonUtils {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-
+    }*/
     public static void dismissLoadingDialog() {
-//        if (progressDial != null) {
-//            progressDial.dismiss();
-//            progressDial = null;
-//        }
+        if (progressDial != null) {
+            progressDial.dismiss();
+            progressDial = null;
+        }
 
-        if (dialog != null) {
+       /* if (dialog != null) {
             dialog.dismiss();
             dialog = null;
-        }
+        }*/
     }
 
     public static void showSingleButtonPopup(Context context, String msg) {
-        final Dialog dialog = new Dialog(context, android.R.style.Theme_Translucent_NoTitleBar);
-
-        //setting custom layout to dialog
-        dialog.setContentView(R.layout.single_button_custom_dialog);
-        WindowManager.LayoutParams lp = dialog.getWindow().getAttributes();
-        lp.dimAmount = 0.7f; // Dim level. 0.0 - no dim, 1.0 - completely opaque
-        dialog.getWindow().setAttributes(lp);
-        dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
-        dialog.setCancelable(true);
-        dialog.setCanceledOnTouchOutside(false);
-
-        //adding text dynamically
-        TextView txt = (TextView) dialog.findViewById(R.id.textMessage);
-        txt.setText(msg);
-
-        //adding button click event
-        Button dismissButton = (Button) dialog.findViewById(R.id.button);
-        dismissButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(context);
+        alertDialog.setCancelable(false);
+        alertDialog.setMessage(msg);
+        alertDialog.setPositiveButton(context.getString(R.string.ok), new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
+
             }
         });
-        dialog.show();
+        alertDialog.show();
     }
+
+    /**
+     * public static void showSingleButtonPopup(Context context, String msg) {
+     * final Dialog dialog = new Dialog(context, android.R.style.Theme_Translucent_NoTitleBar);
+     * <p/>
+     * //setting custom layout to dialog
+     * dialog.setContentView(R.layout.single_button_custom_dialog);
+     * WindowManager.LayoutParams lp = dialog.getWindow().getAttributes();
+     * lp.dimAmount = 0.7f; // Dim level. 0.0 - no dim, 1.0 - completely opaque
+     * dialog.getWindow().setAttributes(lp);
+     * dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+     * dialog.setCancelable(true);
+     * dialog.setCanceledOnTouchOutside(false);
+     * <p/>
+     * //adding text dynamically
+     * TextView txt = (TextView) dialog.findViewById(R.id.textMessage);
+     * txt.setText(msg);
+     * <p/>
+     * //adding button click event
+     * Button dismissButton = (Button) dialog.findViewById(R.id.button);
+     * dismissButton.setOnClickListener(new View.OnClickListener() {
+     *
+     * @Override public void onClick(View v) {
+     * dialog.dismiss();
+     * }
+     * });
+     * dialog.show();
+     * }
+     */
 
     public static void showRetrofitError(Activity activity, RetrofitError retrofitError) {
         try {
@@ -201,7 +208,7 @@ public class CommonUtils {
                         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |
                                 Intent.FLAG_ACTIVITY_CLEAR_TASK |
                                 Intent.FLAG_ACTIVITY_NEW_TASK);
-                        Toast.makeText(activity,activity.getString(R.string.session_expired),Toast.LENGTH_LONG).show();
+                        Toast.makeText(activity, activity.getString(R.string.session_expired), Toast.LENGTH_LONG).show();
                         activity.startActivity(intent);
                         activity.overridePendingTransition(R.anim.anim_slide_in_left, R.anim.anim_slide_out_left);
                     } else {
@@ -477,7 +484,7 @@ public class CommonUtils {
     }
 
     public static void hideSoftKeyboard(Activity activity) {
-        if(activity!=null) {
+        if (activity != null) {
             InputMethodManager inputMethodManager = (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
             inputMethodManager.hideSoftInputFromWindow(activity.getCurrentFocus().getWindowToken(), 0);
         }
@@ -588,7 +595,7 @@ public class CommonUtils {
         }
     }
 
-    public static void phoneCall(Context context,String phoneNumber){
+    public static void phoneCall(Context context, String phoneNumber) {
         try {
             Intent call = new Intent(Intent.ACTION_DIAL);
             call.setData(Uri.parse("tel:" + "+91" + phoneNumber));

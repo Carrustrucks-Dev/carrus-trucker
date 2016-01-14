@@ -38,7 +38,7 @@ public class BaseActivity extends FragmentActivity implements GPSDailogCallBack,
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         activity = this;
-        accessToken= Prefs.with(this).getString(ACCESS_TOKEN, "");
+        accessToken= Prefs.with(this).getString(ACCESS_TOKEN, null);
         mMessageReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {

@@ -14,7 +14,7 @@
         android:layout_width="match_parent"
         android:gravity="left|top"
         android:layout_height="@dimen/mediumhieght"
-        android:textSize="@dimen/large_font"
+        android:textSize="@dimen/big_font"
         android:textColor="@color/dark_gery"
         android:hint="@string/enter_notes"
         android:background="@drawable/dotted_border"
@@ -25,6 +25,7 @@
         android:layout_margin="@dimen/ten"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:textSize="@dimen/big_font"
         android:background="@drawable/button_background_selector"
         android:text="@string/submit"
         android:textColor="@color/white"/>

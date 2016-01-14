@@ -10,14 +10,14 @@
         android:layout_width="match_parent"
         android:layout_height="fill_parent"
         android:layout_above="@+id/bookingDetailsLayout"
-        android:layout_below="@+id/headerView"/>
+        />
 
 
 
     <RelativeLayout
         android:id="@+id/noBookingLayout"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="@dimen/fifty"
         android:layout_alignParentBottom="true"
         android:background="@color/dark_gery"
         android:visibility="gone">
@@ -30,7 +30,7 @@
             android:textAllCaps="true"
             android:textAppearance="@style/CustomTextAppearance.Bold"
             android:textColor="@color/white"
-            android:textSize="16sp" />
+            android:textSize="@dimen/mid_fond" />
     </RelativeLayout>
 
     <RelativeLayout
@@ -48,7 +48,6 @@
             android:drawableLeft="@mipmap/icon_location_pinn2"
             android:drawablePadding="5dp"
             android:padding="10dp"
-            android:text="Chandigarh to New Delhi"
             android:textColor="@color/white" />
 
         <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -80,7 +79,6 @@
                         android:id="@+id/date"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="31"
                         android:textColor="@color/white"
                         android:textSize="24sp" />
 
@@ -88,9 +86,7 @@
                         android:id="@+id/month"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_below="@+id/date"
                         android:layout_marginTop="-12dp"
-                        android:text="Oct"
                         android:textAllCaps="true"
                         android:textColor="@color/white"
                         android:textSize="14sp" />
@@ -108,7 +104,6 @@
                     android:id="@+id/name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Test Test"
                     android:textAppearance="@style/CustomTextAppearance"
                     android:textColor="@color/blue"
                     android:textSize="14sp" />
@@ -117,7 +112,6 @@
                     android:id="@+id/truckName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Tata Ace, CH 01 A 1111"
                     android:textAppearance="@style/CustomTextAppearance"
                     android:textColor="@color/dark_gery"
                     android:textSize="14sp" />
@@ -126,7 +120,6 @@
                     android:id="@+id/timeSlot"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Monday, 4PM - 8PM"
                     android:textAppearance="@style/CustomTextAppearance"
                     android:textColor="@color/dark_gery"
                     android:textSize="13sp" />
@@ -153,7 +146,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="right"
-                    android:text="Reached Pickup Location"
                     android:textAppearance="@style/CustomTextAppearance"
                     android:textColor="@color/green"
                     android:textSize="13sp" />

@@ -18,6 +18,7 @@ import com.carrus.trucker.retrofit.RestClient;
 import com.carrus.trucker.utils.ApiResponseFlags;
 import com.carrus.trucker.utils.CommonUtils;
 import com.carrus.trucker.utils.InternetConnectionStatus;
+import com.carrus.trucker.utils.Log;
 import com.carrus.trucker.utils.MaterialDesignAnimations;
 import com.carrus.trucker.utils.MyApiCalls;
 import com.carrus.trucker.utils.Prefs;
@@ -77,7 +78,7 @@ public class SplashScreenActivity extends BaseActivity implements View.OnClickLi
 
     private void performAction() {
         if (InternetConnectionStatus.getInstance(this).isOnline()) {
-            getAppVersion();
+            verfiySession();
             progressBar.setVisibility(View.VISIBLE);
             findViewById(R.id.retry_button).setVisibility(View.GONE);
         } else {
@@ -98,6 +99,7 @@ public class SplashScreenActivity extends BaseActivity implements View.OnClickLi
     /**
     * API call for app versioning
     * */
+    /**
     private void getAppVersion() {
         try {
             PackageManager manager = this.getPackageManager();
@@ -179,39 +181,57 @@ public class SplashScreenActivity extends BaseActivity implements View.OnClickLi
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
+    }*/
 
     public void verfiySession() {
 
-        if(!accessToken.isEmpty()) {
+        if(accessToken!=null && !accessToken.isEmpty()) {
             RestClient.getWebServices().verifyUser(accessToken,
                     new Callback<String>() {
                         @Override
                         public void success(String serverResponse, Response response) {
                             try {
-                                JSONObject data = new JSONObject(new JSONObject(serverResponse).getString("data"));
-                                Gson gson = new Gson();
-                                ProfileData profileData = gson.fromJson(data.getString("profileData"), ProfileData.class);
-                                Prefs.with(SplashScreenActivity.this).save(ACCESS_TOKEN, data.getString("accessToken"));
-                                Prefs.with(SplashScreenActivity.this).save(DRIVER_ID, profileData.driverId);
-                                Prefs.with(SplashScreenActivity.this).save(DRIVER_NO, profileData._id);
-                                Prefs.with(SplashScreenActivity.this).save(DRIVAR_NAME, CommonUtils.toCamelCase(profileData.driverName));
-                                Prefs.with(SplashScreenActivity.this).save(DRIVING_LICENSE, profileData.drivingLicense.drivingLicenseNo);
-                                Prefs.with(SplashScreenActivity.this).save(VALIDITY, profileData.drivingLicense.validity);
-                                Prefs.with(SplashScreenActivity.this).save(DRIVER_PHONENO, profileData.phoneNumber);
-                                Prefs.with(SplashScreenActivity.this).save(DL_STATE, profileData.stateDl);
-                                Prefs.with(SplashScreenActivity.this).save(RATING, profileData.rating);
-                                Prefs.with(SplashScreenActivity.this).save(FLEET_OWNER_NO, profileData.fleetOwner.get(0).phoneNumber);
-                                if (profileData.profilePicture != null) {
-                                    Prefs.with(SplashScreenActivity.this).save(DRIVER_IMAGE, profileData.profilePicture.thumb);
+                                final JSONObject data = new JSONObject(new JSONObject(serverResponse).getString("data"));
+                                PackageManager manager = SplashScreenActivity.this.getPackageManager();
+                                final PackageInfo info = manager.getPackageInfo(SplashScreenActivity.this.getPackageName(), 0);
+                                CommonUtils.APP_VERSION = info.versionCode + "";
+                                JSONObject mAndroidVersion = data.getJSONObject("appVersion").getJSONObject("ANDROID");
+
+                                if (mAndroidVersion.has("criticalVersion")) {
+                                    if (Integer.parseInt(mAndroidVersion.getString("criticalVersion")) > info.versionCode) {
+                                        alertDialog.setMessage(getString(R.string.critical_update_message));
+                                        alertDialog.setPositiveButton(getString(R.string.yes), new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                goToAppStore();
+                                                dialog.dismiss();
+                                            }
+                                        });
+                                        alertDialog.show();
+                                    } else {
+                                        saveDriverInfonRedirect(data);
+                                    }
+
+                                } else if (Integer.parseInt(mAndroidVersion.getString("version")) > info.versionCode) {
+                                    alertDialog.setMessage(getString(R.string.update_message));
+                                    alertDialog.setPositiveButton(getString(R.string.yes), new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            goToAppStore();
+                                            dialog.dismiss();
+                                        }
+                                    });
+                                    alertDialog.setNegativeButton(getString(R.string.no), new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            dialog.dismiss();
+                                            saveDriverInfonRedirect(data);
+                                        }
+                                    });
+                                    alertDialog.show();
+                                } else {
+                                    saveDriverInfonRedirect(data);
                                 }
-                                Intent intent = new Intent(getApplicationContext(), HomeScreenActivity.class);
-                                Bundle mBundle = new Bundle();
-                                intent.putExtras(mBundle);
-                                startActivity(intent);
-                                finish();
-                                overridePendingTransition(R.anim.anim_slide_in_left, R.anim.anim_slide_out_left);
-                                finish();
+
+
+
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
@@ -240,6 +260,34 @@ public class SplashScreenActivity extends BaseActivity implements View.OnClickLi
             startActivity(intent);
             finish();
             Transactions.showNextAnimation(SplashScreenActivity.this);
+        }
+    }
+
+    private void saveDriverInfonRedirect(JSONObject data){
+        try {
+            Gson gson = new Gson();
+            ProfileData profileData = gson.fromJson(data.getString("profileData"), ProfileData.class);
+            Prefs.with(SplashScreenActivity.this).save(ACCESS_TOKEN, data.getString("accessToken"));
+            Prefs.with(SplashScreenActivity.this).save(DRIVER_ID, profileData.driverId);
+            Prefs.with(SplashScreenActivity.this).save(DRIVER_NO, profileData._id);
+            Prefs.with(SplashScreenActivity.this).save(DRIVAR_NAME, CommonUtils.toCamelCase(profileData.driverName));
+            Prefs.with(SplashScreenActivity.this).save(DRIVING_LICENSE, profileData.drivingLicense.drivingLicenseNo);
+            Prefs.with(SplashScreenActivity.this).save(VALIDITY, profileData.drivingLicense.validity);
+            Prefs.with(SplashScreenActivity.this).save(DRIVER_PHONENO, profileData.phoneNumber);
+            Prefs.with(SplashScreenActivity.this).save(DL_STATE, profileData.stateDl);
+            Prefs.with(SplashScreenActivity.this).save(RATING, profileData.rating);
+            Prefs.with(SplashScreenActivity.this).save(FLEET_OWNER_NO, profileData.fleetOwner.get(0).phoneNumber);
+            if (profileData.profilePicture != null) {
+                Prefs.with(SplashScreenActivity.this).save(DRIVER_IMAGE, profileData.profilePicture.thumb);
+            }
+            Intent intent = new Intent(getApplicationContext(), HomeScreenActivity.class);
+            Bundle mBundle = new Bundle();
+            intent.putExtras(mBundle);
+            startActivity(intent);
+            Transactions.showNextAnimation(SplashScreenActivity.this);
+            finish();
+        }catch (Exception e){
+            Log.e("Splash Acrtivity", e + "");
         }
     }
 

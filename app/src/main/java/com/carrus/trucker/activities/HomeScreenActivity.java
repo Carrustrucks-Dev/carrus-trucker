@@ -2,6 +2,7 @@ package com.carrus.trucker.activities;
 
 
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.TypedArray;
 import android.os.Bundle;
@@ -9,6 +10,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.AlertDialog;
 import android.view.Gravity;
 import android.view.View;
 import android.view.WindowManager;
@@ -53,6 +55,7 @@ public class HomeScreenActivity extends BaseActivity implements View.OnClickList
     private CircleImageView ivProfilePicture;
     private TextView tvDriverName, tvHeaderTitle;
     private int lastSelectedScreen = 0;
+    private AlertDialog.Builder alertDialog;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -86,6 +89,8 @@ public class HomeScreenActivity extends BaseActivity implements View.OnClickList
      * {@link Activity}
      */
     private void init() {
+        createDialog();
+
         //Get Resource ID from XML
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         lvNavMenuList = (ListView) findViewById(R.id.lvNavMenuList);
@@ -234,7 +239,48 @@ public class HomeScreenActivity extends BaseActivity implements View.OnClickList
     /**
      * Method for show exit popup
      */
-    public void showExitPopup() {
+    private void showExitPopup() {
+        alertDialog.setMessage(getString(R.string.exit_msg));
+        alertDialog.setPositiveButton(getString(R.string.yes), new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+                finish();
+                Transactions.showPreviousAnimation(HomeScreenActivity.this);
+            }
+        });
+
+        alertDialog.setNegativeButton(getString(R.string.no), new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        alertDialog.show();
+    }
+
+    /**
+     * Method to show logout popup
+     * */
+
+    private void logoutPopup() {
+        alertDialog.setMessage(getString(R.string.logout_msg));
+        alertDialog.setPositiveButton(getString(R.string.yes), new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                lastSelectedScreen = 10;
+                dialog.dismiss();
+                logout();
+            }
+        });
+
+        alertDialog.setNegativeButton(getString(R.string.no), new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+                lastSelectedScreen = 10;
+            }
+        });
+        alertDialog.show();
+    }
+
+/**    public void showExitPopup() {
         final Dialog dialog = new Dialog(HomeScreenActivity.this, android.R.style.Theme_Translucent_NoTitleBar);
 
         //setting custom layout to dialog
@@ -271,9 +317,10 @@ public class HomeScreenActivity extends BaseActivity implements View.OnClickList
 
     }
 
-    /**
-     * Method to show logout popup
-     * */
+
+
+
+
     public void logoutPopup() {
 
         final Dialog dialog = new Dialog(HomeScreenActivity.this, android.R.style.Theme_Translucent_NoTitleBar);
@@ -313,7 +360,7 @@ public class HomeScreenActivity extends BaseActivity implements View.OnClickList
         });
         dialog.show();
 
-    }
+    }*/
 
     @Override
     protected void onResume() {
@@ -324,5 +371,10 @@ public class HomeScreenActivity extends BaseActivity implements View.OnClickList
     protected void onDestroy() {
         super.onDestroy();
         stopService(new Intent(HomeScreenActivity.this, MyService.class));
+    }
+
+    private void createDialog() {
+        alertDialog = new AlertDialog.Builder(HomeScreenActivity.this);
+        alertDialog.setCancelable(false);
     }
 }

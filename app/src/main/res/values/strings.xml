@@ -105,4 +105,8 @@
     <string name="saved_successfully">Saved Successfully</string>
     <string name="current_position">Current Position</string>
 
+    <string name="exit_msg">Do you want to exit application?</string>
+    <string name="logout_msg">Do you want to logout?</string>
+    <string name="ok">Ok</string>
+
 </resources>
