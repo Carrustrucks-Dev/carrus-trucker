@@ -1,13 +1,20 @@
 package com.carrus.trucker.fragments;
 
+import android.Manifest;
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.location.Location;
+import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
@@ -16,6 +23,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.carrus.trucker.R;
 import com.carrus.trucker.activities.BookingDetailsActivity;
@@ -57,7 +65,8 @@ import retrofit.RetrofitError;
 import retrofit.client.Response;
 
 /**
- * Created by Saurbhv on 10/28/15.
+ * Developer: Saurbhv
+ * Dated: 10/28/15.
  */
 public class CurrentShipmentFragment extends android.support.v4.app.Fragment implements View.OnClickListener, AppConstants {
 
@@ -69,6 +78,9 @@ public class CurrentShipmentFragment extends android.support.v4.app.Fragment imp
     private TextView tvName, tvDate, tvMonth, tvShipingJourney, tvBookingStatus, tvTimeSlot, tvTruckName;
     private ImageView callShipper;
     private String shipperNumber;
+    private Location location;
+    private boolean isGPSEnabled = false;
+    private boolean isNetworkEnabled = false;
     public SharedPreferences sharedPreferences;
     private double[] latitude = new double[2];
     private double[] longitude = new double[2];
@@ -77,7 +89,8 @@ public class CurrentShipmentFragment extends android.support.v4.app.Fragment imp
     private ArrayList<Marker> mMarkerArray = new ArrayList<Marker>();
     private Marker currentMarker = null;
     private String bookingId;
-
+    final private int REQUEST_CODE_ASK_PERMISSIONS = 123;
+    LocationManager locationManager;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -88,16 +101,16 @@ public class CurrentShipmentFragment extends android.support.v4.app.Fragment imp
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_current_shipment, container, false);
-        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mMessageReceiver,
-                new IntentFilter("custom-event-name"));
-        gpsTracker = new GPSTracker(getActivity());
+
         googleMap = ((SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map)).getMap();
-        googleMap.setMyLocationEnabled(true);
         googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
         googleMap.getUiSettings().setZoomGesturesEnabled(true);
         googleMap.getUiSettings().setZoomControlsEnabled(true);
         googleMap.getUiSettings().setTiltGesturesEnabled(false);
         googleMap.getUiSettings().setMyLocationButtonEnabled(true);
+        sharedPreferences = getActivity().getSharedPreferences(SHARED_PREFERENCES, Context.MODE_PRIVATE);
+        v2GetRouteDirection = new GMapV2GetRouteDirection();
+
         noBookingLayout = (RelativeLayout) v.findViewById(R.id.noBookingLayout);
         bookingDetailsLayout = (RelativeLayout) v.findViewById(R.id.bookingDetailsLayout);
         tvName = (TextView) v.findViewById(R.id.name);
@@ -108,19 +121,79 @@ public class CurrentShipmentFragment extends android.support.v4.app.Fragment imp
         callShipper = (ImageView) v.findViewById(R.id.callShipperButton);
         tvTimeSlot = (TextView) v.findViewById(R.id.timeSlot);
         tvTruckName = (TextView) v.findViewById(R.id.truckName);
+
         callShipper.setOnClickListener(this);
         v.findViewById(R.id.bookingDetailsLayout).setOnClickListener(this);
-        if (gpsTracker.canGetLocation()) {
-            googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(gpsTracker.getLatitude(), gpsTracker.getLongitude()), 14));
-        }
+        checkLocationPermissionNSetLocation();
         return v;
     }
+
+    private void checkLocationPermissionNSetLocation() {
+
+        if (Build.VERSION.SDK_INT >= 23) {
+            if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                    && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION,Manifest.permission.ACCESS_FINE_LOCATION},
+                        REQUEST_CODE_ASK_PERMISSIONS);
+                return;
+            }
+            //gpsTracker = new GPSTracker(getActivity());
+            locationManager = (LocationManager) getActivity().getSystemService(Activity.LOCATION_SERVICE);
+            isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+            isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+            googleMap.setMyLocationEnabled(true);
+            if (isNetworkEnabled) {
+                if (locationManager != null)
+                    location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+            }else {
+                if (isGPSEnabled) {
+                    if (locationManager != null)
+                        location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                }
+            }
+
+            if (location!=null) {
+                googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 14));
+            }
+
+            LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mMessageReceiver,
+                    new IntentFilter("custom-event-name"));
+            getCurrentBookings();
+
+        } else {
+            //gpsTracker = new GPSTracker(getActivity());
+            locationManager = (LocationManager) getActivity().getSystemService(Activity.LOCATION_SERVICE);
+            isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+            isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+            googleMap.setMyLocationEnabled(true);
+
+            if (isNetworkEnabled) {
+                if (locationManager != null)
+                    location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+            }else {
+                if (isGPSEnabled) {
+                    if (locationManager != null)
+                        location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                }
+            }
+
+            if (location!=null) {
+                googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 14));
+            }
+
+            LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mMessageReceiver,
+                    new IntentFilter("custom-event-name"));
+            getCurrentBookings();
+        }
+
+    }
+
 
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             // Get extra data included in the Intent
-            if(intent!=null) {
+            if (intent != null) {
                 tvBookingStatus.setText(CommonUtils.toCamelCase(intent.getStringExtra("bookingStatus").replace("_", " ")));
                 MarkerOptions markerOptions = new MarkerOptions();
                 markerOptions.position(new LatLng(intent.getDoubleExtra("latitude", 0.0), intent.getDoubleExtra("longitude", 0.0)));
@@ -135,19 +208,43 @@ public class CurrentShipmentFragment extends android.support.v4.app.Fragment imp
     };
 
     @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        switch (requestCode) {
+            case REQUEST_CODE_ASK_PERMISSIONS:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    checkLocationPermissionNSetLocation();
+                } else {
+                    // Permission Denied
+                    Toast.makeText(getActivity(), "Location permission denied.", Toast.LENGTH_SHORT)
+                            .show();
+                }
+                break;
+            default:
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+    }
+
+
+    @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        sharedPreferences = getActivity().getSharedPreferences(SHARED_PREFERENCES, Context.MODE_PRIVATE);
+    }
 
-        v2GetRouteDirection = new GMapV2GetRouteDirection();
+    @Override
+    public void onPause() {
+        super.onPause();
+        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mMessageReceiver);
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        getCurrentBookings();
     }
 
+
+    /**
+     * Method for GetCurrentBooking details and set corresponding data
+     */
     private void getCurrentBookings() {
         CommonUtils.showLoadingDialog(getActivity(), "loading...");
         RestClient.getWebServices().getCurrentBooking(sharedPreferences.getString(ACCESS_TOKEN, ""), new Callback<String>() {
@@ -161,6 +258,7 @@ public class CurrentShipmentFragment extends android.support.v4.app.Fragment imp
                         googleMap.getUiSettings().setZoomControlsEnabled(false);
                     } else {
                         bookingDetailsLayout.setVisibility(View.VISIBLE);
+
                         JSONObject bookingData = data.getJSONObject("bookingData");
                         bookingId = bookingData.getString("_id");
 
@@ -177,17 +275,17 @@ public class CurrentShipmentFragment extends android.support.v4.app.Fragment imp
                         tvBookingStatus.setText(CommonUtils.toCamelCase(bookingData.getString("bookingStatus").replace("_", " ")));
 
                         shipperNumber = bookingData.getJSONObject("shipper").getString("phoneNumber");
-                        name[0]=bookingData.getJSONObject("pickUp").getString("companyName");
-                        name[1]=bookingData.getJSONObject("dropOff").getString("companyName");
-                        address[0]=bookingData.getJSONObject("pickUp").getString("address")+", "+
-                                bookingData.getJSONObject("pickUp").getString("city")+", "+
+                        name[0] = bookingData.getJSONObject("pickUp").getString("companyName");
+                        name[1] = bookingData.getJSONObject("dropOff").getString("companyName");
+                        address[0] = bookingData.getJSONObject("pickUp").getString("address") + ", " +
+                                bookingData.getJSONObject("pickUp").getString("city") + ", " +
                                 bookingData.getJSONObject("pickUp").getString("state");
 
-                        address[1]=bookingData.getJSONObject("dropOff").getString("address")+", "+
-                                bookingData.getJSONObject("dropOff").getString("city")+", "+
+                        address[1] = bookingData.getJSONObject("dropOff").getString("address") + ", " +
+                                bookingData.getJSONObject("dropOff").getString("city") + ", " +
                                 bookingData.getJSONObject("dropOff").getString("state");
 
-                        getDriectionToDestination(new LatLng(gpsTracker.getLatitude(), gpsTracker.getLongitude()),
+                        getDriectionToDestination(new LatLng(location.getLatitude(), location.getLongitude()),
                                 bookingData.getJSONObject("pickUp").getJSONObject("coordinates").getString("pickUpLat") + ", " + bookingData.getJSONObject("pickUp").getJSONObject("coordinates").getString("pickUpLong"),
                                 bookingData.getJSONObject("dropOff").getJSONObject("coordinates").getString("dropOffLat") + ", " + bookingData.getJSONObject("dropOff").getJSONObject("coordinates").getString("dropOffLong"),
                                 GMapV2GetRouteDirection.MODE_DRIVING);
@@ -221,7 +319,9 @@ public class CurrentShipmentFragment extends android.support.v4.app.Fragment imp
         });
     }
 
-    //Path Direction Call
+    /**
+     * Method for google API call of get path between two latlng points
+     */
     private void getDriectionToDestination(final LatLng currentposition, final String start, final String end, String mode) {
         RestClient.getGoogleApiService().getDriections(start, end, "false", "metric", mode, new Callback<String>() {
             @Override
@@ -303,9 +403,9 @@ public class CurrentShipmentFragment extends android.support.v4.app.Fragment imp
             Marker marker = googleMap.addMarker(new MarkerOptions().position(location)
                             .title(CommonUtils.toCamelCase(name[i]))
                             .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
-                    .snippet(CommonUtils.toCamelCase(address[i]))
+                            .snippet(CommonUtils.toCamelCase(address[i]))
 
-                    );
+            );
 
             mMarkerArray.add(marker);
         }
@@ -322,11 +422,14 @@ public class CurrentShipmentFragment extends android.support.v4.app.Fragment imp
                 Intent intent = new Intent(getActivity(), BookingDetailsActivity.class);
                 intent.putExtra("bookingId", bookingId);
                 startActivity(intent);
-                getActivity().overridePendingTransition(R.anim.anim_slide_in_left, R.anim.anim_slide_out_left);
+                Transactions.showNextAnimation(getActivity());
                 break;
         }
     }
 
+    /**
+     * Method to retry when getCurrentBooking Api call fails
+     */
     private void showRetryPopup(String msg) {
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity());
         alertDialog.setMessage(msg);
@@ -348,14 +451,4 @@ public class CurrentShipmentFragment extends android.support.v4.app.Fragment imp
         });
         alertDialog.show();
     }
-
-    //    @Override
-//    public void onDestroyView() {
-//        super.onDestroyView();
-//        FragmentManager fm = getActivity().getFragmentManager();
-//        Fragment fragment = (fm.findFragmentById(R.id.map));
-//        FragmentTransaction ft = fm.beginTransaction();
-//        ft.remove(fragment);
-//        ft.commit();
-//    }
 }

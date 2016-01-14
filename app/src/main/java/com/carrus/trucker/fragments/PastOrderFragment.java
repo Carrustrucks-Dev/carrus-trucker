@@ -83,6 +83,10 @@ public class PastOrderFragment extends android.support.v4.app.Fragment implement
         tvNoBookingText = (TextView) v.findViewById(R.id.tvNoBookingText);
         llNoBookingPlaceholder = (LinearLayout) v.findViewById(R.id.llNoBookingPlaceholder);
         tvNoBookingText.setText(getString(R.string.no_past_orders));
+
+        bookingList = new ArrayList<>();
+        bookingAdapter = new BookingRecyclerAdapter(getActivity(), bookingList, mRecyclerView, true);
+        mRecyclerView.setAdapter(bookingAdapter);
     }
 
     @Override

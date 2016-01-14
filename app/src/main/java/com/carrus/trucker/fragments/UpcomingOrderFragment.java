@@ -83,6 +83,10 @@ public class UpcomingOrderFragment extends android.support.v4.app.Fragment imple
         tvNoBookingText = (TextView) v.findViewById(R.id.tvNoBookingText);
         llNoBookingPlaceholder = (LinearLayout) v.findViewById(R.id.llNoBookingPlaceholder);
         tvNoBookingText.setText(getString(R.string.no_upcoming_orders));
+
+        bookingList = new ArrayList<>();
+        bookingAdapter = new BookingRecyclerAdapter(getActivity(), bookingList, mRecyclerView, true);
+        mRecyclerView.setAdapter(bookingAdapter);
     }
 
     @Override

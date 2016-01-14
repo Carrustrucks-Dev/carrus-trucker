@@ -260,7 +260,6 @@ public class HomeScreenActivity extends BaseActivity implements View.OnClickList
     /**
      * Method to show logout popup
      * */
-
     private void logoutPopup() {
         alertDialog.setMessage(getString(R.string.logout_msg));
         alertDialog.setPositiveButton(getString(R.string.yes), new DialogInterface.OnClickListener() {

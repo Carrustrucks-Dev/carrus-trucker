@@ -8,6 +8,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.v4.app.FragmentActivity;
@@ -33,6 +35,10 @@ public class BaseActivity extends FragmentActivity implements GPSDailogCallBack,
     private Dialog dialog;
     protected String accessToken;
     private BroadcastReceiver mMessageReceiver;
+    private LocationManager locationManager;
+    private Location location;
+    private boolean isGPSEnabled = false;
+    private boolean isNetworkEnabled = false;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -44,8 +50,21 @@ public class BaseActivity extends FragmentActivity implements GPSDailogCallBack,
             public void onReceive(Context context, Intent intent) {
                 if (dialog != null)
                     dialog.dismiss();
-                boolean enabled = CommonUtils.isGPSEnabled(activity);
-                Log.e("GPS Online Status", "" + enabled);
+
+                locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+                isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+                isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+
+                if (!isGPSEnabled && !isNetworkEnabled) {
+                    showGSP();
+                    Log.e("GPS Online Status", "" + false);
+                }else{
+                    Log.e("GPS Online Status", "" + true);
+                }
+
+//
+//                boolean enabled = CommonUtils.isGPSEnabled(activity);
+//                Log.e("GPS Online Status", "" + enabled);
             }
         };
     }

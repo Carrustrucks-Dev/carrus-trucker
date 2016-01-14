@@ -1,14 +1,18 @@
 package com.carrus.trucker.services;
 
+import android.Manifest;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.LocalBroadcastManager;
 
 import com.carrus.trucker.interfaces.AppConstants;
@@ -33,9 +37,11 @@ public class MyService extends Service implements AppConstants, LocationListener
     Location location;
     boolean isGPSEnabled = false;
     boolean isNetworkEnabled = false;
+    private Context context;
 
     @Override
     public IBinder onBind(Intent arg0) {
+        context=this;
         return null;
     }
 
@@ -47,6 +53,7 @@ public class MyService extends Service implements AppConstants, LocationListener
         isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
         isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
         Log.d(TAG, "onCreate");
+        context=this;
         mythread = new MyThread();
     }
 
@@ -112,65 +119,68 @@ public class MyService extends Service implements AppConstants, LocationListener
             while (isRunning) {
                 Log.d(TAG, "Running");
                 Log.d("OrderId", "" + orderId);
-                if (!isGPSEnabled && !isNetworkEnabled) {
 
-                } else {
-                    if (isNetworkEnabled) {
-                        //Log.d("Network", "Network");
-                        if (locationManager != null) {
-                            location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-                            if (location != null) {
-                            }
-                        }
+                if (Build.VERSION.SDK_INT >= 23) {
+                    if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                            && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                        mythread.interrupt();
+                        return;
                     }
-                    if (isGPSEnabled) {
-                        if (location == null) {
-                            //Log.d("GPS Enabled", "GPS Enabled");
+
+                    if (!isGPSEnabled && !isNetworkEnabled) {
+
+                    } else {
+                        if (isNetworkEnabled) {
+                            if (locationManager != null) {
+                                location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+                            }
+                        } else if (isGPSEnabled) {
+
                             if (locationManager != null) {
                                 location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
                             }
                         }
                     }
-                }
 
-                if(location!=null) {
-                    RestClient.getWebServices().sendTracking(orderId,
-                            sharedPreferences.getString(DRIVER_NO, ""),
-                            String.valueOf(location.getLongitude()),
-                            String.valueOf(location.getLatitude()), new Callback<String>() {
-                                @Override
-                                public void success(String s, Response response) {
+                    if (location != null) {
+                        RestClient.getWebServices().sendTracking(orderId,
+                                sharedPreferences.getString(DRIVER_NO, ""),
+                                String.valueOf(location.getLongitude()),
+                                String.valueOf(location.getLatitude()), new Callback<String>() {
+                                    @Override
+                                    public void success(String s, Response response) {
 
-                                    try {
-                                        JSONObject jsonObject = new JSONObject(s);
+                                        try {
+                                            JSONObject jsonObject = new JSONObject(s);
 
-                                        Intent i = new Intent("custom-event-name");
-                                        i.putExtra("bookingStatus", jsonObject.getJSONObject("data").getString("bookingStatus"));
-                                        i.putExtra("longitude", location.getLongitude());
-                                        i.putExtra("latitude", location.getLatitude());
-                                        LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(i);
-                                        Log.d("Tracking Success", s);
-                                    } catch (JSONException e) {
-                                        e.printStackTrace();
+                                            Intent i = new Intent("custom-event-name");
+                                            i.putExtra("bookingStatus", jsonObject.getJSONObject("data").getString("bookingStatus"));
+                                            i.putExtra("longitude", location.getLongitude());
+                                            i.putExtra("latitude", location.getLatitude());
+                                            LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(i);
+                                            Log.d("Tracking Success", s);
+                                        } catch (JSONException e) {
+                                            e.printStackTrace();
+                                        }
                                     }
-                                }
 
-                                @Override
-                                public void failure(RetrofitError error) {
-                                    Log.d("Tracking Failed", "" + error);
-                                }
-                            });
-                }
-                try {
-                    readWebPage();
-                    Thread.sleep(DELAY);
-                } catch (InterruptedException e) {
-                    isRunning = false;
-                    e.printStackTrace();
+                                    @Override
+                                    public void failure(RetrofitError error) {
+                                        Log.d("Tracking Failed", "" + error);
+                                    }
+                                });
+                    }
+                    try {
+                        readWebPage();
+                        Thread.sleep(DELAY);
+                    } catch (InterruptedException e) {
+                        isRunning = false;
+                        e.printStackTrace();
+                    }
                 }
             }
-        }
 
+        }
     }
 
 }
