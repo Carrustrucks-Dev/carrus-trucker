@@ -242,10 +242,11 @@ public class UpcomingOrderFragment extends android.support.v4.app.Fragment imple
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
-                        if ((bookingList != null) && bookingList.get(bookingList.size() - 1) == null) {
+                        if ((bookingList != null) && bookingList.size()>0 && bookingList.get(bookingList.size() - 1) == null) {
                             bookingList.remove(bookingList.size() - 1);
                             bookingAdapter.notifyItemRemoved(bookingList.size());
                         }
+                        //CommonUtils.showSingleButtonPopup(getActivity(),getActivity().getString(R.string.internetConnectionError));
                         MaterialDesignAnimations.fadeIn(getActivity(), getActivity().findViewById(R.id.errorLayout), getActivity().getString(R.string.internetConnectionError), 0);
                     }
                     isRefreshView = false;

@@ -4,5 +4,5 @@
     <dimen name="mid_fond">13sp</dimen>
     <dimen name="toolarge_font">24sp</dimen>
 
-    <dimen name="minus_twelve">-16dp</dimen>
+    <dimen name="minus_twelve">-15dp</dimen>
 </resources>

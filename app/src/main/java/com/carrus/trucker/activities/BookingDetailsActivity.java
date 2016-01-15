@@ -1,7 +1,11 @@
 package com.carrus.trucker.activities;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -12,6 +16,7 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.carrus.trucker.R;
 import com.carrus.trucker.adapters.ExpandableListAdapter;
@@ -51,6 +56,7 @@ public class BookingDetailsActivity extends BaseActivity implements View.OnClick
             tvPaymentMethod, tvTotalAmount,
             tvPaymentStatus;
     private Button btnStatus;
+    final private int REQUEST_CODE_ASK_PERMISSIONS = 124;
 
 
     @Override
@@ -99,7 +105,18 @@ public class BookingDetailsActivity extends BaseActivity implements View.OnClick
             }
         });
 
-        getOrderDetails();
+
+        if (Build.VERSION.SDK_INT >= 23) {
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                        REQUEST_CODE_ASK_PERMISSIONS);
+                return;
+            }
+
+            getOrderDetails();
+        }else {
+            getOrderDetails();
+        }
     }
 
     /**
@@ -167,129 +184,133 @@ public class BookingDetailsActivity extends BaseActivity implements View.OnClick
                 new Callback<String>() {
                     @Override
                     public void success(String serverResponse, Response response) {
-                        findViewById(R.id.scrollView).setVisibility(View.VISIBLE);
-                        try {
-                            JSONObject jsonObject = new JSONObject(serverResponse);
-                            JSONObject data = jsonObject.getJSONObject("data");
-                            tvCrnNumber.setText(getString(R.string.crn) + " - " + data.getString("crn").toUpperCase());
-                            orderStatusLayout.setBackgroundColor(statusBarColor(data.getString("bookingStatus").toUpperCase()));
-                            btnStatus.setText(textOnButton(data.getString("bookingStatus").toUpperCase()));
-                            if (data.getString("paymentStatus").equalsIgnoreCase("PENDING")) {
-                                tvPaymentStatus.setText(getString(R.string.no));
-                            } else {
-                                tvPaymentStatus.setText(getString(R.string.yes));
-                            }
-
-                            JSONObject pickupJson = data.getJSONObject("pickUp");
-                            tvOrderStatus.setText(CommonUtils.toCamelCase(data.getString("bookingStatus").toUpperCase().replace("_", " ")));
-                            tvTruckName.setText(data.getJSONObject("truck").getJSONObject("truckType").getString("typeTruckName").toUpperCase());
-                            tvTruckNumber.setText(data.getJSONObject("assignTruck").getString("truckNumber").toUpperCase());
-                            tvPickupTruckerName.setText(pickupJson.getString("companyName"));
-                            tvPickupName.setText(pickupJson.getString("name"));
-                            tvPickupLocation.setText(pickupJson.getString("address") + ", " +
-                                    pickupJson.getString("city") + ", " +
-                                    pickupJson.getString("state") + " - " +
-                                    pickupJson.getString("zipCode"));
-                            pickUpPhoneNumber = pickupJson.getString("contactNumber");
-                            tvPickupDay.setText(CommonUtils.getDayNameNumberFromUTC(pickupJson.getString("date"))
-                                    + CommonUtils.getDateSuffix(CommonUtils.getDayNumberFromUTC(pickupJson.getString("date")))
-                                    + " " + CommonUtils.getMonthNameFromUTC(pickupJson.getString("date")));
-                            tvPickupTime.setText(pickupJson.getString("time").toUpperCase());
-                            JSONObject dropoffJson = data.getJSONObject("dropOff");
-                            tvDropoffTruckerName.setText(dropoffJson.getString("companyName"));
-                            tvDropoffName.setText(dropoffJson.getString("name"));
-                            tvDropoffLocation.setText(dropoffJson.getString("address") + ", " +
-                                    dropoffJson.getString("city") + ", " +
-                                    dropoffJson.getString("state") + " - " +
-                                    dropoffJson.getString("zipCode"));
-                            dropOffPhoneNumber = dropoffJson.getString("contactNumber");
-                            tvDropoffDay.setText(CommonUtils.getDayNameNumberFromUTC(dropoffJson.getString("date"))
-                                    + CommonUtils.getDateSuffix(CommonUtils.getDayNumberFromUTC(dropoffJson.getString("date")))
-                                    + " " + CommonUtils.getMonthNameFromUTC(dropoffJson.getString("date")));
-
-
-                            tvDropoffTime.setText(dropoffJson.getString("time").toUpperCase());
-                            tvPaymentMethod.setText(data.getString("paymentMode").toUpperCase());
-                            tvTotalAmount.setText(getString(R.string.indian_rupee_symbol) + " " + data.getJSONObject("bid").getString("acceptPrice"));
-                            if (data.getString("paymentStatus").equalsIgnoreCase("Pending")
-                                    && data.getString("paymentMode").equalsIgnoreCase("Cash"))
-                                findViewById(R.id.btnCollectCash).setVisibility(View.VISIBLE);
-                            listDataChild = new HashMap<String, List<ExpandableChildItem>>();
-
-                            // Adding child data
-                            ArrayList<ExpandableChildItem> cargoDetails = new ArrayList<ExpandableChildItem>();
-                            cargoDetails.add(new ExpandableChildItem(getString(R.string.type_of_cargo), CommonUtils.toCamelCase(data.getJSONObject("cargo").getJSONObject("cargoType").getString("typeCargoName"))));
-                            cargoDetails.add(new ExpandableChildItem(getString(R.string.weight), data.getJSONObject("cargo").getString("weight") + " Ton"));
-
-                            ArrayList<ExpandableChildItem> documents = new ArrayList<ExpandableChildItem>();
-                            if (jsonObject.getJSONObject("data").has("doc")) {
-                                JSONObject docJson = data.getJSONObject("doc");
-                                documents.add(new ExpandableChildItem(getString(R.string.pod), docJson.has("pod") ? docJson.getString("pod") : null));
-                                documents.add(new ExpandableChildItem(getString(R.string.invoice), docJson.has("invoice") ? docJson.getString("invoice") : null));
-                                documents.add(new ExpandableChildItem(getString(R.string.consignment), docJson.has("consigmentNote") ? docJson.getString("consigmentNote") : null));
-                            } else {
-                                documents.add(new ExpandableChildItem(getString(R.string.pod), null));
-                                documents.add(new ExpandableChildItem(getString(R.string.invoice), null));
-                                documents.add(new ExpandableChildItem(getString(R.string.consignment), null));
-                            }
-
-
-                            ArrayList<ExpandableChildItem> checklist = new ArrayList<ExpandableChildItem>();
-                            checklist.add(new ExpandableChildItem("Checklist 1", "Driving License"));
-                            checklist.add(new ExpandableChildItem("Checklist 2", "PAN"));
-                            checklist.add(new ExpandableChildItem("Checklist 3", "SIN"));
-
-                            ArrayList<ExpandableChildItem> notes = new ArrayList<ExpandableChildItem>();
-                            notes.add(new ExpandableChildItem(data.getString("jobNote"), ""));
-
-                            ArrayList<ExpandableChildItem> myNotes = new ArrayList<ExpandableChildItem>();
-                            if (data.has("truckerNote") && !data.isNull("truckerNote")) {
-
-                                myNotes.add(new ExpandableChildItem(data.getString("truckerNote"), ""));
-                            } else {
-                                myNotes.add(new ExpandableChildItem("", ""));
-                            }
-
-                            listDataChild.put(listDataHeader.get(0), cargoDetails); // Header, Child data
-                            listDataChild.put(listDataHeader.get(1), documents);
-                            listDataChild.put(listDataHeader.get(2), checklist);
-                            listDataChild.put(listDataHeader.get(3), notes);
-                            listDataChild.put(listDataHeader.get(4), myNotes);
-                            listAdapter = new ExpandableListAdapter(BookingDetailsActivity.this, bookingId, listDataHeader, listDataChild);
-                            expListView.setAdapter(listAdapter);
-                            setListViewHeight(expListView);  //CommonUtils.setListViewHeightBasedOnChildren(expListView);
-                            final ScrollView scrollview = (ScrollView) findViewById(R.id.scrollView);
-                            expListView.setOnChildClickListener(BookingDetailsActivity.this);
-                            scrollview.post(new Runnable() {
-                                public void run() {
-                                    scrollview.scrollTo(0, 0);
+                        if(getApplicationContext()!=null) {
+                            findViewById(R.id.scrollView).setVisibility(View.VISIBLE);
+                            try {
+                                JSONObject jsonObject = new JSONObject(serverResponse);
+                                JSONObject data = jsonObject.getJSONObject("data");
+                                tvCrnNumber.setText(getString(R.string.crn) + " - " + data.getString("crn").toUpperCase());
+                                orderStatusLayout.setBackgroundColor(statusBarColor(data.getString("bookingStatus").toUpperCase()));
+                                btnStatus.setText(textOnButton(data.getString("bookingStatus").toUpperCase()));
+                                if (data.getString("paymentStatus").equalsIgnoreCase("PENDING")) {
+                                    tvPaymentStatus.setText(getString(R.string.no));
+                                } else {
+                                    tvPaymentStatus.setText(getString(R.string.yes));
                                 }
-                            });
+
+                                JSONObject pickupJson = data.getJSONObject("pickUp");
+                                tvOrderStatus.setText(CommonUtils.toCamelCase(data.getString("bookingStatus").toUpperCase().replace("_", " ")));
+                                tvTruckName.setText(data.getJSONObject("truck").getJSONObject("truckType").getString("typeTruckName").toUpperCase());
+                                tvTruckNumber.setText(data.getJSONObject("assignTruck").getString("truckNumber").toUpperCase());
+                                tvPickupTruckerName.setText(pickupJson.getString("companyName"));
+                                tvPickupName.setText(pickupJson.getString("name"));
+                                tvPickupLocation.setText(pickupJson.getString("address") + ", " +
+                                        pickupJson.getString("city") + ", " +
+                                        pickupJson.getString("state") + " - " +
+                                        pickupJson.getString("zipCode"));
+                                pickUpPhoneNumber = pickupJson.getString("contactNumber");
+                                tvPickupDay.setText(CommonUtils.getDayNameNumberFromUTC(pickupJson.getString("date"))
+                                        + CommonUtils.getDateSuffix(CommonUtils.getDayNumberFromUTC(pickupJson.getString("date")))
+                                        + " " + CommonUtils.getMonthNameFromUTC(pickupJson.getString("date")));
+                                tvPickupTime.setText(pickupJson.getString("time").toUpperCase());
+                                JSONObject dropoffJson = data.getJSONObject("dropOff");
+                                tvDropoffTruckerName.setText(dropoffJson.getString("companyName"));
+                                tvDropoffName.setText(dropoffJson.getString("name"));
+                                tvDropoffLocation.setText(dropoffJson.getString("address") + ", " +
+                                        dropoffJson.getString("city") + ", " +
+                                        dropoffJson.getString("state") + " - " +
+                                        dropoffJson.getString("zipCode"));
+                                dropOffPhoneNumber = dropoffJson.getString("contactNumber");
+                                tvDropoffDay.setText(CommonUtils.getDayNameNumberFromUTC(dropoffJson.getString("date"))
+                                        + CommonUtils.getDateSuffix(CommonUtils.getDayNumberFromUTC(dropoffJson.getString("date")))
+                                        + " " + CommonUtils.getMonthNameFromUTC(dropoffJson.getString("date")));
 
 
-                        } catch (Exception e) {
-                            e.printStackTrace();
+                                tvDropoffTime.setText(dropoffJson.getString("time").toUpperCase());
+                                tvPaymentMethod.setText(data.getString("paymentMode").toUpperCase());
+                                tvTotalAmount.setText(getString(R.string.indian_rupee_symbol) + " " + data.getJSONObject("bid").getString("acceptPrice"));
+                                if (data.getString("paymentStatus").equalsIgnoreCase("Pending")
+                                        && data.getString("paymentMode").equalsIgnoreCase("Cash"))
+                                    findViewById(R.id.btnCollectCash).setVisibility(View.VISIBLE);
+                                listDataChild = new HashMap<String, List<ExpandableChildItem>>();
+
+                                // Adding child data
+                                ArrayList<ExpandableChildItem> cargoDetails = new ArrayList<ExpandableChildItem>();
+                                cargoDetails.add(new ExpandableChildItem(getString(R.string.type_of_cargo), CommonUtils.toCamelCase(data.getJSONObject("cargo").getJSONObject("cargoType").getString("typeCargoName"))));
+                                cargoDetails.add(new ExpandableChildItem(getString(R.string.weight), data.getJSONObject("cargo").getString("weight") + " Ton"));
+
+                                ArrayList<ExpandableChildItem> documents = new ArrayList<ExpandableChildItem>();
+                                if (jsonObject.getJSONObject("data").has("doc")) {
+                                    JSONObject docJson = data.getJSONObject("doc");
+                                    documents.add(new ExpandableChildItem(getString(R.string.pod), docJson.has("pod") ? docJson.getString("pod") : null));
+                                    documents.add(new ExpandableChildItem(getString(R.string.invoice), docJson.has("invoice") ? docJson.getString("invoice") : null));
+                                    documents.add(new ExpandableChildItem(getString(R.string.consignment), docJson.has("consigmentNote") ? docJson.getString("consigmentNote") : null));
+                                } else {
+                                    documents.add(new ExpandableChildItem(getString(R.string.pod), null));
+                                    documents.add(new ExpandableChildItem(getString(R.string.invoice), null));
+                                    documents.add(new ExpandableChildItem(getString(R.string.consignment), null));
+                                }
+
+
+                                ArrayList<ExpandableChildItem> checklist = new ArrayList<ExpandableChildItem>();
+                                checklist.add(new ExpandableChildItem("Checklist 1", "Driving License"));
+                                checklist.add(new ExpandableChildItem("Checklist 2", "PAN"));
+                                checklist.add(new ExpandableChildItem("Checklist 3", "SIN"));
+
+                                ArrayList<ExpandableChildItem> notes = new ArrayList<ExpandableChildItem>();
+                                notes.add(new ExpandableChildItem(data.getString("jobNote"), ""));
+
+                                ArrayList<ExpandableChildItem> myNotes = new ArrayList<ExpandableChildItem>();
+                                if (data.has("truckerNote") && !data.isNull("truckerNote")) {
+
+                                    myNotes.add(new ExpandableChildItem(data.getString("truckerNote"), ""));
+                                } else {
+                                    myNotes.add(new ExpandableChildItem("", ""));
+                                }
+
+                                listDataChild.put(listDataHeader.get(0), cargoDetails); // Header, Child data
+                                listDataChild.put(listDataHeader.get(1), documents);
+                                listDataChild.put(listDataHeader.get(2), checklist);
+                                listDataChild.put(listDataHeader.get(3), notes);
+                                listDataChild.put(listDataHeader.get(4), myNotes);
+                                listAdapter = new ExpandableListAdapter(BookingDetailsActivity.this, bookingId, listDataHeader, listDataChild);
+                                expListView.setAdapter(listAdapter);
+                                setListViewHeight(expListView);  //CommonUtils.setListViewHeightBasedOnChildren(expListView);
+                                final ScrollView scrollview = (ScrollView) findViewById(R.id.scrollView);
+                                expListView.setOnChildClickListener(BookingDetailsActivity.this);
+                                scrollview.post(new Runnable() {
+                                    public void run() {
+                                        scrollview.scrollTo(0, 0);
+                                    }
+                                });
+
+
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                                CommonUtils.dismissLoadingDialog();
+                            }
+
+
                             CommonUtils.dismissLoadingDialog();
                         }
-
-
-                        CommonUtils.dismissLoadingDialog();
                     }
 
                     @Override
                     public void failure(RetrofitError retrofitError) {
-                        if (((RetrofitError) retrofitError).getKind() == RetrofitError.Kind.NETWORK) {
-                            MaterialDesignAnimations.fadeIn(getApplicationContext(), findViewById(R.id.errorLayout), getResources().getString(R.string.internetConnectionError), 0);
-                            findViewById(R.id.scrollView).setVisibility(View.GONE);
-                            findViewById(R.id.retry_button).setVisibility(View.VISIBLE);
-                            CommonUtils.dismissLoadingDialog();
-                        } else {
-                            int statusCode = retrofitError.getResponse().getStatus();
-                            if (ApiResponseFlags.Not_Found.getOrdinal() == statusCode) {
-                                finish();
-                            } else {
+                        if (getApplicationContext() != null) {
+                            if (((RetrofitError) retrofitError).getKind() == RetrofitError.Kind.NETWORK) {
+                                MaterialDesignAnimations.fadeIn(getApplicationContext(), findViewById(R.id.errorLayout), getResources().getString(R.string.internetConnectionError), 0);
+                                findViewById(R.id.scrollView).setVisibility(View.GONE);
+                                findViewById(R.id.retry_button).setVisibility(View.VISIBLE);
                                 CommonUtils.dismissLoadingDialog();
-                                CommonUtils.showRetrofitError(BookingDetailsActivity.this, retrofitError);
+                            } else {
+                                int statusCode = retrofitError.getResponse().getStatus();
+                                if (ApiResponseFlags.Not_Found.getOrdinal() == statusCode) {
+                                    finish();
+                                } else {
+                                    CommonUtils.dismissLoadingDialog();
+                                    CommonUtils.showRetrofitError(BookingDetailsActivity.this, retrofitError);
+                                }
                             }
                         }
                     }
@@ -522,6 +543,25 @@ public class BookingDetailsActivity extends BaseActivity implements View.OnClick
     @Override
     public void startActivityResult(Intent intent, int requestCode, int resultCode) {
         startActivityForResult(intent, requestCode);
+    }
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        switch (requestCode) {
+            case REQUEST_CODE_ASK_PERMISSIONS:
+                getOrderDetails();
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                } else {
+
+                    // Permission Denied
+                    Toast.makeText(BookingDetailsActivity.this, "Read permission denied.", Toast.LENGTH_SHORT)
+                            .show();
+                }
+                break;
+            default:
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
     }
 
     @Override

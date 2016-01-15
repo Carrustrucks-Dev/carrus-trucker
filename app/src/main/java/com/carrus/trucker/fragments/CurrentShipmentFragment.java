@@ -145,15 +145,16 @@ public class CurrentShipmentFragment extends android.support.v4.app.Fragment imp
             if (isNetworkEnabled) {
                 if (locationManager != null)
                     location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-            }else {
+            }
+            if(location==null)
                 if (isGPSEnabled) {
                     if (locationManager != null)
                         location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
                 }
-            }
+
 
             if (location!=null) {
-                googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 14));
+                googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 10));
             }
 
             LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mMessageReceiver,
@@ -170,15 +171,15 @@ public class CurrentShipmentFragment extends android.support.v4.app.Fragment imp
             if (isNetworkEnabled) {
                 if (locationManager != null)
                     location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-            }else {
+            }
+            if(location==null)
                 if (isGPSEnabled) {
                     if (locationManager != null)
                         location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
                 }
-            }
 
             if (location!=null) {
-                googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 14));
+                googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 10));
             }
 
             LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mMessageReceiver,
@@ -250,70 +251,75 @@ public class CurrentShipmentFragment extends android.support.v4.app.Fragment imp
         RestClient.getWebServices().getCurrentBooking(sharedPreferences.getString(ACCESS_TOKEN, ""), new Callback<String>() {
             @Override
             public void success(String s, Response response) {
-                try {
-                    JSONObject serverResponse = new JSONObject(s);
-                    JSONObject data = serverResponse.getJSONObject("data");
-                    if (data.isNull("bookingData")) {
-                        noBookingLayout.setVisibility(View.VISIBLE);
-                        googleMap.getUiSettings().setZoomControlsEnabled(false);
-                    } else {
-                        bookingDetailsLayout.setVisibility(View.VISIBLE);
+                if(getActivity()!=null) {
+                    try {
+                        JSONObject serverResponse = new JSONObject(s);
+                        JSONObject data = serverResponse.getJSONObject("data");
+                        if (data.isNull("bookingData")) {
+                            noBookingLayout.setVisibility(View.VISIBLE);
+                            googleMap.getUiSettings().setZoomControlsEnabled(false);
+                        } else {
+                            bookingDetailsLayout.setVisibility(View.VISIBLE);
 
-                        JSONObject bookingData = data.getJSONObject("bookingData");
-                        bookingId = bookingData.getString("_id");
+                            JSONObject bookingData = data.getJSONObject("bookingData");
+                            bookingId = bookingData.getString("_id");
 
-                        tvDate.setText(CommonUtils.getDateFromUTC(bookingData.getJSONObject("pickUp").getString("date")));
-                        tvMonth.setText(CommonUtils.getShortMonthNameFromUTC(bookingData.getJSONObject("pickUp").getString("date")));
-                        tvTimeSlot.setText(CommonUtils.getDayNameFromUTC(bookingData.getJSONObject("pickUp").getString("date")) + ", " + bookingData.getJSONObject("pickUp").getString("time"));
-                        tvTruckName.setText(bookingData.getJSONObject("truck").getJSONObject("truckType").getString("typeTruckName")
-                                + " " + bookingData.getJSONObject("assignTruck").getString("truckNumber"));
+                            tvDate.setText(CommonUtils.getDateFromUTC(bookingData.getJSONObject("pickUp").getString("date")));
+                            tvMonth.setText(CommonUtils.getShortMonthNameFromUTC(bookingData.getJSONObject("pickUp").getString("date")));
+                            tvTimeSlot.setText(CommonUtils.getDayNameFromUTC(bookingData.getJSONObject("pickUp").getString("date")) + ", " + bookingData.getJSONObject("pickUp").getString("time"));
+                            tvTruckName.setText(bookingData.getJSONObject("truck").getJSONObject("truckType").getString("typeTruckName")
+                                    + " " + bookingData.getJSONObject("assignTruck").getString("truckNumber"));
 
-                        tvShipingJourney.setText(CommonUtils.toCamelCase(bookingData.getJSONObject("pickUp").getString("city")) + " to " +
-                                CommonUtils.toCamelCase(bookingData.getJSONObject("dropOff").getString("city")));
-                        tvName.setText(CommonUtils.toCamelCase(bookingData.getJSONObject("shipper").getString("firstName") + " " +
-                                bookingData.getJSONObject("shipper").getString("lastName")));
-                        tvBookingStatus.setText(CommonUtils.toCamelCase(bookingData.getString("bookingStatus").replace("_", " ")));
+                            tvShipingJourney.setText(CommonUtils.toCamelCase(bookingData.getJSONObject("pickUp").getString("city")) + " to " +
+                                    CommonUtils.toCamelCase(bookingData.getJSONObject("dropOff").getString("city")));
+                            tvName.setText(CommonUtils.toCamelCase(bookingData.getJSONObject("shipper").getString("firstName") + " " +
+                                    bookingData.getJSONObject("shipper").getString("lastName")));
+                            tvBookingStatus.setText(CommonUtils.toCamelCase(bookingData.getString("bookingStatus").replace("_", " ")));
 
-                        shipperNumber = bookingData.getJSONObject("shipper").getString("phoneNumber");
-                        name[0] = bookingData.getJSONObject("pickUp").getString("companyName");
-                        name[1] = bookingData.getJSONObject("dropOff").getString("companyName");
-                        address[0] = bookingData.getJSONObject("pickUp").getString("address") + ", " +
-                                bookingData.getJSONObject("pickUp").getString("city") + ", " +
-                                bookingData.getJSONObject("pickUp").getString("state");
+                            shipperNumber = bookingData.getJSONObject("shipper").getString("phoneNumber");
+                            name[0] = bookingData.getJSONObject("pickUp").getString("companyName");
+                            name[1] = bookingData.getJSONObject("dropOff").getString("companyName");
+                            address[0] = bookingData.getJSONObject("pickUp").getString("address") + ", " +
+                                    bookingData.getJSONObject("pickUp").getString("city") + ", " +
+                                    bookingData.getJSONObject("pickUp").getString("state");
 
-                        address[1] = bookingData.getJSONObject("dropOff").getString("address") + ", " +
-                                bookingData.getJSONObject("dropOff").getString("city") + ", " +
-                                bookingData.getJSONObject("dropOff").getString("state");
+                            address[1] = bookingData.getJSONObject("dropOff").getString("address") + ", " +
+                                    bookingData.getJSONObject("dropOff").getString("city") + ", " +
+                                    bookingData.getJSONObject("dropOff").getString("state");
 
-                        getDriectionToDestination(new LatLng(location.getLatitude(), location.getLongitude()),
-                                bookingData.getJSONObject("pickUp").getJSONObject("coordinates").getString("pickUpLat") + ", " + bookingData.getJSONObject("pickUp").getJSONObject("coordinates").getString("pickUpLong"),
-                                bookingData.getJSONObject("dropOff").getJSONObject("coordinates").getString("dropOffLat") + ", " + bookingData.getJSONObject("dropOff").getJSONObject("coordinates").getString("dropOffLong"),
-                                GMapV2GetRouteDirection.MODE_DRIVING);
+                            if (location != null)
+                                getDriectionToDestination(new LatLng(location.getLatitude(), location.getLongitude()),
+                                        bookingData.getJSONObject("pickUp").getJSONObject("coordinates").getString("pickUpLat") + ", " + bookingData.getJSONObject("pickUp").getJSONObject("coordinates").getString("pickUpLong"),
+                                        bookingData.getJSONObject("dropOff").getJSONObject("coordinates").getString("dropOffLat") + ", " + bookingData.getJSONObject("dropOff").getJSONObject("coordinates").getString("dropOffLong"),
+                                        GMapV2GetRouteDirection.MODE_DRIVING);
 
 
-                        if (bookingData.getString("tracking").equalsIgnoreCase("YES")) {
-                            if (!bookingData.getString("_id").isEmpty()) {
-                                Intent intent = new Intent(getActivity(), MyService.class);
-                                intent.putExtra("bookingId", bookingData.getString("_id"));
-                                getActivity().startService(intent);
+                            if (bookingData.getString("tracking").equalsIgnoreCase("YES")) {
+                                if (!bookingData.getString("_id").isEmpty()) {
+                                    Intent intent = new Intent(getActivity(), MyService.class);
+                                    intent.putExtra("bookingId", bookingData.getString("_id"));
+                                    getActivity().startService(intent);
+                                }
                             }
                         }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        CommonUtils.dismissLoadingDialog();
                     }
-                } catch (JSONException e) {
-                    e.printStackTrace();
+
                     CommonUtils.dismissLoadingDialog();
                 }
-
-                CommonUtils.dismissLoadingDialog();
             }
 
             @Override
             public void failure(RetrofitError error) {
-                CommonUtils.dismissLoadingDialog();
-                if (((RetrofitError) error).getKind() == RetrofitError.Kind.NETWORK) {
-                    showRetryPopup(getActivity().getString(R.string.no_internet_access));
-                } else {
-                    showRetryPopup(getActivity().getString(R.string.some_ereor_ocurred));
+                if(getActivity()!=null) {
+                    CommonUtils.dismissLoadingDialog();
+                    if (((RetrofitError) error).getKind() == RetrofitError.Kind.NETWORK) {
+                        showRetryPopup(getActivity().getString(R.string.no_internet_access));
+                    } else {
+                        showRetryPopup(getActivity().getString(R.string.some_ereor_ocurred));
+                    }
                 }
             }
         });

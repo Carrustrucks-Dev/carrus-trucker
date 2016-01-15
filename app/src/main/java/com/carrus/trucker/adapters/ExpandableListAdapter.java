@@ -1,12 +1,16 @@
 package com.carrus.trucker.adapters;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Matrix;
+import android.os.Build;
+import android.support.v4.app.ActivityCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -57,6 +61,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter implements 
     private String documentName;
     private Map<String, TypedFile> images;
     private ExpandableChildItem expandableChildItem;
+    final private int REQUEST_CODE_ASK_PERMISSIONS = 124;
 
     public ExpandableListAdapter(Context context, String orderId, List<String> listDataHeader,
                                  HashMap<String, List<ExpandableChildItem>> listChildData) {
@@ -215,14 +220,14 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter implements 
             @Override
             public void onClick(DialogInterface dialog, int item) {
                 if (item == 0) {
-                    try {
-                        Intent intent = new Intent();
-                        intent.setType("image/*");
-                        intent.setAction(Intent.ACTION_GET_CONTENT);
-                        resultCallback.startActivityResult(intent, LOAD_IMAGE_RESULTS, 10);
-                    } catch (Exception ex) {
-                        Toast.makeText(_context, _context.getString(R.string.unable_to_perform_action), Toast.LENGTH_LONG).show();
-                    }
+                        try {
+                            Intent intent = new Intent();
+                            intent.setType("image/*");
+                            intent.setAction(Intent.ACTION_GET_CONTENT);
+                            resultCallback.startActivityResult(intent, LOAD_IMAGE_RESULTS, 10);
+                        } catch (Exception ex) {
+                            Toast.makeText(_context, _context.getString(R.string.unable_to_perform_action), Toast.LENGTH_LONG).show();
+                        }
 
                 } else if (item == 1) {
                     Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
@@ -244,7 +249,16 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter implements 
             ExpandableChildItem childItem = (ExpandableChildItem) getChild(groupPosition, childPosition);
             if (childItem.getDetail().equalsIgnoreCase("null")) {
                 documentName = childItem.getName();
-                selectImage();
+                if (Build.VERSION.SDK_INT >= 23) {
+                    if (ActivityCompat.checkSelfPermission(_context, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                        Toast.makeText(_context, "Please grant read permission.", Toast.LENGTH_SHORT)
+                                .show();
+                        return false;
+                    }
+                    selectImage();
+                }else{
+                    selectImage();
+                }
                 Log.e("Document Name", documentName);
             } else {
                 Intent intent = new Intent(_context, ShowImageActivity.class);
@@ -257,6 +271,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter implements 
         }
         return true;
     }
+
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         Matrix mat = new Matrix();
