@@ -76,14 +76,13 @@ public class CommonUtils {
     }
 
 
-    public static void showLoadingDialog(Context context, String msg) {
+    public static void showLoadingDialog(final Activity activity, String msg) {
         dismissLoadingDialog();
 
-        progressDial = new Dialog(context,
+        progressDial = new Dialog(activity,
                 R.style.Theme_AppCompat_Translucent);
         progressDial.setCancelable(false);
         //progressDial.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
-        progressDial.show();
         WindowManager.LayoutParams layoutParams = progressDial.getWindow()
                 .getAttributes();
         progressDial.setContentView(R.layout.loading_box);
@@ -91,6 +90,7 @@ public class CommonUtils {
         progressBar.getIndeterminateDrawable().setColorFilter(0xFF2362C0, android.graphics.PorterDuff.Mode.MULTIPLY);
         @SuppressWarnings("unused")
         TextView dialogTxt = (TextView) progressDial.findViewById(R.id.tv101);
+        progressDial.show();
         //dialogTxt.setText(msg);
 
     }
@@ -139,7 +139,7 @@ public class CommonUtils {
         }
     }*/
     public static void dismissLoadingDialog() {
-        if (progressDial != null) {
+        if (progressDial != null && progressDial.isShowing()) {
             progressDial.dismiss();
             progressDial = null;
         }
