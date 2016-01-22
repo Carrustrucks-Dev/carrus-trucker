@@ -68,7 +68,7 @@
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyA-KOCI0olKYzAgUDAgp_57VxGIyDbgF-4" />
+            android:value="@string/google_api_key" />
 
         <receiver android:name=".receivers.LocationStateReceiver">
             <intent-filter>
