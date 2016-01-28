@@ -18,6 +18,7 @@ import com.carrus.trucker.R;
 import com.carrus.trucker.retrofit.RestClient;
 import com.carrus.trucker.utils.CommonUtils;
 import com.carrus.trucker.utils.Log;
+import com.flurry.android.FlurryAgent;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
@@ -53,7 +54,6 @@ public class ShowImageActivity extends BaseActivity  implements View.OnClickList
         setupUI(getWindow().getDecorView().getRootView());
 
         init();
-        showDocument(url);
 
     }
 
@@ -79,6 +79,8 @@ public class ShowImageActivity extends BaseActivity  implements View.OnClickList
 
         //Initialize variables
         images = new HashMap<String, TypedFile>();
+
+        showDocument(url);
     }
 
     /**
@@ -91,16 +93,16 @@ public class ShowImageActivity extends BaseActivity  implements View.OnClickList
             @Override
             public void onClick(DialogInterface dialog, int item) {
 
-                switch (item){
+                switch (item) {
                     case 0:
                         try {
-                        Intent intent = new Intent();
-                        intent.setType("image/*");
-                        intent.setAction(Intent.ACTION_GET_CONTENT);
-                        startActivityForResult(intent, LOAD_IMAGE_RESULTS);
-                    } catch (Exception ex) {
-                        Toast.makeText(ShowImageActivity.this, getResources().getString(R.string.unable_to_perform_action), Toast.LENGTH_LONG).show();
-                    }
+                            Intent intent = new Intent();
+                            intent.setType("image/*");
+                            intent.setAction(Intent.ACTION_GET_CONTENT);
+                            startActivityForResult(intent, LOAD_IMAGE_RESULTS);
+                        } catch (Exception ex) {
+                            Toast.makeText(ShowImageActivity.this, getResources().getString(R.string.unable_to_perform_action), Toast.LENGTH_LONG).show();
+                        }
                         break;
                     case 1:
                         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
@@ -194,6 +196,7 @@ public class ShowImageActivity extends BaseActivity  implements View.OnClickList
             @Override
             public void success(String s, Response response) {
                 try {
+                    FlurryAgent.onEvent("Upload document mode");
                     JSONObject jsonObject = new JSONObject(s);
                     CommonUtils.dismissLoadingDialog();
                     CommonUtils.showSingleButtonPopup(ShowImageActivity.this, jsonObject.getString("message"));
@@ -240,5 +243,17 @@ public class ShowImageActivity extends BaseActivity  implements View.OnClickList
                 selectImage();
                 break;
         }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        FlurryAgent.onStartSession(this, MY_FLURRY_APIKEY);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        FlurryAgent.onEndSession(this);
     }
 }

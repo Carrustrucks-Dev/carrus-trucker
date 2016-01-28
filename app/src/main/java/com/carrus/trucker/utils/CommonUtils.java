@@ -139,9 +139,13 @@ public class CommonUtils {
         }
     }*/
     public static void dismissLoadingDialog() {
-        if (progressDial != null && progressDial.isShowing()) {
-            progressDial.dismiss();
-            progressDial = null;
+        try {
+            if (progressDial != null && progressDial.isShowing()) {
+                progressDial.dismiss();
+                progressDial = null;
+            }
+        }catch (Exception e){
+            e.printStackTrace();
         }
 
        /* if (dialog != null) {

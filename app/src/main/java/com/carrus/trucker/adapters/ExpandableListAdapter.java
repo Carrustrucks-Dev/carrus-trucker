@@ -30,6 +30,7 @@ import com.carrus.trucker.retrofit.RestClient;
 import com.carrus.trucker.utils.CommonUtils;
 import com.carrus.trucker.utils.Log;
 import com.carrus.trucker.utils.MaterialDesignAnimations;
+import com.flurry.android.FlurryAgent;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -141,6 +142,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter implements 
                             RestClient.getWebServices().addNotes(sharedPreferences.getString(ACCESS_TOKEN, ""), orderId, myNotes.getText().toString().trim(), new Callback<String>() {
                                 @Override
                                 public void success(String s, Response response) {
+                                    FlurryAgent.onEvent("Add notes mode");
                                     expandableChildItem.setName(myNotesData);
                                     CommonUtils.dismissLoadingDialog();
                                     MaterialDesignAnimations.fadeIn(_context, ((Activity) _context).findViewById(R.id.errorLayout), _context.getString(R.string.saved_successfully), 1);
@@ -408,6 +410,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter implements 
             @Override
             public void success(String s, Response response) {
                 try {
+                    FlurryAgent.onEvent("Upload document mode");
                     JSONObject jsonObject = new JSONObject(s);
                     CommonUtils.dismissLoadingDialog();
                     MaterialDesignAnimations.fadeIn(_context, ((Activity) _context).findViewById(R.id.errorLayout), jsonObject.getString("message"), 1);

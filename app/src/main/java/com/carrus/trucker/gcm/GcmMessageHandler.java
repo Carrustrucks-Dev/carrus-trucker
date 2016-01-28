@@ -39,15 +39,16 @@ public class GcmMessageHandler extends IntentService implements AppConstants {
         Bundle extras = intent.getExtras();
         GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(this);
         String messageType = gcm.getMessageType(intent);
-        Log.v("extras value", "--->" + extras.toString());
-        try {
-            JSONObject mJSONObject = new JSONObject(extras.getString("flag"));
-            sendNotification(extras.getString("message"), mJSONObject.getString("bookingId"), extras.getString("brand_name"));
-        } catch (Exception e) {
-            sendNotification("", "", "");
+        if(extras!=null) {
+            try {
+                JSONObject mJSONObject = new JSONObject(extras.getString("flag"));
+                sendNotification(extras.getString("message"), mJSONObject.getString("bookingId"), extras.getString("brand_name"));
+            } catch (Exception e) {
+                sendNotification("", "", "");
+            }
+            Log.i("GCM", "Received : (" + messageType + ")  " + extras.toString());
+            GcmBroadcastReceiver.completeWakefulIntent(intent);
         }
-        Log.i("GCM", "Received : (" + messageType + ")  " + extras.toString());
-        GcmBroadcastReceiver.completeWakefulIntent(intent);
     }
 
     private void sendNotification(String msg, String bookingId, String brandName) {

@@ -2,11 +2,11 @@
     <string name="app_name">Carrus Driver</string>
 
     <!--Debuge Key Google Map-->
-    <!--<string name="google_api_key">AIzaSyA-KOCI0olKYzAgUDAgp_57VxGIyDbgF-4</string>-->
+    <string name="google_api_key">AIzaSyA-KOCI0olKYzAgUDAgp_57VxGIyDbgF-4</string>
 
 
     <!--Released Key Google Map-->
-    <string name="google_api_key">AIzaSyCHLcN4FVT29tkXZcOSfNRL9C9CKar6d_g</string>
+  <!--  <string name="google_api_key">AIzaSyCHLcN4FVT29tkXZcOSfNRL9C9CKar6d_g</string>-->
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_login">LoginActivity</string>

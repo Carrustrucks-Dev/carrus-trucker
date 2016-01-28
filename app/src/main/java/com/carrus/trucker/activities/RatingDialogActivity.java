@@ -1,18 +1,20 @@
 package com.carrus.trucker.activities;
 
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.v4.graphics.drawable.DrawableCompat;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RatingBar;
-import android.widget.Toast;
 
 import com.carrus.trucker.R;
 import com.carrus.trucker.retrofit.RestClient;
-import com.carrus.trucker.utils.ApiResponseFlags;
 import com.carrus.trucker.utils.CommonUtils;
 import com.carrus.trucker.utils.MaterialDesignAnimations;
+import com.flurry.android.FlurryAgent;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -20,7 +22,6 @@ import org.json.JSONObject;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
-import retrofit.mime.TypedByteArray;
 
 public class RatingDialogActivity extends BaseActivity implements View.OnClickListener {
 
@@ -76,6 +77,7 @@ public class RatingDialogActivity extends BaseActivity implements View.OnClickLi
         RestClient.getWebServices().addRating(accessToken, bookingId, String.valueOf(ratingBar.getRating()), etComment.getText().toString(), new Callback<String>() {
             @Override
             public void success(String s, Response response) {
+                FlurryAgent.onEvent("Shipper Rating mode");
                 CommonUtils.dismissLoadingDialog();
                 try {
                     setMessage(true, new JSONObject(s).getString("message"));
@@ -87,7 +89,7 @@ public class RatingDialogActivity extends BaseActivity implements View.OnClickLi
             @Override
             public void failure(RetrofitError retrofitError) {
                 CommonUtils.dismissLoadingDialog();
-                CommonUtils.showRetrofitError(RatingDialogActivity.this,retrofitError);
+                CommonUtils.showRetrofitError(RatingDialogActivity.this, retrofitError);
             }
         });
     }
@@ -115,5 +117,17 @@ public class RatingDialogActivity extends BaseActivity implements View.OnClickLi
             return false;
         }
         return true;
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        FlurryAgent.onStartSession(this, MY_FLURRY_APIKEY);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        FlurryAgent.onEndSession(this);
     }
 }

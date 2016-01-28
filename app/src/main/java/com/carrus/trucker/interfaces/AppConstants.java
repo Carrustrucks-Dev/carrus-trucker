@@ -4,6 +4,7 @@ package com.carrus.trucker.interfaces;
  * Created by Saurbhv on 10/21/15.
  */
 public interface AppConstants {
+    String MY_FLURRY_APIKEY = "J478Z6RPB988BQFHB3QG";
     String YOUR_DEFAULT_FONT_PATH = "fonts/Helvetica/Helvetica.ttf";
     String DEVICE_TYPE = "ANDROID";
     String DEVICE_NAME = android.os.Build.MODEL;

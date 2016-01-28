@@ -16,7 +16,7 @@ public class RestClient {
     public static WebServices getWebServices() {
         if (webServices == null) {
             webServices = new RestAdapter.Builder()
-                    .setEndpoint(Config.getBaseURL()).setConverter(new StringConverter()).setLogLevel(RestAdapter.LogLevel.NONE).build().create(WebServices.class);
+                    .setEndpoint(Config.getBaseURL()).setConverter(new StringConverter()).setLogLevel(RestAdapter.LogLevel.FULL).build().create(WebServices.class);
 
         }
         return webServices;

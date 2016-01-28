@@ -23,6 +23,7 @@ import com.carrus.trucker.utils.MaterialDesignAnimations;
 import com.carrus.trucker.utils.MyApiCalls;
 import com.carrus.trucker.utils.Prefs;
 import com.carrus.trucker.utils.Transactions;
+import com.flurry.android.FlurryAgent;
 import com.google.gson.Gson;
 
 import org.json.JSONException;
@@ -191,6 +192,7 @@ public class SplashScreenActivity extends BaseActivity implements View.OnClickLi
                         @Override
                         public void success(String serverResponse, Response response) {
                             try {
+                                FlurryAgent.onEvent("Session verify mode");
                                 final JSONObject data = new JSONObject(new JSONObject(serverResponse).getString("data"));
                                 PackageManager manager = SplashScreenActivity.this.getPackageManager();
                                 final PackageInfo info = manager.getPackageInfo(SplashScreenActivity.this.getPackageName(), 0);
@@ -331,5 +333,17 @@ public class SplashScreenActivity extends BaseActivity implements View.OnClickLi
         alertDialog = new AlertDialog.Builder(SplashScreenActivity.this);
         alertDialog.setCancelable(false);
         alertDialog.setTitle(getString(R.string.update_app_title));
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        FlurryAgent.onStartSession(this, MY_FLURRY_APIKEY);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        FlurryAgent.onEndSession(this);
     }
 }

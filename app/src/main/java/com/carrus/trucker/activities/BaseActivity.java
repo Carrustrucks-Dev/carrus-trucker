@@ -123,10 +123,8 @@ public class BaseActivity extends FragmentActivity implements GPSDailogCallBack,
         }
     }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-    }
+
+
 
     @Override
     protected void onDestroy() {

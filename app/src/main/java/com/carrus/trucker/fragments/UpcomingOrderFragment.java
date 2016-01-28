@@ -23,6 +23,7 @@ import com.carrus.trucker.utils.CommonUtils;
 import com.carrus.trucker.utils.InternetConnectionStatus;
 import com.carrus.trucker.utils.MaterialDesignAnimations;
 import com.carrus.trucker.utils.Prefs;
+import com.flurry.android.FlurryAgent;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -123,6 +124,7 @@ public class UpcomingOrderFragment extends android.support.v4.app.Fragment imple
             public void success(String serverResponse, Response response) {
                 if (getActivity() != null) {
                     try {
+                        FlurryAgent.onEvent("Upcoming order mode");
                         JSONObject mObject = new JSONObject(serverResponse);
                         int status = mObject.getInt("statusCode");
                         if (ApiResponseFlags.OK.getOrdinal() == status) {

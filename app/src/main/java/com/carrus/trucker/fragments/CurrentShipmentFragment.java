@@ -35,6 +35,7 @@ import com.carrus.trucker.utils.GMapV2GetRouteDirection;
 import com.carrus.trucker.utils.GPSTracker;
 import com.carrus.trucker.utils.Log;
 import com.carrus.trucker.utils.Transactions;
+import com.flurry.android.FlurryAgent;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -102,15 +103,6 @@ public class CurrentShipmentFragment extends android.support.v4.app.Fragment imp
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_current_shipment, container, false);
 
-        googleMap = ((SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map)).getMap();
-        googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-        googleMap.getUiSettings().setZoomGesturesEnabled(true);
-        googleMap.getUiSettings().setZoomControlsEnabled(true);
-        googleMap.getUiSettings().setTiltGesturesEnabled(false);
-        googleMap.getUiSettings().setMyLocationButtonEnabled(true);
-        sharedPreferences = getActivity().getSharedPreferences(SHARED_PREFERENCES, Context.MODE_PRIVATE);
-        v2GetRouteDirection = new GMapV2GetRouteDirection();
-
         noBookingLayout = (RelativeLayout) v.findViewById(R.id.noBookingLayout);
         bookingDetailsLayout = (RelativeLayout) v.findViewById(R.id.bookingDetailsLayout);
         tvName = (TextView) v.findViewById(R.id.name);
@@ -124,7 +116,21 @@ public class CurrentShipmentFragment extends android.support.v4.app.Fragment imp
 
         callShipper.setOnClickListener(this);
         v.findViewById(R.id.bookingDetailsLayout).setOnClickListener(this);
-        checkLocationPermissionNSetLocation();
+
+
+        googleMap = ((SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map)).getMap();
+        if(googleMap!=null) {
+            googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+            googleMap.getUiSettings().setZoomGesturesEnabled(true);
+            googleMap.getUiSettings().setZoomControlsEnabled(true);
+            googleMap.getUiSettings().setTiltGesturesEnabled(false);
+            googleMap.getUiSettings().setMyLocationButtonEnabled(true);
+            sharedPreferences = getActivity().getSharedPreferences(SHARED_PREFERENCES, Context.MODE_PRIVATE);
+            v2GetRouteDirection = new GMapV2GetRouteDirection();
+            checkLocationPermissionNSetLocation();
+        }else{
+            Toast.makeText(getActivity(),"Unable to load google map.",Toast.LENGTH_LONG).show();
+        }
         return v;
     }
 
@@ -253,6 +259,7 @@ public class CurrentShipmentFragment extends android.support.v4.app.Fragment imp
             public void success(String s, Response response) {
                 if(getActivity()!=null) {
                     try {
+                        FlurryAgent.onEvent("Current Booking mode");
                         JSONObject serverResponse = new JSONObject(s);
                         JSONObject data = serverResponse.getJSONObject("data");
                         if (data.isNull("bookingData")) {

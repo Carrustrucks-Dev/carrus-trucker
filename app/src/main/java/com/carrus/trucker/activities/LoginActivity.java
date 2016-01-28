@@ -24,6 +24,7 @@ import com.carrus.trucker.utils.MaterialDesignAnimations;
 import com.carrus.trucker.utils.MyApiCalls;
 import com.carrus.trucker.utils.Prefs;
 import com.carrus.trucker.utils.Transactions;
+import com.flurry.android.FlurryAgent;
 import com.google.gson.Gson;
 
 import org.json.JSONException;
@@ -153,6 +154,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                 new Callback<String>() {
                     @Override
                     public void success(String serverResponse, Response response) {
+                        FlurryAgent.onEvent("OTP mode");
                         if (!isResendOtp) {
                             flipper.setInAnimation(slideLeftIn);
                             flipper.setOutAnimation(slideLeftOut);
@@ -190,6 +192,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                     @Override
                     public void success(String serverResponse, Response response) {
                         try {
+                            FlurryAgent.onEvent("OTP verify mode");
                             JSONObject data = new JSONObject(new JSONObject(serverResponse).getString("data"));
                             Toast.makeText(getApplicationContext(), new JSONObject(serverResponse).getString("message"), Toast.LENGTH_SHORT).show();
                             Gson gson = new Gson();
@@ -270,5 +273,17 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                 sendDriverId();
                 break;
         }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        FlurryAgent.onStartSession(this, MY_FLURRY_APIKEY);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        FlurryAgent.onEndSession(this);
     }
 }

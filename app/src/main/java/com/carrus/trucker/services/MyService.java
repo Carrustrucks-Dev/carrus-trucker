@@ -41,7 +41,7 @@ public class MyService extends Service implements AppConstants, LocationListener
 
     @Override
     public IBinder onBind(Intent arg0) {
-        context=this;
+        context = this;
         return null;
     }
 
@@ -53,7 +53,7 @@ public class MyService extends Service implements AppConstants, LocationListener
         isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
         isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
         Log.d(TAG, "onCreate");
-        context=this;
+        context = this;
         mythread = new MyThread();
     }
 
@@ -126,61 +126,60 @@ public class MyService extends Service implements AppConstants, LocationListener
                         mythread.interrupt();
                         return;
                     }
+                }
 
-                    if (!isGPSEnabled && !isNetworkEnabled) {
+                if (!isGPSEnabled && !isNetworkEnabled) {
 
-                    } else {
-                        if (isNetworkEnabled) {
-                            if (locationManager != null) {
-                                location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-                            }
-                        } else if (isGPSEnabled) {
+                } else {
+                    if (isNetworkEnabled) {
+                        if (locationManager != null) {
+                            location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+                        }
+                    } else if (isGPSEnabled) {
 
-                            if (locationManager != null) {
-                                location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-                            }
+                        if (locationManager != null) {
+                            location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
                         }
                     }
+                }
 
-                    if (location != null) {
-                        RestClient.getWebServices().sendTracking(orderId,
-                                sharedPreferences.getString(DRIVER_NO, ""),
-                                String.valueOf(location.getLongitude()),
-                                String.valueOf(location.getLatitude()), new Callback<String>() {
-                                    @Override
-                                    public void success(String s, Response response) {
+                if (location != null) {
+                    RestClient.getWebServices().sendTracking(orderId,
+                            sharedPreferences.getString(DRIVER_NO, ""),
+                            String.valueOf(location.getLongitude()),
+                            String.valueOf(location.getLatitude()), new Callback<String>() {
+                                @Override
+                                public void success(String s, Response response) {
 
-                                        try {
-                                            JSONObject jsonObject = new JSONObject(s);
+                                    try {
+                                        JSONObject jsonObject = new JSONObject(s);
 
-                                            Intent i = new Intent("custom-event-name");
-                                            i.putExtra("bookingStatus", jsonObject.getJSONObject("data").getString("bookingStatus"));
-                                            i.putExtra("longitude", location.getLongitude());
-                                            i.putExtra("latitude", location.getLatitude());
-                                            LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(i);
-                                            Log.d("Tracking Success", s);
-                                        } catch (JSONException e) {
-                                            e.printStackTrace();
-                                        }
+                                        Intent i = new Intent("custom-event-name");
+                                        i.putExtra("bookingStatus", jsonObject.getJSONObject("data").getString("bookingStatus"));
+                                        i.putExtra("longitude", location.getLongitude());
+                                        i.putExtra("latitude", location.getLatitude());
+                                        LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(i);
+                                        Log.d("Tracking Success", s);
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
                                     }
+                                }
 
-                                    @Override
-                                    public void failure(RetrofitError error) {
-                                        Log.d("Tracking Failed", "" + error);
-                                    }
-                                });
-                    }
-                    try {
-                        readWebPage();
-                        Thread.sleep(DELAY);
-                    } catch (InterruptedException e) {
-                        isRunning = false;
-                        e.printStackTrace();
-                    }
+                                @Override
+                                public void failure(RetrofitError error) {
+                                    Log.d("Tracking Failed", "" + error);
+                                }
+                            });
+                }
+                try {
+                    readWebPage();
+                    Thread.sleep(DELAY);
+                } catch (InterruptedException e) {
+                    isRunning = false;
+                    e.printStackTrace();
                 }
             }
-
         }
-    }
 
+    }
 }

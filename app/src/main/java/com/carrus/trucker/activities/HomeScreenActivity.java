@@ -32,6 +32,7 @@ import com.carrus.trucker.utils.CommonUtils;
 import com.carrus.trucker.utils.InternetConnectionStatus;
 import com.carrus.trucker.utils.Prefs;
 import com.carrus.trucker.utils.Transactions;
+import com.flurry.android.FlurryAgent;
 import com.squareup.picasso.MemoryPolicy;
 import com.squareup.picasso.Picasso;
 
@@ -199,6 +200,7 @@ public class HomeScreenActivity extends BaseActivity implements View.OnClickList
                     new Callback<String>() {
                         @Override
                         public void success(String serverResponse, Response response) {
+                            FlurryAgent.onEvent("Logout mode");
                             try {
                                 JSONObject jsonObject = new JSONObject(serverResponse);
                                 Toast.makeText(getApplicationContext(), jsonObject.getString("message"), Toast.LENGTH_SHORT).show();
@@ -375,5 +377,17 @@ public class HomeScreenActivity extends BaseActivity implements View.OnClickList
     private void createDialog() {
         alertDialog = new AlertDialog.Builder(HomeScreenActivity.this);
         alertDialog.setCancelable(false);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        FlurryAgent.onStartSession(this, MY_FLURRY_APIKEY);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        FlurryAgent.onEndSession(this);
     }
 }

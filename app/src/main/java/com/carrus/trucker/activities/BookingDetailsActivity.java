@@ -28,6 +28,7 @@ import com.carrus.trucker.utils.CommonUtils;
 import com.carrus.trucker.utils.Log;
 import com.carrus.trucker.utils.MaterialDesignAnimations;
 import com.carrus.trucker.utils.Transactions;
+import com.flurry.android.FlurryAgent;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -185,6 +186,7 @@ public class BookingDetailsActivity extends BaseActivity implements View.OnClick
                     @Override
                     public void success(String serverResponse, Response response) {
                         if(getApplicationContext()!=null) {
+                            FlurryAgent.onEvent("Booking detail mode");
                             findViewById(R.id.scrollView).setVisibility(View.VISIBLE);
                             try {
                                 JSONObject jsonObject = new JSONObject(serverResponse);
@@ -325,6 +327,7 @@ public class BookingDetailsActivity extends BaseActivity implements View.OnClick
                 RestClient.getWebServices().collectCash(accessToken, bookingId, "PAID", new Callback<String>() {
                     @Override
                     public void success(String serverResponse, Response response) {
+                        FlurryAgent.onEvent("Collect cash mode");
                         findViewById(R.id.btnCollectCash).setVisibility(View.GONE);
                         try {
                             JSONObject jsonObject = new JSONObject(serverResponse);
@@ -369,6 +372,7 @@ public class BookingDetailsActivity extends BaseActivity implements View.OnClick
                         RestClient.getWebServices().completeOrder(accessToken, bookingId, "COMPLETED", new Callback<String>() {
                             @Override
                             public void success(String s, Response response) {
+                                FlurryAgent.onEvent("End trip mode");
                                 Log.i("Success", "" + s);
                                 btnStatus.setVisibility(View.GONE);
                                 CommonUtils.dismissLoadingDialog();
@@ -667,6 +671,7 @@ public class BookingDetailsActivity extends BaseActivity implements View.OnClick
         RestClient.getWebServices().changeOrderStatus(accessToken, bookingId, orderStatus, new Callback<String>() {
             @Override
             public void success(String s, Response response) {
+                FlurryAgent.onEvent("Change booking status mode");
                 btnStatus.setVisibility(View.GONE);
                 CommonUtils.dismissLoadingDialog();
                 getOrderDetails();
@@ -678,6 +683,18 @@ public class BookingDetailsActivity extends BaseActivity implements View.OnClick
                 CommonUtils.dismissLoadingDialog();
             }
         });
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        FlurryAgent.onStartSession(this, MY_FLURRY_APIKEY);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        FlurryAgent.onEndSession(this);
     }
 }
 
