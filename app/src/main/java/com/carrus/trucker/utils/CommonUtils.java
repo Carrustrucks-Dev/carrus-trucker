@@ -1,21 +1,19 @@
 package com.carrus.trucker.utils;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.ProgressDialog;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.drawable.ColorDrawable;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
-import android.support.v7.app.AlertDialog;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -30,6 +28,7 @@ import android.widget.Toast;
 
 import com.carrus.trucker.R;
 import com.carrus.trucker.activities.LoginActivity;
+import com.carrus.trucker.interfaces.AppConstants;
 
 import org.json.JSONObject;
 
@@ -47,11 +46,14 @@ import retrofit.mime.TypedByteArray;
 /**
  * Created by Saurbhv on 10/21/15.
  */
-public class CommonUtils {
+public class CommonUtils implements AppConstants {
 
     public static Dialog progressDial;
     public static Dialog dialog;
     public static String APP_VERSION = "0";
+    public static AlertDialog.Builder alertDialog=null;
+    public static int pastHitCount=0;
+    public static int upComingHitCount=0;
 
     public static String toCamelCase(String inputString) {
         String result = "";
@@ -200,7 +202,8 @@ public class CommonUtils {
         try {
             Log.e("request succesfull", "RetrofitError = " + retrofitError.toString());
             if (((RetrofitError) retrofitError).getKind() == RetrofitError.Kind.NETWORK) {
-                MaterialDesignAnimations.fadeIn(activity, activity.findViewById(R.id.errorLayout), activity.getResources().getString(R.string.internetConnectionError), 0);
+                showDialog(activity, activity.getResources().getString(R.string.internetConnectionError));
+                //MaterialDesignAnimations.fadeIn(activity, activity.findViewById(R.id.errorLayout), activity.getResources().getString(R.string.internetConnectionError), 0);
             } else {
                 try {
                     String json = new String(((TypedByteArray) retrofitError.getResponse()
@@ -225,6 +228,41 @@ public class CommonUtils {
 
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    public static void showDialog(final Context context, String msg) {
+        try {
+            if (alertDialog == null) {
+                alertDialog = new AlertDialog.Builder(context);
+                alertDialog.setCancelable(false);
+                alertDialog.setMessage(msg);
+                alertDialog.setPositiveButton(context.getString(R.string.ok), new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                        alertDialog = null;
+
+                    }
+                });
+                alertDialog.setNegativeButton(context.getString(R.string.call_carrus), new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                        try {
+                            Intent call = new Intent(Intent.ACTION_DIAL);
+                            call.setData(Uri.parse("tel:" + "+91" + CONTACT_CARRUS));
+                            context.startActivity(call);
+                        } catch (Exception e) {
+                            CommonUtils.showSingleButtonPopup(context, "Unable to perform action.");
+                        }
+                        alertDialog = null;
+
+                    }
+                });
+
+                alertDialog.show();
+            }
+        }catch (Exception ex){
+            ex.printStackTrace();
         }
     }
 

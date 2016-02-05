@@ -28,4 +28,7 @@ public interface AppConstants {
     int FIVE_REQUEST_CODE = 5;
     String USER_TYPE = "TRUCKER";
     int LIMIT = 15;
+
+    String CONTACT_CARRUS="8057772081";
+
 }

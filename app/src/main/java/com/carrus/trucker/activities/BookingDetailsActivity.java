@@ -301,7 +301,8 @@ public class BookingDetailsActivity extends BaseActivity implements View.OnClick
                     public void failure(RetrofitError retrofitError) {
                         if (getApplicationContext() != null) {
                             if (((RetrofitError) retrofitError).getKind() == RetrofitError.Kind.NETWORK) {
-                                MaterialDesignAnimations.fadeIn(getApplicationContext(), findViewById(R.id.errorLayout), getResources().getString(R.string.internetConnectionError), 0);
+                                //MaterialDesignAnimations.fadeIn(getApplicationContext(), findViewById(R.id.errorLayout), getResources().getString(R.string.internetConnectionError), 0);
+                                CommonUtils.showDialog(BookingDetailsActivity.this,getString(R.string.internetConnectionError));
                                 findViewById(R.id.scrollView).setVisibility(View.GONE);
                                 findViewById(R.id.retry_button).setVisibility(View.VISIBLE);
                                 CommonUtils.dismissLoadingDialog();

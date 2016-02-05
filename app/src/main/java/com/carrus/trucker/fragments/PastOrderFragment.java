@@ -20,7 +20,6 @@ import com.carrus.trucker.models.Booking;
 import com.carrus.trucker.retrofit.RestClient;
 import com.carrus.trucker.utils.ApiResponseFlags;
 import com.carrus.trucker.utils.CommonUtils;
-import com.carrus.trucker.utils.InternetConnectionStatus;
 import com.carrus.trucker.utils.MaterialDesignAnimations;
 import com.carrus.trucker.utils.Prefs;
 import com.flurry.android.FlurryAgent;
@@ -40,21 +39,21 @@ import retrofit.mime.TypedByteArray;
  * Developer: Saurbhv
  * Dated: 1/13/16.
  */
-public class PastOrderFragment extends android.support.v4.app.Fragment implements  SwipeRefreshLayout.OnRefreshListener, AppConstants {
+public class PastOrderFragment extends android.support.v4.app.Fragment implements SwipeRefreshLayout.OnRefreshListener, AppConstants {
     private RecyclerView mRecyclerView;
     private BookingRecyclerAdapter bookingAdapter;
     private SwipeRefreshLayout swipeRefreshLayout;
     private ArrayList<Booking> bookingList;
     private int skip = 0;
     private boolean isRefreshView = false;
-    private boolean isUpdate=false;
+    private boolean isUpdate = false;
     private TextView tvNoBookingText;
     private LinearLayout llNoBookingPlaceholder;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View v=inflater.inflate(R.layout.fragment_booking_listview, container, false);
+        View v = inflater.inflate(R.layout.fragment_booking_listview, container, false);
         init(v);
         return v;
     }
@@ -68,12 +67,22 @@ public class PastOrderFragment extends android.support.v4.app.Fragment implement
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        if(InternetConnectionStatus.getInstance(getActivity()).isOnline()){
+/*        if (InternetConnectionStatus.getInstance(getActivity()).isOnline()) {
             apiCallForPastOrders();
-        }
+        } else {
+            skip = 0;
+            if (bookingList != null)
+                bookingList.clear();
+            bookingAdapter = new BookingRecyclerAdapter(getActivity(), bookingList, mRecyclerView, true);
+            mRecyclerView.setAdapter(bookingAdapter);
+            llNoBookingPlaceholder.setVisibility(View.VISIBLE);
+            tvNoBookingText.setText(getString(R.string.no_internet_connection));
+        }*/
+        CommonUtils.pastHitCount++;
+        apiCallForPastOrders(CommonUtils.pastHitCount);
     }
 
-    private void init(View v){
+    private void init(View v) {
         mRecyclerView = (RecyclerView) v.findViewById(R.id.relvBookingList);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mRecyclerView.addItemDecoration(
@@ -83,7 +92,6 @@ public class PastOrderFragment extends android.support.v4.app.Fragment implement
         mRecyclerView.setHasFixedSize(true);
         tvNoBookingText = (TextView) v.findViewById(R.id.tvNoBookingText);
         llNoBookingPlaceholder = (LinearLayout) v.findViewById(R.id.llNoBookingPlaceholder);
-        tvNoBookingText.setText(getString(R.string.no_past_orders));
 
         bookingList = new ArrayList<>();
         bookingAdapter = new BookingRecyclerAdapter(getActivity(), bookingList, mRecyclerView, true);
@@ -93,11 +101,12 @@ public class PastOrderFragment extends android.support.v4.app.Fragment implement
     @Override
     public void onResume() {
         super.onResume();
-        if(isUpdate){
+        if (isUpdate) {
             isRefreshView = true;
-            apiCallForPastOrders();
-        }else{
-            isUpdate=true;
+            CommonUtils.pastHitCount++;
+            apiCallForPastOrders(CommonUtils.pastHitCount);
+        } else {
+            isUpdate = true;
         }
     }
 
@@ -105,24 +114,25 @@ public class PastOrderFragment extends android.support.v4.app.Fragment implement
     public void onRefresh() {
         swipeRefreshLayout.setRefreshing(true);
         isRefreshView = true;
-        apiCallForPastOrders();
+        CommonUtils.pastHitCount++;
+        apiCallForPastOrders(CommonUtils.pastHitCount);
     }
 
-    private void apiCallForPastOrders(){
+    private void apiCallForPastOrders(final int count) {
 
         if (isRefreshView) {
             swipeRefreshLayout.setRefreshing(true);
-            bookingList=null;
-            skip=0;
+            bookingList = null;
+            skip = 0;
         } else {
-            if(bookingList==null || bookingList.size()==0)
+            if (bookingList == null || bookingList.size() == 0)
                 CommonUtils.showLoadingDialog(getActivity(), getString(R.string.loading));
         }
 
         RestClient.getWebServices().getPastOrders(Prefs.with(getActivity()).getString(ACCESS_TOKEN, ""), LIMIT, skip, "DESC", new Callback<String>() {
             @Override
             public void success(String serverResponse, Response response) {
-                if (getActivity() != null) {
+                if (getActivity() != null && isAdded()) {
                     try {
                         FlurryAgent.onEvent("Past Order mode");
                         JSONObject mObject = new JSONObject(serverResponse);
@@ -152,15 +162,21 @@ public class PastOrderFragment extends android.support.v4.app.Fragment implement
                                 bookingList.addAll(temBookingArrayList);
                                 if (bookingList.size() == 0) {
                                     llNoBookingPlaceholder.setVisibility(View.VISIBLE);
+                                    tvNoBookingText.setText(getString(R.string.no_past_orders));
                                 } else {
                                     llNoBookingPlaceholder.setVisibility(View.GONE);
                                 }
-                                bookingAdapter = new BookingRecyclerAdapter(getActivity(), bookingList, mRecyclerView, true);
-                                mRecyclerView.setAdapter(bookingAdapter);
-                                if (bookingList.size() == LIMIT)
-                                    setonScrollListener();
+                                if(count==CommonUtils.pastHitCount) {
+                                    if (getActivity() != null && isAdded()) {
+                                        bookingAdapter = new BookingRecyclerAdapter(getActivity(), bookingList, mRecyclerView, true);
+                                        mRecyclerView.setAdapter(bookingAdapter);
 
-                                skip = skip + temBookingArrayList.size();
+                                        if (bookingList.size() == LIMIT)
+                                            setonScrollListener(count);
+
+                                        skip = skip + temBookingArrayList.size();
+                                    }
+                                }
                             } else {
                                 if (bookingList.size() > 0) {
                                     bookingList.remove(bookingList.size() - 1);
@@ -222,19 +238,19 @@ public class PastOrderFragment extends android.support.v4.app.Fragment implement
 
             @Override
             public void failure(RetrofitError error) {
-                if (getActivity() != null) {
+                if (getActivity() != null && isAdded()) {
                     CommonUtils.dismissLoadingDialog();
                     try {
                         int statusCode = error.getResponse().getStatus();
                         String json = new String(((TypedByteArray) error.getResponse().getBody()).getBytes());
                         JSONObject jsonObject = new JSONObject(json);
                         if (statusCode == 404) {
-                            if (bookingAdapter != null) {
-                                bookingAdapter.clearAll();
-                            }
+                            bookingAdapter = new BookingRecyclerAdapter(getActivity(), bookingList, mRecyclerView, true);
+                            mRecyclerView.setAdapter(bookingAdapter);
                             llNoBookingPlaceholder.setVisibility(View.VISIBLE);
+                            tvNoBookingText.setText(getString(R.string.no_past_orders));
                         } else if (statusCode == 405) {
-                            if ((bookingList != null) && bookingList.get(bookingList.size() - 1) == null) {
+                            if ((bookingList != null) && bookingList.size() > 0 && bookingList.get(bookingList.size() - 1) == null) {
                                 bookingList.remove(bookingList.size() - 1);
                                 bookingAdapter.notifyItemRemoved(bookingList.size());
                             }
@@ -244,12 +260,19 @@ public class PastOrderFragment extends android.support.v4.app.Fragment implement
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
-                        if ((bookingList != null) && bookingList.size()>0 && bookingList.get(bookingList.size() - 1) == null) {
+                        /*if ((bookingList != null) && bookingList.size() > 0 && bookingList.get(bookingList.size() - 1) == null) {
                             bookingList.remove(bookingList.size() - 1);
                             bookingAdapter.notifyItemRemoved(bookingList.size());
-                        }
-                        //CommonUtils.showSingleButtonPopup(getActivity(),getActivity().getString(R.string.internetConnectionError));
-                        MaterialDesignAnimations.fadeIn(getActivity(), getActivity().findViewById(R.id.errorLayout), getActivity().getString(R.string.internetConnectionError), 0);
+                        }*/
+                        skip = 0;
+                        bookingList=new ArrayList<Booking>();
+                        bookingAdapter = new BookingRecyclerAdapter(getActivity(), bookingList, mRecyclerView, true);
+                        mRecyclerView.setAdapter(bookingAdapter);
+                        llNoBookingPlaceholder.setVisibility(View.VISIBLE);
+                        tvNoBookingText.setText(getString(R.string.no_internet_connection));
+                        CommonUtils.showDialog(getActivity(), getActivity().getString(R.string.internetConnectionError));
+                        //MaterialDesignAnimations.fadeIn(getActivity(), getActivity().findViewById(R.id.errorLayout), getActivity().getString(R.string.internetConnectionError), 0);
+
                     }
                     isRefreshView = false;
                     swipeRefreshLayout.setRefreshing(false);
@@ -258,24 +281,25 @@ public class PastOrderFragment extends android.support.v4.app.Fragment implement
         });
     }
 
-    private void setonScrollListener() {
+    private void setonScrollListener(final int count) {
 
         bookingAdapter.setOnLoadMoreListener(new OnLoadMoreListener() {
             @Override
             public void onLoadMore() {
                 //add null , so the adapter will check view_type and show progress bar at bottom
-                try {
-                    if(bookingList.get(bookingList.size()-1)!=null) {
-                        bookingList.add(null);
-                        bookingAdapter.notifyItemInserted(bookingList.size() - 1);
+                if (count == CommonUtils.pastHitCount) {
+                    try {
+                        if (bookingList.get(bookingList.size() - 1) != null) {
+                            bookingList.add(null);
+                            bookingAdapter.notifyItemInserted(bookingList.size() - 1);
+                        }
+                        apiCallForPastOrders(CommonUtils.pastHitCount);
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                    apiCallForPastOrders();
-                } catch (Exception e) {
-                    e.printStackTrace();
                 }
-
-
             }
+
         });
     }
 }

@@ -105,14 +105,14 @@ public class BookingRecyclerAdapter extends RecyclerView.Adapter {
     public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
         if (holder instanceof MyViewHolder) {
 
-            ((MyViewHolder)holder).date.setText(CommonUtils.getDateFromUTC(data.get(position).getBookingTime()));
-            ((MyViewHolder)holder).month.setText(CommonUtils.getShortMonthNameFromUTC(data.get(position).getBookingTime()));
-            ((MyViewHolder)holder).name.setText(CommonUtils.toCamelCase(data.get(position).getName()));
-            ((MyViewHolder)holder).truckName.setText(data.get(position).getTruckName());
-            ((MyViewHolder)holder).shipingJourney.setText(data.get(position).getShipingJourney());
-            ((MyViewHolder)holder).timeSlot.setText(CommonUtils.getShortDayNameFromUTC(data.get(position).getBookingTime()) + ", " + data.get(position).getTimeSlot());
+            ((MyViewHolder) holder).date.setText(CommonUtils.getDateFromUTC(data.get(position).getBookingTime()));
+            ((MyViewHolder) holder).month.setText(CommonUtils.getShortMonthNameFromUTC(data.get(position).getBookingTime()));
+            ((MyViewHolder) holder).name.setText(CommonUtils.toCamelCase(data.get(position).getName()));
+            ((MyViewHolder) holder).truckName.setText(data.get(position).getTruckName());
+            ((MyViewHolder) holder).shipingJourney.setText(data.get(position).getShipingJourney());
+            ((MyViewHolder) holder).timeSlot.setText(CommonUtils.getShortDayNameFromUTC(data.get(position).getBookingTime()) + ", " + data.get(position).getTimeSlot());
             setTextColorOfStatus(data.get(position).getStatus().toUpperCase(), ((MyViewHolder) holder));
-            ((MyViewHolder)holder).status.setText(CommonUtils.toCamelCase(data.get(position).getStatus().replace("_", " ")));
+            ((MyViewHolder) holder).status.setText(CommonUtils.toCamelCase(data.get(position).getStatus().replace("_", " ")));
             ((MyViewHolder) holder).itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -142,7 +142,8 @@ public class BookingRecyclerAdapter extends RecyclerView.Adapter {
 
     @Override
     public int getItemCount() {
-        return data.size();
+        return data != null ? data.size() : 0;
+
     }
 
     public void setLoaded() {
@@ -178,16 +179,16 @@ public class BookingRecyclerAdapter extends RecyclerView.Adapter {
     }
 
     public void clearAll() {
-        data.clear();
+        if (data != null)
+            data.clear();
         notifyDataSetChanged();
     }
 
     /**
      * @param String
-     * @param ViewHolder
-     * Method to set text color of status textView
-     * */
-    private void setTextColorOfStatus(String status, MyViewHolder mViewHolder){
+     * @param ViewHolder Method to set text color of status textView
+     */
+    private void setTextColorOfStatus(String status, MyViewHolder mViewHolder) {
         switch (status) {
             case "REACHED_DESTINATION":
             case "REACHED_PICKUP_LOCATION":

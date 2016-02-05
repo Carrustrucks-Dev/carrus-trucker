@@ -20,7 +20,6 @@ import com.carrus.trucker.models.Booking;
 import com.carrus.trucker.retrofit.RestClient;
 import com.carrus.trucker.utils.ApiResponseFlags;
 import com.carrus.trucker.utils.CommonUtils;
-import com.carrus.trucker.utils.InternetConnectionStatus;
 import com.carrus.trucker.utils.MaterialDesignAnimations;
 import com.carrus.trucker.utils.Prefs;
 import com.flurry.android.FlurryAgent;
@@ -40,21 +39,21 @@ import retrofit.mime.TypedByteArray;
  * Developer: Saurbhv
  * Dated: 1/13/16.
  */
-public class UpcomingOrderFragment extends android.support.v4.app.Fragment implements  SwipeRefreshLayout.OnRefreshListener, AppConstants{
+public class UpcomingOrderFragment extends android.support.v4.app.Fragment implements SwipeRefreshLayout.OnRefreshListener, AppConstants {
     private RecyclerView mRecyclerView;
     private BookingRecyclerAdapter bookingAdapter;
     private SwipeRefreshLayout swipeRefreshLayout;
     private ArrayList<Booking> bookingList;
     private int skip = 0;
     private boolean isRefreshView = false;
-    private boolean isUpdate=false;
+    private boolean isUpdate = false;
     private TextView tvNoBookingText;
     private LinearLayout llNoBookingPlaceholder;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View v=inflater.inflate(R.layout.fragment_booking_listview, container, false);
+        View v = inflater.inflate(R.layout.fragment_booking_listview, container, false);
         init(v);
         return v;
     }
@@ -68,12 +67,22 @@ public class UpcomingOrderFragment extends android.support.v4.app.Fragment imple
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        if(InternetConnectionStatus.getInstance(getActivity()).isOnline()){
+       /* if (InternetConnectionStatus.getInstance(getActivity()).isOnline()) {
             apiCallForUpcomingOrders();
-        }
+        } else {
+            skip = 0;
+            if (bookingList != null)
+                bookingList.clear();
+            bookingAdapter = new BookingRecyclerAdapter(getActivity(), bookingList, mRecyclerView, true);
+            mRecyclerView.setAdapter(bookingAdapter);
+            llNoBookingPlaceholder.setVisibility(View.VISIBLE);
+            tvNoBookingText.setText(getString(R.string.no_internet_connection));
+        }*/
+        CommonUtils.upComingHitCount++;
+        apiCallForUpcomingOrders(CommonUtils.upComingHitCount);
     }
 
-    private void init(View v){
+    private void init(View v) {
         mRecyclerView = (RecyclerView) v.findViewById(R.id.relvBookingList);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mRecyclerView.addItemDecoration(
@@ -93,11 +102,12 @@ public class UpcomingOrderFragment extends android.support.v4.app.Fragment imple
     @Override
     public void onResume() {
         super.onResume();
-        if(isUpdate){
+        if (isUpdate) {
             isRefreshView = true;
-            apiCallForUpcomingOrders();
-        }else{
-            isUpdate=true;
+            CommonUtils.upComingHitCount++;
+            apiCallForUpcomingOrders(CommonUtils.upComingHitCount);
+        } else {
+            isUpdate = true;
         }
     }
 
@@ -105,24 +115,25 @@ public class UpcomingOrderFragment extends android.support.v4.app.Fragment imple
     public void onRefresh() {
         swipeRefreshLayout.setRefreshing(true);
         isRefreshView = true;
-        apiCallForUpcomingOrders();
+        CommonUtils.upComingHitCount++;
+        apiCallForUpcomingOrders(CommonUtils.upComingHitCount);
     }
 
-    private void apiCallForUpcomingOrders(){
+    private void apiCallForUpcomingOrders(final int count) {
 
         if (isRefreshView) {
             swipeRefreshLayout.setRefreshing(true);
-            bookingList=null;
-            skip=0;
+            bookingList = null;
+            skip = 0;
         } else {
-            if(bookingList==null || bookingList.size()==0)
+            if (bookingList == null || bookingList.size() == 0)
                 CommonUtils.showLoadingDialog(getActivity(), getString(R.string.loading));
         }
 
         RestClient.getWebServices().getUpComingOrders(Prefs.with(getActivity()).getString(ACCESS_TOKEN, ""), LIMIT, skip, "ASC", new Callback<String>() {
             @Override
             public void success(String serverResponse, Response response) {
-                if (getActivity() != null) {
+                if (getActivity() != null && isAdded()) {
                     try {
                         FlurryAgent.onEvent("Upcoming order mode");
                         JSONObject mObject = new JSONObject(serverResponse);
@@ -130,7 +141,7 @@ public class UpcomingOrderFragment extends android.support.v4.app.Fragment imple
                         if (ApiResponseFlags.OK.getOrdinal() == status) {
                             if (bookingList == null) {
                                 bookingList = new ArrayList<>();
-                                ArrayList<Booking> temBookingArrayList=new ArrayList<Booking>();
+                                ArrayList<Booking> temBookingArrayList = new ArrayList<Booking>();
                                 JSONObject jsonObjectServerResponse = new JSONObject(serverResponse);
                                 if (!jsonObjectServerResponse.isNull("data")) {
                                     JSONArray jsonDataArray = new JSONArray(jsonObjectServerResponse.getString("data"));
@@ -144,7 +155,7 @@ public class UpcomingOrderFragment extends android.support.v4.app.Fragment imple
                                         booking.setStatus(jsonObject.getString("bookingStatus"));
                                         booking.setTimeSlot(jsonObject.getJSONObject("pickUp").getString("time"));
                                         booking.setTruckName(jsonObject.getJSONObject("truck").getJSONObject("truckType").getString("typeTruckName")
-                                                +" "+jsonObject.getJSONObject("assignTruck").getString("truckNumber"));
+                                                + " " + jsonObject.getJSONObject("assignTruck").getString("truckNumber"));
                                         temBookingArrayList.add(booking);
                                     }
                                 }
@@ -155,19 +166,23 @@ public class UpcomingOrderFragment extends android.support.v4.app.Fragment imple
                                 } else {
                                     llNoBookingPlaceholder.setVisibility(View.GONE);
                                 }
-                                bookingAdapter = new BookingRecyclerAdapter(getActivity(), bookingList, mRecyclerView, true);
-                                mRecyclerView.setAdapter(bookingAdapter);
-                                if (bookingList.size() == LIMIT)
-                                    setonScrollListener();
+                                if(count==CommonUtils.upComingHitCount) {
+                                    if (getActivity() != null && isAdded()) {
+                                        bookingAdapter = new BookingRecyclerAdapter(getActivity(), bookingList, mRecyclerView, true);
+                                        mRecyclerView.setAdapter(bookingAdapter);
+                                        if (bookingList.size() == LIMIT)
+                                            setonScrollListener(count);
 
-                                skip = skip + temBookingArrayList.size();
+                                        skip = skip + temBookingArrayList.size();
+                                    }
+                                }
                             } else {
                                 if (bookingList.size() > 0) {
                                     bookingList.remove(bookingList.size() - 1);
                                     bookingAdapter.notifyItemRemoved(bookingList.size());
                                 }
 
-                                ArrayList<Booking> temBookingArrayList=new ArrayList<Booking>();
+                                ArrayList<Booking> temBookingArrayList = new ArrayList<Booking>();
                                 JSONObject jsonObjectServerResponse = new JSONObject(serverResponse);
                                 if (!jsonObjectServerResponse.isNull("data")) {
                                     JSONArray jsonDataArray = new JSONArray(jsonObjectServerResponse.getString("data"));
@@ -181,7 +196,7 @@ public class UpcomingOrderFragment extends android.support.v4.app.Fragment imple
                                         booking.setStatus(jsonObject.getString("bookingStatus"));
                                         booking.setTimeSlot(jsonObject.getJSONObject("pickUp").getString("time"));
                                         booking.setTruckName(jsonObject.getJSONObject("truck").getJSONObject("truckType").getString("typeTruckName")
-                                                +" "+jsonObject.getJSONObject("assignTruck").getString("truckNumber"));
+                                                + " " + jsonObject.getJSONObject("assignTruck").getString("truckNumber"));
                                         temBookingArrayList.add(booking);
                                     }
                                 }
@@ -222,16 +237,15 @@ public class UpcomingOrderFragment extends android.support.v4.app.Fragment imple
 
             @Override
             public void failure(RetrofitError error) {
-                if (getActivity() != null) {
+                if (getActivity() != null && isAdded()) {
                     CommonUtils.dismissLoadingDialog();
                     try {
                         int statusCode = error.getResponse().getStatus();
                         String json = new String(((TypedByteArray) error.getResponse().getBody()).getBytes());
                         JSONObject jsonObject = new JSONObject(json);
                         if (statusCode == 404) {
-                            if (bookingAdapter != null) {
-                                bookingAdapter.clearAll();
-                            }
+                            bookingAdapter = new BookingRecyclerAdapter(getActivity(), bookingList, mRecyclerView, true);
+                            mRecyclerView.setAdapter(bookingAdapter);
                             llNoBookingPlaceholder.setVisibility(View.VISIBLE);
                         } else if (statusCode == 405) {
                             if ((bookingList != null) && bookingList.get(bookingList.size() - 1) == null) {
@@ -244,12 +258,19 @@ public class UpcomingOrderFragment extends android.support.v4.app.Fragment imple
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
-                        if ((bookingList != null) && bookingList.size()>0 && bookingList.get(bookingList.size() - 1) == null) {
+                        /*if ((bookingList != null) && bookingList.size() > 0 && bookingList.get(bookingList.size() - 1) == null) {
                             bookingList.remove(bookingList.size() - 1);
                             bookingAdapter.notifyItemRemoved(bookingList.size());
-                        }
+                        }*/
                         //CommonUtils.showSingleButtonPopup(getActivity(),getActivity().getString(R.string.internetConnectionError));
-                        MaterialDesignAnimations.fadeIn(getActivity(), getActivity().findViewById(R.id.errorLayout), getActivity().getString(R.string.internetConnectionError), 0);
+                        // MaterialDesignAnimations.fadeIn(getActivity(), getActivity().findViewById(R.id.errorLayout), getActivity().getString(R.string.internetConnectionError), 0);
+                        skip = 0;
+                        bookingList=new ArrayList<Booking>();
+                        bookingAdapter = new BookingRecyclerAdapter(getActivity(), bookingList, mRecyclerView, true);
+                        mRecyclerView.setAdapter(bookingAdapter);
+                        llNoBookingPlaceholder.setVisibility(View.VISIBLE);
+                        tvNoBookingText.setText(getString(R.string.no_internet_connection));
+                        CommonUtils.showDialog(getActivity(), getActivity().getString(R.string.internetConnectionError));
                     }
                     isRefreshView = false;
                     swipeRefreshLayout.setRefreshing(false);
@@ -258,23 +279,25 @@ public class UpcomingOrderFragment extends android.support.v4.app.Fragment imple
         });
     }
 
-    private void setonScrollListener() {
+    private void setonScrollListener(final int count) {
 
         bookingAdapter.setOnLoadMoreListener(new OnLoadMoreListener() {
             @Override
             public void onLoadMore() {
                 //add null , so the adapter will check view_type and show progress bar at bottom
-                try {
-                    if(bookingList.get(bookingList.size()-1)!=null) {
-                        bookingList.add(null);
-                        bookingAdapter.notifyItemInserted(bookingList.size() - 1);
+                if(count==CommonUtils.upComingHitCount) {
+                    try {
+                        if (bookingList.get(bookingList.size() - 1) != null) {
+                            bookingList.add(null);
+
+                            bookingAdapter.notifyItemInserted(bookingList.size() - 1);
+                        }
+                        apiCallForUpcomingOrders(CommonUtils.upComingHitCount);
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                    apiCallForUpcomingOrders();
-                } catch (Exception e) {
-                    e.printStackTrace();
+
                 }
-
-
             }
         });
     }

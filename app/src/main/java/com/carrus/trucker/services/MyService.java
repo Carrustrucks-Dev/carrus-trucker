@@ -132,12 +132,14 @@ public class MyService extends Service implements AppConstants, LocationListener
 
                 } else {
                     if (isNetworkEnabled) {
+                        //android.util.Log.d("Network", "Network");
                         if (locationManager != null) {
                             location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
                         }
-                    } else if (isGPSEnabled) {
-
-                        if (locationManager != null) {
+                    }
+                    if (isGPSEnabled) {
+                        //android.util.Log.d("GPS Enabled", "GPS Enabled");
+                        if (location==null && locationManager != null) {
                             location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
                         }
                     }

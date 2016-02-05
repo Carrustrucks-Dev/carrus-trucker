@@ -9,10 +9,13 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RatingBar;
+import android.widget.Toast;
 
 import com.carrus.trucker.R;
 import com.carrus.trucker.retrofit.RestClient;
+import com.carrus.trucker.utils.ApiResponseFlags;
 import com.carrus.trucker.utils.CommonUtils;
+import com.carrus.trucker.utils.Log;
 import com.carrus.trucker.utils.MaterialDesignAnimations;
 import com.flurry.android.FlurryAgent;
 
@@ -22,6 +25,7 @@ import org.json.JSONObject;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
+import retrofit.mime.TypedByteArray;
 
 public class RatingDialogActivity extends BaseActivity implements View.OnClickListener {
 
@@ -89,7 +93,37 @@ public class RatingDialogActivity extends BaseActivity implements View.OnClickLi
             @Override
             public void failure(RetrofitError retrofitError) {
                 CommonUtils.dismissLoadingDialog();
-                CommonUtils.showRetrofitError(RatingDialogActivity.this, retrofitError);
+                try {
+                    Log.e("request succesfull", "RetrofitError = " + retrofitError.toString());
+                    if (((RetrofitError) retrofitError).getKind() == RetrofitError.Kind.NETWORK) {
+                        CommonUtils.alertDialog=null;
+                        CommonUtils.showDialog(RatingDialogActivity.this, getString(R.string.internetConnectionError));
+                        //MaterialDesignAnimations.fadeIn(activity, activity.findViewById(R.id.errorLayout), activity.getResources().getString(R.string.internetConnectionError), 0);
+                    } else {
+                        try {
+                            String json = new String(((TypedByteArray) retrofitError.getResponse()
+                                    .getBody()).getBytes());
+                            JSONObject jsonObject = new JSONObject(json);
+                            int statusCode = retrofitError.getResponse().getStatus();
+                            if (statusCode == ApiResponseFlags.Unauthorized.getOrdinal()) {
+                                Intent intent = new Intent(RatingDialogActivity.this, LoginActivity.class);
+                                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |
+                                        Intent.FLAG_ACTIVITY_CLEAR_TASK |
+                                        Intent.FLAG_ACTIVITY_NEW_TASK);
+                                Toast.makeText(RatingDialogActivity.this, getString(R.string.session_expired), Toast.LENGTH_LONG).show();
+                                startActivity(intent);
+                                overridePendingTransition(R.anim.anim_slide_in_left, R.anim.anim_slide_out_left);
+                            } else {
+                                MaterialDesignAnimations.fadeIn(RatingDialogActivity.this, findViewById(R.id.errorLayout), jsonObject.get("message").toString(), 0);
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         });
     }

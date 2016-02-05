@@ -12,6 +12,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
@@ -454,14 +455,28 @@ public class CurrentShipmentFragment extends android.support.v4.app.Fragment imp
             }
         });
 
-        alertDialog.setNegativeButton("Exit", new DialogInterface.OnClickListener() {
+        alertDialog.setNegativeButton(getString(R.string.call_carrus), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+                try {
+                    Intent call = new Intent(Intent.ACTION_DIAL);
+                    call.setData(Uri.parse("tel:" + "+91" + CONTACT_CARRUS));
+                    startActivity(call);
+                } catch (Exception e) {
+                    CommonUtils.showSingleButtonPopup(getActivity(), "Unable to perform action.");
+                }
+            }
+        });
 
+        alertDialog.setNeutralButton("Exit", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
                 dialog.cancel();
                 getActivity().finish();
                 Transactions.showPreviousAnimation(getActivity());
             }
         });
+
+
         alertDialog.show();
     }
 }

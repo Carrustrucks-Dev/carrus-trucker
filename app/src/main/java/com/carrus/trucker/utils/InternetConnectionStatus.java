@@ -32,7 +32,9 @@ public class InternetConnectionStatus {
                     && networkInfo.isConnected();
 
             if(!connected&&!((Activity)context instanceof SplashScreenActivity))
-                MaterialDesignAnimations.fadeIn(context, ((Activity)context).findViewById(R.id.errorLayout), context.getResources().getString(R.string.internetConnectionError), 0);
+                CommonUtils.showDialog(context,context.getString(R.string.internetConnectionError));
+                //MaterialDesignAnimations.fadeIn(context, ((Activity)context).findViewById(R.id.errorLayout), context.getResources().getString(R.string.internetConnectionError), 0);
+
             return connected;
 
         } catch (Exception e) {
