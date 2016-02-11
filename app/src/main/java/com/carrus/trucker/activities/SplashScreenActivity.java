@@ -15,24 +15,23 @@ import android.widget.ProgressBar;
 import com.carrus.trucker.R;
 import com.carrus.trucker.models.ProfileData;
 import com.carrus.trucker.retrofit.RestClient;
+import com.carrus.trucker.services.MyService;
+import com.carrus.trucker.services.TrackingService;
 import com.carrus.trucker.utils.ApiResponseFlags;
 import com.carrus.trucker.utils.CommonUtils;
 import com.carrus.trucker.utils.InternetConnectionStatus;
 import com.carrus.trucker.utils.Log;
-import com.carrus.trucker.utils.MaterialDesignAnimations;
 import com.carrus.trucker.utils.MyApiCalls;
 import com.carrus.trucker.utils.Prefs;
 import com.carrus.trucker.utils.Transactions;
 import com.flurry.android.FlurryAgent;
 import com.google.gson.Gson;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
-import retrofit.mime.TypedByteArray;
 
 
 public class SplashScreenActivity extends BaseActivity implements View.OnClickListener {
@@ -285,6 +284,7 @@ public class SplashScreenActivity extends BaseActivity implements View.OnClickLi
             Intent intent = new Intent(getApplicationContext(), HomeScreenActivity.class);
             Bundle mBundle = new Bundle();
             intent.putExtras(mBundle);
+            startService(new Intent(SplashScreenActivity.this, TrackingService.class));
             startActivity(intent);
             Transactions.showNextAnimation(SplashScreenActivity.this);
             finish();

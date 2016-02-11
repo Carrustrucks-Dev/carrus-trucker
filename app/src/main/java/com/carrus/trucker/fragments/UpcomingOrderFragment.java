@@ -247,6 +247,7 @@ public class UpcomingOrderFragment extends android.support.v4.app.Fragment imple
                             bookingAdapter = new BookingRecyclerAdapter(getActivity(), bookingList, mRecyclerView, true);
                             mRecyclerView.setAdapter(bookingAdapter);
                             llNoBookingPlaceholder.setVisibility(View.VISIBLE);
+                            tvNoBookingText.setText(getString(R.string.no_upcoming_orders));
                         } else if (statusCode == 405) {
                             if ((bookingList != null) && bookingList.get(bookingList.size() - 1) == null) {
                                 bookingList.remove(bookingList.size() - 1);

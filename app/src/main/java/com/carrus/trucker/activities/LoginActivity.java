@@ -18,6 +18,8 @@ import android.widget.ViewFlipper;
 import com.carrus.trucker.R;
 import com.carrus.trucker.models.ProfileData;
 import com.carrus.trucker.retrofit.RestClient;
+import com.carrus.trucker.services.MyService;
+import com.carrus.trucker.services.TrackingService;
 import com.carrus.trucker.utils.CommonUtils;
 import com.carrus.trucker.utils.InternetConnectionStatus;
 import com.carrus.trucker.utils.MaterialDesignAnimations;
@@ -210,8 +212,10 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                             if (profileData.profilePicture != null) {
                                 Prefs.with(LoginActivity.this).save(DRIVER_IMAGE, profileData.profilePicture.thumb);
                             }
+                            startService(new Intent(LoginActivity.this, TrackingService.class));
                             startActivity(new Intent(LoginActivity.this, HomeScreenActivity.class));
                             Transactions.showNextAnimation(LoginActivity.this);
+
                             finish();
                         } catch (Exception e) {
                             e.printStackTrace();

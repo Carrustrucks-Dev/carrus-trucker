@@ -5,7 +5,7 @@ package com.carrus.trucker.utils;
  */
 public class Log {
 
-    private static final boolean PRINT = false; // true for printing and false
+    private static final boolean PRINT = true; // true for printing and false
     // for not
 
     public Log() {

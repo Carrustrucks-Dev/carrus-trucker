@@ -106,8 +106,15 @@ public interface WebServices {
 
     @FormUrlEncoded
     @POST("/api/v1/tracking")
-    public void sendTracking(@Field("bookingId") String bookingId,
+    public void sendBookingTracking(@Field("bookingId") String bookingId,
                              @Field("truckerId") String truckerId,
+                             @Field("long") String lon,
+                             @Field("lat") String lat,
+                             Callback<String> callback);
+
+    @FormUrlEncoded
+    @POST("/api/v1/tracking")
+    public void sendTracking(@Field("truckerId") String truckerId,
                              @Field("long") String lon,
                              @Field("lat") String lat,
                              Callback<String> callback);

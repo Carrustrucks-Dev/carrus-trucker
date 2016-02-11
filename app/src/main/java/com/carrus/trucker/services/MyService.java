@@ -146,7 +146,7 @@ public class MyService extends Service implements AppConstants, LocationListener
                 }
 
                 if (location != null) {
-                    RestClient.getWebServices().sendTracking(orderId,
+                    RestClient.getWebServices().sendBookingTracking(orderId,
                             sharedPreferences.getString(DRIVER_NO, ""),
                             String.valueOf(location.getLongitude()),
                             String.valueOf(location.getLatitude()), new Callback<String>() {
@@ -155,13 +155,12 @@ public class MyService extends Service implements AppConstants, LocationListener
 
                                     try {
                                         JSONObject jsonObject = new JSONObject(s);
-
                                         Intent i = new Intent("custom-event-name");
                                         i.putExtra("bookingStatus", jsonObject.getJSONObject("data").getString("bookingStatus"));
                                         i.putExtra("longitude", location.getLongitude());
                                         i.putExtra("latitude", location.getLatitude());
                                         LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(i);
-                                        Log.d("Tracking Success", s);
+                                        Log.d("Order Tracking Success", s);
                                     } catch (JSONException e) {
                                         e.printStackTrace();
                                     }
@@ -169,7 +168,7 @@ public class MyService extends Service implements AppConstants, LocationListener
 
                                 @Override
                                 public void failure(RetrofitError error) {
-                                    Log.d("Tracking Failed", "" + error);
+                                    Log.d("Order Tracking Failed", "" + error);
                                 }
                             });
                 }

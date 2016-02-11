@@ -90,6 +90,7 @@
             android:screenOrientation="portrait"/>
 
         <service android:name=".services.MyService" />
+        <service android:name=".services.TrackingService" />
 
         <meta-data
             android:name="io.fabric.ApiKey"

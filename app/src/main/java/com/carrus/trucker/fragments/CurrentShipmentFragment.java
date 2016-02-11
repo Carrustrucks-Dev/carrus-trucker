@@ -308,6 +308,8 @@ public class CurrentShipmentFragment extends android.support.v4.app.Fragment imp
                                     intent.putExtra("bookingId", bookingData.getString("_id"));
                                     getActivity().startService(intent);
                                 }
+                            }else {
+                                getActivity().stopService(new Intent(getActivity(), MyService.class));
                             }
                         }
                     } catch (JSONException e) {
