@@ -8,7 +8,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -36,7 +35,6 @@ public class BaseActivity extends FragmentActivity implements GPSDailogCallBack,
     protected String accessToken;
     private BroadcastReceiver mMessageReceiver;
     private LocationManager locationManager;
-    private Location location;
     private boolean isGPSEnabled = false;
     private boolean isNetworkEnabled = false;
 

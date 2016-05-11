@@ -117,7 +117,7 @@ public class TrackingService extends Service implements AppConstants, LocationLi
     }
 
     class MyThread extends Thread {
-        static final long DELAY = 10000;
+        static final long DELAY = 60000;
 
         @Override
         public void run() {

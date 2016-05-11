@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationManager;
@@ -51,16 +52,13 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 
 import retrofit.Callback;
 import retrofit.RetrofitError;
@@ -117,21 +115,6 @@ public class CurrentShipmentFragment extends android.support.v4.app.Fragment imp
 
         callShipper.setOnClickListener(this);
         v.findViewById(R.id.bookingDetailsLayout).setOnClickListener(this);
-
-
-        googleMap = ((SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map)).getMap();
-        if(googleMap!=null) {
-            googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-            googleMap.getUiSettings().setZoomGesturesEnabled(true);
-            googleMap.getUiSettings().setZoomControlsEnabled(true);
-            googleMap.getUiSettings().setTiltGesturesEnabled(false);
-            googleMap.getUiSettings().setMyLocationButtonEnabled(true);
-            sharedPreferences = getActivity().getSharedPreferences(SHARED_PREFERENCES, Context.MODE_PRIVATE);
-            v2GetRouteDirection = new GMapV2GetRouteDirection();
-            checkLocationPermissionNSetLocation();
-        }else{
-            Toast.makeText(getActivity(),"Unable to load google map.",Toast.LENGTH_LONG).show();
-        }
         return v;
     }
 
@@ -236,6 +219,19 @@ public class CurrentShipmentFragment extends android.support.v4.app.Fragment imp
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        googleMap = ((SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map)).getMap();
+        if(googleMap!=null) {
+            googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+            googleMap.getUiSettings().setZoomGesturesEnabled(true);
+            googleMap.getUiSettings().setZoomControlsEnabled(true);
+            googleMap.getUiSettings().setTiltGesturesEnabled(false);
+            googleMap.getUiSettings().setMyLocationButtonEnabled(true);
+            sharedPreferences = getActivity().getSharedPreferences(SHARED_PREFERENCES, Context.MODE_PRIVATE);
+            v2GetRouteDirection = new GMapV2GetRouteDirection();
+            checkLocationPermissionNSetLocation();
+        }else{
+            Toast.makeText(getActivity(),"Unable to load google map.",Toast.LENGTH_LONG).show();
+        }
     }
 
     @Override
@@ -344,9 +340,10 @@ public class CurrentShipmentFragment extends android.support.v4.app.Fragment imp
             public void success(String s, Response response) {
                 googleMap.clear();
                 // convert String into InputStream
-                InputStream in = new ByteArrayInputStream(s.getBytes());
-                DocumentBuilder builder = null;
+
                 try {
+                    InputStream in = new ByteArrayInputStream(s.getBytes());
+                    DocumentBuilder builder = null;
                     builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
                     Document doc = builder.parse(in);
                     ArrayList<LatLng> directionPoint = v2GetRouteDirection.getDirection(doc);
@@ -360,7 +357,12 @@ public class CurrentShipmentFragment extends android.support.v4.app.Fragment imp
                     MarkerOptions markerOptions = new MarkerOptions();
                     markerOptions.position(currentposition);
                     markerOptions.icon(BitmapDescriptorFactory.fromResource(R.mipmap.icon_van));
-                    markerOptions.title(getActivity().getString(R.string.current_position));
+
+                    try {
+                        markerOptions.title(getActivity().getResources().getString(R.string.current_position));
+                    } catch (Resources.NotFoundException e) {
+                        e.printStackTrace();
+                    }
                     currentMarker = googleMap.addMarker(markerOptions);
                     String source[] = start.split(",");
                     try {
@@ -392,11 +394,7 @@ public class CurrentShipmentFragment extends android.support.v4.app.Fragment imp
                     googleMap.animateCamera(cu);
 
 
-                } catch (ParserConfigurationException e) {
-                    e.printStackTrace();
-                } catch (SAXException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
 
@@ -409,20 +407,15 @@ public class CurrentShipmentFragment extends android.support.v4.app.Fragment imp
         });
     }
 
-
     public void addmarkers() {
-
         for (int i = 0; i < latitude.length; i++) {
-
             LatLng location = new LatLng(latitude[i], longitude[i]);
-
             Marker marker = googleMap.addMarker(new MarkerOptions().position(location)
                             .title(CommonUtils.toCamelCase(name[i]))
                             .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
                             .snippet(CommonUtils.toCamelCase(address[i]))
 
             );
-
             mMarkerArray.add(marker);
         }
     }
